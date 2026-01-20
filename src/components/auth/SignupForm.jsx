@@ -189,6 +189,7 @@ export default function SignupPage() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const [form, setForm] = useState({
     name: "",
@@ -213,8 +214,12 @@ export default function SignupPage() {
       toast.error("All fields are required");
       return false;
     }
-    if (form.password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+     if (!emailRegex.test(form.email)) {
+    toast.error("Please enter a valid email address");
+    return false;
+  }
+    if (form.password.length < 8) {
+      toast.error("Password must be at least 8 characters");
       return false;
     }
     if (form.password !== form.confirmPassword) {
