@@ -1,4 +1,5 @@
 import CourseGrid from "@/components/course/CourseGrid";
+import ContactUs from "@/components/home/contactUs/ContactUs";
 import HeroLeft from "@/components/home/HeroLeft";
 import HeroRight from "@/components/home/HeroRight";
 import PopularCoursesHeader from "@/components/home/most-popular/PopularCoursesHeader";
@@ -45,7 +46,8 @@ export default function HeroSection() {
     </div>
 
     <div className="bg-white">
-       <WhyChooseVK/> 
+       <WhyChooseVK/>
+       <ContactUs/> 
 
     </div>
 
