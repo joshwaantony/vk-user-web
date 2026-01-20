@@ -12,7 +12,7 @@ export default function FeatureCard({
       className={`
         border rounded-xl p-6 bg-white transition
         ${highlight
-          ? "border-[#1E40E6] shadow-md"
+          ? " shadow-md"
           : "border-gray-200 shadow-sm hover:shadow-md"}
       `}
     >

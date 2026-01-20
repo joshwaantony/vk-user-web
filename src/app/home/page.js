@@ -1,4 +1,7 @@
 import CourseGrid from "@/components/course/CourseGrid";
+import CarouselPagination from "@/components/home/Carousel Card/CarouselPagination";
+import PremiumCourseSlide from "@/components/home/Carousel Card/PremiumCourseSlide";
+import SpecialOffer from "@/components/home/Carousel Card/SpecialOffer";
 import ContactUs from "@/components/home/contactUs/ContactUs";
 import HeroLeft from "@/components/home/HeroLeft";
 import HeroRight from "@/components/home/HeroRight";
@@ -17,8 +20,15 @@ export default function HeroSection() {
    
     </section>
     <div className="bg-white">
+        <SpecialOffer/>
+    <PremiumCourseSlide/> 
+    <CarouselPagination/>   
+    </div>
+    <div className="bg-white">
             <PopularCoursesHeader />
             <CourseGrid />
+                   
+
 
     <div className="w-full flex justify-center mt-12 sm:mt-14 md:mt-16">
   <button
