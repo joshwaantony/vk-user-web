@@ -1,4 +1,5 @@
 
+import Link from "next/link";
 
 
 export default function HeroRight() {
@@ -57,22 +58,24 @@ export default function HeroRight() {
         </p>
 
         {/* PRIMARY BUTTON */}
-        <button
-          className="
-            w-full
-            bg-[#1E40E6]
-            text-white
-            py-2.5 sm:py-3
-            rounded-xl
-            font-semibold
-            mb-4
-            shadow-[0_6px_16px_rgba(30,64,230,0.35)]
-            hover:bg-[#1a36c9]
-            transition
-          "
-        >
-          Sign In
-        </button>
+   <Link
+  href="/login"
+  className="
+    block w-full text-center
+    bg-[#1E40E6]
+    text-white
+    py-2.5 sm:py-3
+    rounded-xl
+    font-semibold
+    mb-4
+    shadow-[0_6px_16px_rgba(30,64,230,0.35)]
+    hover:bg-[#1a36c9]
+    transition
+  "
+>
+  Sign In
+</Link>
+
 
         {/* SECONDARY BUTTON */}
         <button

@@ -2,7 +2,6 @@ import CourseGrid from "@/components/course/CourseGrid";
 import CarouselPagination from "@/components/home/Carousel Card/CarouselPagination";
 import PremiumCourseSlide from "@/components/home/Carousel Card/PremiumCourseSlide";
 import SpecialOffer from "@/components/home/Carousel Card/SpecialOffer";
-import ContactUs from "@/components/home/contactUs/ContactUs";
 import HeroLeft from "@/components/home/HeroLeft";
 import HeroRight from "@/components/home/HeroRight";
 import PopularCoursesHeader from "@/components/home/most-popular/PopularCoursesHeader";
@@ -57,7 +56,6 @@ export default function HeroSection() {
 
     <div className="bg-white">
        <WhyChooseVK/>
-       <ContactUs/> 
 
     </div>
 

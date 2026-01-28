@@ -29,7 +29,9 @@ export default function RootLayout({ children }) {
             duration: 3000,
           }}
         />
+     
         {children}
+      
       </body>
     </html>
   );
