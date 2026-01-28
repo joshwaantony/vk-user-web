@@ -794,7 +794,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F3F8FF] flex items-center justify-center px-4">
+    <main className="min-h-screen bg-[#F3F8FF] flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-[420px] text-center">
 
         {/* Logo */}

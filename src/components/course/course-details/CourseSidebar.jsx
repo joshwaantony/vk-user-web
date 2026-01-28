@@ -7,6 +7,7 @@ import { FiPlayCircle, FiVideo, FiDownload, FiSmartphone } from "react-icons/fi"
 import { HiOutlineBadgeCheck } from "react-icons/hi";
 import { BsInfinity } from "react-icons/bs";
 import { BiSupport } from "react-icons/bi";
+import Link from "next/link";
 
 export default function CourseSidebar() {
   return (
@@ -25,10 +26,12 @@ export default function CourseSidebar() {
             $149
           </h2>
 
-          <button className="mt-5 w-full bg-white text-[#1F3FD7] flex items-center justify-center gap-2 py-3 rounded-xl font-semibold">
-            <FiPlayCircle size={18} />
-            Continue Learning
-          </button>
+      <Link href="/course/slug/lesson">
+  <button className="mt-5 w-full bg-white text-[#1F3FD7] flex items-center justify-center gap-2 py-3 rounded-xl font-semibold">
+    <FiPlayCircle size={18} />
+    Continue Learning
+  </button>
+</Link>
         </div>
 
         {/* PROGRESS CARD */}
