@@ -120,7 +120,7 @@ export default function LessonSidebar() {
   const [openSection1, setOpenSection1] = useState(true);
 
   return (
-    <div className="w-full lg:w-[360px] bg-white text-black border-l min-h-screen">
+    <div className="w-full lg:w-[360px] bg-white text-black border-l min-h-screen ">
 
       {/* ================= PROGRESS ================= */}
       <div className="p-4 sm:p-6 border-b">

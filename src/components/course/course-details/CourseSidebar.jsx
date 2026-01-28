@@ -27,7 +27,7 @@ export default function CourseSidebar() {
           </h2>
 
       <Link href="/course/slug/lesson">
-  <button className="mt-5 w-full bg-white text-[#1F3FD7] flex items-center justify-center gap-2 py-3 rounded-xl font-semibold">
+  <button className="mt-5 w-full bg-white text-[#1F3FD7] flex items-center justify-center gap-2 py-3 rounded-xl font-semibold cursor-pointer">
     <FiPlayCircle size={18} />
     Continue Learning
   </button>

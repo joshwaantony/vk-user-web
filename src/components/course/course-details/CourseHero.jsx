@@ -1,14 +1,20 @@
+"use client";
 import { HiArrowLeft, HiStar } from "react-icons/hi";
 import { FiUsers, FiClock, FiPlay } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
 export default function CourseHero() {
+    const router = useRouter();
   return (
     <>
       {/* BACK BUTTON */}
-      <button className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 font-semibold mb-3">
-        <HiArrowLeft className="text-base sm:text-lg" />
-        Back to Courses
-      </button>
+     <button
+      onClick={() => router.push("/course")}
+      className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 font-semibold mb-3 hover:text-black transition cursor-pointer"
+    >
+      <HiArrowLeft className="text-base sm:text-lg" />
+      Back to Courses
+    </button>
 
       <div className="bg-white rounded-2xl overflow-hidden border">
 

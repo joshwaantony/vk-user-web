@@ -1,3 +1,4 @@
+"use client";
 import {
   FiArrowLeft,
   FiArrowRight,
@@ -5,8 +6,10 @@ import {
   FiCheckCircle,
   FiMaximize,
 } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
 export default function LessonContent() {
+    const router = useRouter();
   return (
     <div className="flex-1 flex flex-col bg-[#0F172A] text-white">
 
@@ -14,10 +17,13 @@ export default function LessonContent() {
       <div className="h-16 flex items-center px-4 sm:px-6 bg-[#0B1220] border-b border-white/10">
 
         {/* LEFT : BACK */}
-        <div className="flex items-center gap-2 sm:gap-3 text-sm text-gray-300">
-          <FiArrowLeft />
-          <span className="hidden sm:inline">Back to Courses</span>
-        </div>
+        <div
+      onClick={() => router.push("/course/slug")}
+      className="flex items-center gap-2 sm:gap-3 text-sm text-gray-300 cursor-pointer hover:text-white transition"
+    >
+      <FiArrowLeft />
+      <span className="hidden sm:inline">Back to Courses</span>
+    </div>
 
         {/* CENTER / RIGHT SHIFTED TITLE */}
         <div className="
@@ -127,7 +133,7 @@ export default function LessonContent() {
       </div>
 
       {/* ================= INSTRUCTOR ================= */}
-      <div className="px-4 sm:px-8 py-6 bg-[#0B1220] border-t border-white/10 flex gap-4">
+      <div className="px-4 sm:px-8 py-6 bg-[#0B1220] border-t border-white/10 flex gap-4 pb-20">
 
         <img
           src="https://randomuser.me/api/portraits/women/44.jpg"
