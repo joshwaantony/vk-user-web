@@ -4,19 +4,20 @@ import Link from "next/link";
 
 export default function HeroRight() {
   return (
-    <div className="relative flex justify-center items-center w-full">
+    <div className="relative flex justify-center items-center w-full pb-20">
 
       {/* OUTER SOFT GLOW CONTAINER */}
       <div
         className="
-          absolute
-          w-[280px] h-[360px]
-          sm:w-[340px] sm:h-[440px]
-          md:w-[400px] md:h-[500px]
-          lg:w-[440px] lg:h-[560px]
-          rounded-[32px]
-          bg-[#f9fafd]
-          shadow-[0_0_60px_rgba(37,99,235,0.15)]
+              absolute
+    hidden sm:block
+    w-[280px] h-[360px]
+    sm:w-[340px] sm:h-[440px]
+    md:w-[400px] md:h-[500px]
+    lg:w-[440px] lg:h-[560px]
+    rounded-[32px]
+    bg-[#f9fafd]
+    shadow-[0_0_60px_rgba(37,99,235,0.15)]
         "
       />
 

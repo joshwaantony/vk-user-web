@@ -7,7 +7,7 @@ export default function TaxPlanningSection() {
 
         {/* Header */}
         <div className="text-center mb-14">
-          <span className="inline-block mb-4 rounded-full bg-[#E0EBFF] px-4 py-1.5 text-sm font-semibold text-[#2563EB]">
+          <span className="inline-block mb-6 sm:mb-4 rounded-full bg-[#E0EBFF] px-4 py-1.5  text-sm font-semibold text-[#2563EB]">
             Specialized Training
           </span>
 
