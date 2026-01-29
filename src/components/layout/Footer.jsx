@@ -54,11 +54,8 @@ export default function Footer() {
       {/* Divider */}
       <div className="border-t border-white/10" />
 
-      {/* Bottom Bar */}
-      <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center text-sm text-white/60 gap-4">
-        <p>© {new Date().getFullYear()} W✔ Academy. All rights reserved.</p>
-        <p>Made with ❤️ for learners</p>
-      </div>
+     
+   
     </footer>
   );
 }

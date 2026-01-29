@@ -59,7 +59,7 @@ export default function CourseCard({
       bg-[#1C3FD1]
       text-white
       py-3
-      rounded-lg
+      rounded-xl
       font-semibold
       hover:bg-[#1733A5]
       transition

@@ -13,14 +13,14 @@ export default function ContactHero() {
         sm:min-h-[480px]
         lg:min-h-[420px]
 
-        /* 👇 ADD THIS */
+        
         max-[650px]:pt-10
         
         /* Gradient only below 650px */
         max-[650px]:bg-gradient-to-br
         max-[650px]:from-[#1E40E6]
         max-[650px]:via-[#1e3a8a]
-        max-[650px]:to-[#0f172a]
+        max-[650px]:to-[#0f172a] py-20
       "
     >
       {/* BACKGROUND IMAGE (>=651px) */}

@@ -1,11 +1,8 @@
-
 import Link from "next/link";
-
 
 export default function HeroRight() {
   return (
     <div className="relative flex justify-center items-center w-full pb-20">
-
       {/* OUTER SOFT GLOW CONTAINER */}
       <div
         className="
@@ -25,7 +22,7 @@ export default function HeroRight() {
       <div
         className="
           relative
-          w-[260px]
+          w-[500px]
           sm:w-[300px]
           md:w-[340px]
           lg:w-[360px]
@@ -40,15 +37,11 @@ export default function HeroRight() {
       >
         {/* LOGO */}
         <div className="flex justify-center mb-6">
-          <img
-            src="/logo.svg"
-            alt="VK Logo"
-            className="h-12 sm:h-13 md:h-14"
-          />
+          <img src="/logo.svg" alt="VK Logo" className="h-13 sm:h-13 md:h-14" />
         </div>
 
         {/* TITLE */}
-        <h3 className="text-lg sm:text-xl font-semibold text-black mb-3">
+        <h3 className="text-[20px] sm:text-xl font-semibold text-black mb-3">
           Welcome to VK
         </h3>
 
@@ -59,9 +52,9 @@ export default function HeroRight() {
         </p>
 
         {/* PRIMARY BUTTON */}
-   <Link
-  href="/login"
-  className="
+        <Link
+          href="/login"
+          className="
     block w-full text-center
     bg-[#1E40E6]
     text-white
@@ -73,10 +66,9 @@ export default function HeroRight() {
     hover:bg-[#1a36c9]
     transition
   "
->
-  Sign In
-</Link>
-
+        >
+          Sign In
+        </Link>
 
         {/* SECONDARY BUTTON */}
         <button
