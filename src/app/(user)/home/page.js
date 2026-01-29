@@ -39,7 +39,7 @@ export default function HeroSection() {
       text-base sm:text-lg
       px-6 sm:px-8 md:px-10
       py-3 sm:py-3.5 md:py-4
-      rounded-lg sm:rounded-xl
+      rounded-xl sm:rounded-xl
       hover:bg-[#1E40E6]
       hover:text-white
       transition

@@ -14,7 +14,7 @@ export default function CourseSidebar() {
     <aside className="w-full lg:max-w-sm">
 
       {/* Sticky only on desktop */}
-      <div className="space-y-8 lg:sticky lg:pt-[35px]">
+      <div className="space-y-8 lg:sticky lg:pt-0">
 
         {/* PRICE CARD */}
         <div className="bg-[#1F3FD7] text-white rounded-2xl p-6 sm:p-8 text-center">
