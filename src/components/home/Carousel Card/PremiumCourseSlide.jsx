@@ -30,7 +30,7 @@ export default function PremiumCourseSlide() {
     rounded-3xl
     overflow-hidden
     shadow-2xl
-    w-[500px]
+    w-[320px]
     sm:w-full
     sm:max-w-md
     mx-auto
