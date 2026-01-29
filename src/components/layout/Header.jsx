@@ -73,7 +73,7 @@ export default function Header() {
           </div>
 
           {/* RIGHT CTA */}
-          <Link href="/register">
+          <Link href="/">
             <button className="hidden md:block bg-[#1C4ED8] font-semibold text-white px-5 py-2 rounded-lg hover:bg-[#163EB8] transition">
               Get Started
             </button>
@@ -125,7 +125,7 @@ export default function Header() {
         </nav>
 
         <div className="px-6 mt-auto pb-6">
-          <Link href="/register" onClick={() => setOpen(false)}>
+          <Link href="/" onClick={() => setOpen(false)}>
             <button className="w-full bg-[#1C4ED8] font-semibold text-white py-3 rounded-lg hover:bg-[#163EB8] transition">
               Get Started
             </button>
