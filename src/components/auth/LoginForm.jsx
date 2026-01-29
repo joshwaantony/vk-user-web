@@ -898,13 +898,19 @@ export default function LoginPage() {
             <div className="flex-1 h-px bg-[#E2E8F0]" />
           </div>
 
-          <button
-            className="w-full h-14 rounded-xl border border-[#CBD5E1]
-                       flex items-center justify-center gap-3
-                       font-semibold hover:bg-[#F8FAFC]"
-          >
-            Sign in with Google
-          </button>
+    <button
+  className="w-full h-14 rounded-xl border text-[#334155] border-[#CBD5E1]
+             flex items-center justify-center gap-3
+             font-semibold hover:bg-[#F8FAFC]"
+>
+  <img
+    src="/google.svg"
+    alt="Google"
+    className="w-5 h-5"
+  />
+  Sign in with Google
+</button>
+
         </div>
 
         <p className="mt-8 text-[#64748B] mb-10">
