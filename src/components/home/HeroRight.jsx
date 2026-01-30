@@ -71,21 +71,23 @@ export default function HeroRight() {
         </Link>
 
         {/* SECONDARY BUTTON */}
-        <button
-          className="
-            w-full
-            border
-            border-[#1E40E6]
-            text-[#1E40E6]
-            py-2.5 sm:py-3
-            rounded-xl
-            font-semibold
-            hover:bg-[#EEF3FF]
-            transition
-          "
-        >
-          Create Account
-        </button>
+  <Link href="/phone/enter-phone" className="w-full block">
+  <button
+    className="
+      w-full
+      border
+      border-[#1E40E6]
+      text-[#1E40E6]
+      py-2.5 sm:py-3
+      rounded-xl
+      font-semibold
+      hover:bg-[#EEF3FF]
+      transition
+    "
+  >
+    Create Account
+  </button>
+</Link>
       </div>
     </div>
   );
