@@ -27,10 +27,11 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // ✅ ACTIVE + HOVER COLOR FIX
   const navLink = (path) =>
     pathname === path
-      ? "text-[#1C4ED8]"
-      : "text-[#475569] hover:text-[#1C4ED8] transition";
+      ? "text-[#1C4ED8] font-semibold"
+      : "text-[#475569] hover:text-[#1C4ED8] transition-colors duration-200";
 
   return (
     <>
@@ -43,7 +44,6 @@ export default function Header() {
         `}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
-
           {/* LEFT */}
           <div className="flex items-center gap-16">
             {/* LOGO */}
@@ -63,9 +63,15 @@ export default function Header() {
               <Link href="/home" className={navLink("/home")}>
                 Home
               </Link>
+
               <Link href="/course" className={navLink("/course")}>
                 Courses
               </Link>
+
+              <Link href="/my-course" className={navLink("/my-course")}>
+                My Courses
+              </Link>
+
               <Link href="/contact" className={navLink("/contact")}>
                 Contact
               </Link>
@@ -79,7 +85,7 @@ export default function Header() {
             </button>
           </Link>
 
-          {/* MOBILE MENU */}
+          {/* MOBILE MENU BUTTON */}
           <button
             onClick={() => setOpen(true)}
             className="md:hidden text-2xl text-[#1C4ED8]"
@@ -103,6 +109,7 @@ export default function Header() {
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
+        {/* CLOSE */}
         <div className="flex justify-end px-5 py-7 border-b">
           <button
             onClick={() => setOpen(false)}
@@ -112,18 +119,42 @@ export default function Header() {
           </button>
         </div>
 
+        {/* MOBILE NAV */}
         <nav className="flex flex-col gap-5 px-6 py-6 text-sm font-semibold">
-          <Link href="/home" onClick={() => setOpen(false)} className={navLink("/home")}>
+          <Link
+            href="/home"
+            onClick={() => setOpen(false)}
+            className={navLink("/home")}
+          >
             Home
           </Link>
-          <Link href="/course" onClick={() => setOpen(false)} className={navLink("/course")}>
+
+          <Link
+            href="/course"
+            onClick={() => setOpen(false)}
+            className={navLink("/course")}
+          >
             Courses
           </Link>
-          <Link href="/contact" onClick={() => setOpen(false)} className={navLink("/contact")}>
+
+          <Link
+            href="/my-course"
+            onClick={() => setOpen(false)}
+            className={navLink("/my-course")}
+          >
+            My Courses
+          </Link>
+
+          <Link
+            href="/contact"
+            onClick={() => setOpen(false)}
+            className={navLink("/contact")}
+          >
             Contact
           </Link>
         </nav>
 
+        {/* MOBILE CTA */}
         <div className="px-6 mt-auto pb-6">
           <Link href="/phone/enter-phone" onClick={() => setOpen(false)}>
             <button className="w-full bg-[#1C4ED8] font-semibold text-white py-3 rounded-lg hover:bg-[#163EB8] transition">

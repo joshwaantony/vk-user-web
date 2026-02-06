@@ -51,7 +51,7 @@ export default function HeroSection() {
 
     </div>
     <div>
-        <TaxPlanningSection/>
+        {/* <TaxPlanningSection/> */}
     </div>
 
     <div className="bg-white">
