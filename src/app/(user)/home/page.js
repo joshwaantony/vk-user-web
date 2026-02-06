@@ -5,7 +5,6 @@ import SpecialOffer from "@/components/home/Carousel Card/SpecialOffer";
 import HeroLeft from "@/components/home/HeroLeft";
 import HeroRight from "@/components/home/HeroRight";
 import PopularCoursesHeader from "@/components/home/most-popular/PopularCoursesHeader";
-import TaxPlanningSection from "@/components/home/specialized training/TaxPlanningSection";
 import WhyChooseVK from "@/components/home/why choose vk/WhyChooseVK";
 
 
@@ -51,7 +50,6 @@ export default function HeroSection() {
 
     </div>
     <div>
-        {/* <TaxPlanningSection/> */}
     </div>
 
     <div className="bg-white">

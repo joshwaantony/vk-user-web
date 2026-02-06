@@ -1,28 +1,33 @@
+
+
+
+"use client";
+
 import Link from "next/link";
 
 export default function HeroRight() {
   return (
     <div className="relative flex justify-center items-center w-full pb-20">
-      {/* OUTER SOFT GLOW CONTAINER */}
+      {/* OUTER SOFT GLOW */}
       <div
         className="
-              absolute
-    hidden sm:block
-    w-[280px] h-[360px]
-    sm:w-[340px] sm:h-[440px]
-    md:w-[400px] md:h-[500px]
-    lg:w-[440px] lg:h-[560px]
-    rounded-[32px]
-    bg-[#f9fafd]
-    shadow-[0_0_60px_rgba(37,99,235,0.15)]
+          absolute
+          hidden sm:block
+          w-[280px] h-[360px]
+          sm:w-[340px] sm:h-[440px]
+          md:w-[400px] md:h-[500px]
+          lg:w-[440px] lg:h-[560px]
+          rounded-[32px]
+          bg-[#f9fafd]
+          shadow-[0_0_60px_rgba(37,99,235,0.15)]
         "
       />
 
-      {/* MAIN CARD */}
+      {/* MAIN CARD – BOUNCE POPUP */}
       <div
         className="
           relative
-          w-[500px]
+          w-[280px]
           sm:w-[300px]
           md:w-[340px]
           lg:w-[360px]
@@ -33,20 +38,22 @@ export default function HeroRight() {
           text-center
           border border-gray-200
           shadow-[0_18px_40px_rgba(0,0,0,0.15)]
+
+          animate-[popup-bounce_0.8s_ease-out_forwards]
         "
       >
         {/* LOGO */}
         <div className="flex justify-center mb-6">
-          <img src="/logo.svg" alt="VK Logo" className="h-13 sm:h-13 md:h-14" />
+          <img src="/logo.svg" alt="VK Logo" className="h-12 sm:h-14" />
         </div>
 
         {/* TITLE */}
-        <h3 className="text-[20px] sm:text-xl font-semibold text-black mb-3">
+        <h3 className="text-lg sm:text-xl font-semibold text-black mb-3">
           Welcome to VK
         </h3>
 
         {/* DESCRIPTION */}
-        <p className="text-sm leading-relaxed text-gray-600 mb-8 px-3">
+        <p className="text-sm leading-relaxed text-gray-600 mb-8 px-2">
           Your trusted platform for learning and growth. Join thousands of users
           already on their journey.
         </p>
@@ -55,39 +62,37 @@ export default function HeroRight() {
         <Link
           href="/login"
           className="
-    block w-full text-center
-    bg-[#1E40E6]
-    text-white
-    py-2.5 sm:py-3
-    rounded-xl
-    font-semibold
-    mb-4
-    shadow-[0_6px_16px_rgba(30,64,230,0.35)]
-    hover:bg-[#1a36c9]
-    transition
-  "
+            block w-full
+            bg-[#1E40E6]
+            text-white
+            py-2.5 sm:py-3
+            rounded-xl
+            font-semibold
+            mb-4
+            shadow-[0_6px_16px_rgba(30,64,230,0.35)]
+            hover:bg-[#1a36c9]
+            transition
+          "
         >
           Sign In
         </Link>
 
         {/* SECONDARY BUTTON */}
-  <Link href="/phone/enter-phone" className="w-full block">
-  <button
-    className="
-      w-full
-      border
-      border-[#1E40E6]
-      text-[#1E40E6]
-      py-2.5 sm:py-3
-      rounded-xl
-      font-semibold
-      hover:bg-[#EEF3FF]
-      transition
-    "
-  >
-    Create Account
-  </button>
-</Link>
+        <Link
+          href="/phone/enter-phone"
+          className="
+            block w-full
+            border border-[#1E40E6]
+            text-[#1E40E6]
+            py-2.5 sm:py-3
+            rounded-xl
+            font-semibold
+            hover:bg-[#EEF3FF]
+            transition
+          "
+        >
+          Create Account
+        </Link>
       </div>
     </div>
   );

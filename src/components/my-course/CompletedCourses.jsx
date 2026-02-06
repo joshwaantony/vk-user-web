@@ -35,10 +35,16 @@ export default function CompletedCourses() {
         {completedCourses.map((course) => (
           <div
             key={course.id}
-            className="bg-white rounded-2xl shadow-sm border overflow-hidden transition hover:shadow-md"
+            className="
+              bg-white rounded-2xl border overflow-hidden
+              transition-all duration-300 ease-out
+              hover:-translate-y-1
+              hover:scale-[1.02]
+              hover:shadow-lg
+            "
           >
             {/* ================= IMAGE ================= */}
-            <div className="relative">
+            <div className="relative overflow-hidden group">
               <img
                 src={course.image}
                 alt={course.title}
@@ -46,6 +52,8 @@ export default function CompletedCourses() {
                   w-full
                   h-40 sm:h-44 md:h-48
                   object-cover
+                  transition-transform duration-300
+                  group-hover:scale-110
                 "
               />
 
@@ -58,6 +66,8 @@ export default function CompletedCourses() {
                   w-7 h-7 sm:w-8 sm:h-8
                   rounded-full
                   flex items-center justify-center
+                  transition-transform duration-300
+                  group-hover:scale-110
                 "
               >
                 <FiCheckCircle size={16} />

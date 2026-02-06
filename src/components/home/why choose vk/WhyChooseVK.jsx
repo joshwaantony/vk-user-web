@@ -1,4 +1,5 @@
 import FeatureGrid from "./FeatureGrid";
+import Link from "next/link";
 
 export default function WhyChooseVK() {
   return (
@@ -7,9 +8,22 @@ export default function WhyChooseVK() {
 
         {/* Header */}
         <div className="text-center mb-16">
-          <span className="inline-flex items-center gap-2 mb-4 rounded-full bg-[#E0EBFF] px-4 py-1.5 text-sm font-semibold text-[#1E40E6]">
-            ⭐ Why Choose VK
-          </span>
+     <span
+  className="
+    inline-flex
+    items-center
+    gap-2
+    mb-4
+    text-sm sm:text-base
+    font-semibold
+    text-[#2563EB]
+    tracking-wide
+  "
+>
+  <span className="text-base">⭐</span>
+  Why Choose VK
+</span>
+
 
           <h2 className="text-3xl sm:text-4xl font-extrabold text-black mb-4">
             Everything You Need to Succeed
@@ -34,9 +48,12 @@ export default function WhyChooseVK() {
             Join thousands of professionals advancing their careers with VK
           </p>
 
-          <button className="bg-white text-[#1E40E6] px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition">
-            Get Started Today
-          </button>
+     
+<Link href="/phone/enter-phone">
+  <button className="bg-white text-[#1E40E6] px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition">
+    Get Started Today
+  </button>
+</Link>
         </div>
 
       </div>
