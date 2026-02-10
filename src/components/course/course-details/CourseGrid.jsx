@@ -42,7 +42,7 @@
 "use client";
 
 import { useEffect } from "react";
-import usePopularCourseStore from "@/store/usePopularCourseStore";
+import usePopularCourseStore from "@/store/CourseStore";
 import CourseCard from "./CourseCard";
 
 export default function CourseGrid() {
@@ -93,3 +93,6 @@ export default function CourseGrid() {
     </div>
   );
 }
+
+
+

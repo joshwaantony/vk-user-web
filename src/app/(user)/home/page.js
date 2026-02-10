@@ -1,5 +1,5 @@
 "use client"
-import CourseGrid from "@/components/course/CourseGrid";
+import CourseGrid from "@/components/course/course-details/CourseGrid";
 import CarouselPagination from "@/components/home/Carousel Card/CarouselPagination";
 import PremiumCourseSlide from "@/components/home/Carousel Card/PremiumCourseSlide";
 import SpecialOffer from "@/components/home/Carousel Card/SpecialOffer";
