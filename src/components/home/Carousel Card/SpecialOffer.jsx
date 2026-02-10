@@ -3,6 +3,8 @@
 //     <section className="w-full bg-white py-20 px-4">
 //       <div className="max-w-4xl mx-auto text-center">
 
+
+
 //         {/* Badge */}
 //         <div className="flex justify-center mb-6">
 //           <span className="
@@ -32,10 +34,12 @@
 //       </div>
 //     </section>
 //   );
-// }
-
+// } 
+"use client"
+import usePromoStore from "@/store/usePromoStore";
 
 export default function SpecialOffer() {
+
   return (
     <section className="w-full bg-white py-14 sm:py-16 md:py-20 px-4">
       <div className="max-w-5xl mx-auto text-center">
@@ -89,6 +93,7 @@ export default function SpecialOffer() {
         </p>
 
       </div>
+      
     </section>
   );
 }

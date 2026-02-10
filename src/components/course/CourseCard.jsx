@@ -2,6 +2,7 @@ import { FaStar, FaUser, FaClock } from "react-icons/fa";
 import Link from "next/link";
 
 export default function CourseCard({
+  id,
   image,
   title,
   rating,
@@ -51,9 +52,9 @@ export default function CourseCard({
         </div>
 
         {/* Button */}
-   <Link href="/course/slug">
-  <button
-    className="
+        <Link href={`/course/${id}`}>
+          <button
+            className="
       mt-6
       w-full
       bg-[#1C3FD1]
@@ -64,10 +65,10 @@ export default function CourseCard({
       hover:bg-[#1733A5]
       transition
     "
-  >
-    Enroll Now
-  </button>
-</Link>
+          >
+            Enroll Now
+          </button>
+        </Link>
       </div>
     </div>
   );
