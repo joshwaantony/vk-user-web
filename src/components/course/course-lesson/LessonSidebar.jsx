@@ -120,10 +120,10 @@ export default function LessonSidebar() {
   const [openSection1, setOpenSection1] = useState(true);
 
   return (
-    <div className="w-full lg:w-[360px] bg-white text-black border-l min-h-screen ">
+    <div className="w-full lg:w-[360px] bg-white text-black  min-h-screen ">
 
       {/* ================= PROGRESS ================= */}
-      <div className="p-4 sm:p-6 border-b">
+      <div className="p-4 sm:p-6 border-b border-[#EDEDED]">
         <h3 className="font-semibold text-lg mb-2">Your Progress</h3>
 
         <div className="flex justify-between text-sm mb-2">
@@ -141,7 +141,7 @@ export default function LessonSidebar() {
       </div>
 
       {/* ================= SECTION 1 ================= */}
-      <div className="p-4 sm:p-6 border-b">
+      <div className="p-4 sm:p-6 border-b border-[#EDEDED]">
 
         {/* HEADER */}
         <button
@@ -170,7 +170,7 @@ export default function LessonSidebar() {
             ].map((item, index) => (
               <div
                 key={index}
-                className="flex justify-between items-start gap-3 py-3 border-t"
+                className="flex justify-between items-start gap-3 py-3 border-t border-[#EDEDED]"
               >
                 {/* LEFT */}
                 <div className="flex gap-3">
@@ -215,7 +215,7 @@ export default function LessonSidebar() {
       ].map((section, i) => (
         <div
           key={i}
-          className="p-4 sm:p-6 border-b flex justify-between items-center text-sm font-semibold"
+          className="p-4 sm:p-6 border-b border-[#EDEDED] flex justify-between items-center text-sm font-semibold"
         >
           {section}
           <FiChevronDown />

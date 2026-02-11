@@ -8,7 +8,7 @@ export default function HomePage() {
     <div className="bg-[#FFFFFF]">
           <HeroSection />
       <div className="">
-              {/* <SlideDesign/> */}
+              
 
       </div>
 

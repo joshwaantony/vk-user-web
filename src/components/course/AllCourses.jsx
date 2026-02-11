@@ -6,6 +6,7 @@
 import { useEffect } from "react";
 import useCourseStore from "@/store/CourseStore";
 import AllCourseCard from "./AllCourseCard";
+import PromoLoader from "../loader/PromoLoader";
 
 export default function AllCourses() {
   const { courses, fetchAllCourses, loading, error } = useCourseStore();
@@ -16,8 +17,8 @@ export default function AllCourses() {
 
   if (loading) {
     return (
-      <p className="text-center mt-10 text-gray-500">
-        Loading courses...
+      <p className="">
+        <PromoLoader/>
       </p>
     );
   }

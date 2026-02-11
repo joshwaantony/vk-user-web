@@ -522,6 +522,7 @@ import {
   HiChevronRight,
 } from "react-icons/hi";
 import usePromoStore from "@/store/usePromoStore";
+import PromoLoader from "@/components/loader/PromoLoader";
 
 export default function SlideDesign() {
   const {
@@ -553,8 +554,8 @@ export default function SlideDesign() {
 
   if (loading) {
     return (
-      <div className="text-center py-20 text-gray-500">
-        Loading promotions...
+      <div className="">
+        <PromoLoader/>
       </div>
     );
   }

@@ -44,6 +44,7 @@
 import { useEffect } from "react";
 import usePopularCourseStore from "@/store/CourseStore";
 import CourseCard from "./CourseCard";
+import PromoLoader from "@/components/loader/PromoLoader";
 
 export default function CourseGrid() {
   const { courses, loading, fetchPopularCourses } =
@@ -55,8 +56,8 @@ export default function CourseGrid() {
 
   if (loading) {
     return (
-      <div className="text-center py-20 text-gray-500">
-        Loading popular courses...
+      <div className="">
+      <PromoLoader/>
       </div>
     );
   }

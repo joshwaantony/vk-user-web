@@ -13,6 +13,7 @@ import {
   HiChevronRight,
 } from "react-icons/hi";
 import { FaFireAlt } from "react-icons/fa";
+import PromoLoader from "@/components/loader/PromoLoader";
 
 export default function PremiumCourseSlide() {
   const {
@@ -43,8 +44,8 @@ export default function PremiumCourseSlide() {
   /* ---------------- LOADING ---------------- */
   if (loading) {
     return (
-      <div className="h-[400px] flex items-center justify-center">
-        Loading promos...
+      <div className="">
+        <PromoLoader/>
       </div>
     );
   }
