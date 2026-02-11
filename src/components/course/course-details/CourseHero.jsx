@@ -10,6 +10,8 @@ import { useRouter } from "next/navigation";
 
 export default function CourseHero({ course }) {
   const router = useRouter();
+  console.log("course...",course);
+  
   if (!course) return null;
 
   return (

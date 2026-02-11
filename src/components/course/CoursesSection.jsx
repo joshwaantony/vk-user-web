@@ -33,6 +33,7 @@
 
 import AllCourses from "./AllCourses";
 import CourseFilters from "./CourseFilters";
+import SlideDesign from "./courseslide/SlideDesign";
 
 export default function CoursesSection() {
   return (
@@ -48,6 +49,9 @@ export default function CoursesSection() {
           <br />
           elevate your career
         </p>
+        <div className="pt-20">
+          <SlideDesign/>
+        </div>
 
         <CourseFilters />
 

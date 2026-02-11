@@ -1,49 +1,4 @@
-// import AllCourseCard from "./AllCourseCard";
 
-// export default function AllCourses() {
-//   const courses = [
-//     {
-//       id: 1,
-//       title: "Financial Accounting Fundamentals",
-//       rating: 4.8,
-//       students: "12,500",
-//       instructor: "Dr. Sarah Johnson",
-//       duration: "8 weeks",
-//       price: 149,
-//       image: "/course/course1.jpg",
-//     },
-//     {
-//       id: 2,
-//       title: "Advanced Tax Strategies",
-//       rating: 4.8,
-//       students: "12,500",
-//       instructor: "Dr. Sarah Johnson",
-//       duration: "8 weeks",
-//       price: 199,
-//       image: "/course/course2.jpg",
-//     },
-//     {
-//       id: 3,
-//       title: "Corporate Finance Mastery",
-//       rating: 4.8,
-//       students: "12,500",
-//       instructor: "Dr. Sarah Johnson",
-//       duration: "8 weeks",
-//       price: 249,
-//       image: "/course/course3.jpg",
-//     },
-//   ];
-
-//   return (
-//     <section className="max-w-7xl mx-auto px-4 py-12">
-//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-//         {courses.map(course => (
-//           <AllCourseCard key={course.id} course={course} />
-//         ))}
-//       </div>
-//     </section>
-//   );
-// }
 
 
 "use client";

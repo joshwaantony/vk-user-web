@@ -5,8 +5,16 @@ import HeroSection from "@/components/course/HeroSection";
 export default function HomePage() {
   return (
     <>
-      <HeroSection />
+    <div className="bg-[#FFFFFF]">
+          <HeroSection />
+      <div className="">
+              {/* <SlideDesign/> */}
+
+      </div>
+
       <CoursesSection />
+    </div>
+  
     </>
   );
 }
