@@ -87,7 +87,7 @@
             <p className="text-sm opacity-80">Course Price</p>
             <h2 className="text-3xl font-bold my-3">$149</h2>
 
-            <Link href="/course/slug/lesson">
+            <Link href="/courseId/lesson">
               <button className="w-full bg-white text-[#1F3FD7] py-3 rounded-xl font-semibold flex items-center justify-center gap-2">
                 <FiPlayCircle />
                 Continue Learning

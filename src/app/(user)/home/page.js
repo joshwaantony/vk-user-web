@@ -32,16 +32,16 @@ export default function HeroSection() {
         current={activeIndex + 1}
       />
     </div>
-    <div className="bg-white">
+    <div className="bg-white ">
             <PopularCoursesHeader />
             <CourseGrid />
                    
 
 
-    <div className="w-full flex justify-center mt-12 sm:mt-14 md:mt-16">
+    {/* <div className="w-full flex justify-center mt-12 sm:mt-14 md:mt-16">
   <button
     className="
-       mb-20 border-2 
+       mb-20 border-1 
       border-[#1E40E6]
       text-[#1E40E6]
       font-semibold
@@ -56,7 +56,7 @@ export default function HeroSection() {
   >
     View All Courses
   </button>
-</div>
+</div> */}
 
     </div>
     <div>
