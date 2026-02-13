@@ -50,7 +50,7 @@ export default function CompletedCourses() {
                 alt={course.title}
                 className="
                   w-full
-                  h-40 sm:h-44 md:h-48
+                  h-52 sm:h-56 md:h-60
                   object-cover
                   transition-transform duration-300
                   group-hover:scale-110

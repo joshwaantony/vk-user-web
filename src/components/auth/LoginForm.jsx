@@ -594,7 +594,7 @@
 //             </label>
 
 //             <div className="flex">
-             
+
 //               <input
 //                 type="tel"
 //                 maxLength={10}
@@ -714,6 +714,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginApi } from "@/services/auth.service";
 import { useAuthFlowStore } from "@/store/authFlow.store";
+import { useAuthStore } from "@/store/auth.store";
 import Link from "next/link";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import toast from "react-hot-toast";
@@ -721,6 +722,7 @@ import toast from "react-hot-toast";
 export default function LoginPage() {
   const router = useRouter();
   const setFlow = useAuthFlowStore((state) => state.setFlow);
+  const setToken = useAuthStore((state) => state.setToken);
 
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -755,13 +757,27 @@ export default function LoginPage() {
         purpose: "LOGIN",
       });
 
-      localStorage.setItem("token", res.data.token);
+      // 🔍 DEBUG LOG
+      console.log("Login Response:", res);
 
-      toast.dismiss(toastId);
-      toast.success("Login successful");
+      const token = res?.data?.accessToken || res?.data?.token;
 
-      router.replace("/course");
+      if (token) {
+        // ✅ Update Global Store (React State) -> Updates Header Immediately
+        setToken(token);
+
+        toast.dismiss(toastId);
+        toast.success("Login successful");
+
+        // ✅ Smooth SPA Redirect (No Reload)
+        router.replace("/course");
+
+      } else {
+        throw new Error("Token missing in response");
+      }
+
     } catch (err) {
+      console.error("Login Error:", err);
       toast.dismiss(toastId);
       toast.error(err.response?.data?.message || "Login failed");
     } finally {
@@ -846,7 +862,7 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-14 px-5 rounded-xl bg-[#F8FAFC]
+                className="w-full h-14 px-5 rounded-xl bg-[#F8FAFC]
                            border border-[#94A3B8]
                             text-[#0F172A] placeholder:text-[#94A3B8]
                             outline-none
@@ -898,18 +914,18 @@ export default function LoginPage() {
             <div className="flex-1 h-px bg-[#E2E8F0]" />
           </div>
 
-    <button
-  className="w-full h-14 rounded-xl border text-[#334155] border-[#CBD5E1]
+          <button
+            className="w-full h-14 rounded-xl border text-[#334155] border-[#CBD5E1]
              flex items-center justify-center gap-3
              font-semibold hover:bg-[#F8FAFC]"
->
-  <img
-    src="/google.svg"
-    alt="Google"
-    className="w-5 h-5"
-  />
-  Sign in with Google
-</button>
+          >
+            <img
+              src="/google.svg"
+              alt="Google"
+              className="w-5 h-5"
+            />
+            Sign in with Google
+          </button>
 
         </div>
 

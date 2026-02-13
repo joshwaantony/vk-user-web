@@ -311,7 +311,7 @@ api.interceptors.response.use(
       try {
         const res = await api.post("/auth/refresh");
 
-        const newToken = res.data?.token;
+        const newToken = res.data?.accessToken || res.data?.token;
 
         if (!newToken) {
           throw new Error("No token returned from refresh");
