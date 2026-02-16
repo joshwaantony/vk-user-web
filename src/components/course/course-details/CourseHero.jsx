@@ -1,7 +1,5 @@
 
 
-
-
 "use client";
 
 import { HiArrowLeft, HiStar } from "react-icons/hi";
@@ -10,22 +8,31 @@ import { useRouter } from "next/navigation";
 
 export default function CourseHero({ course }) {
   const router = useRouter();
-  console.log("course...",course);
-  
+
   if (!course) return null;
+
+  const handleBack = () => {
+    // If user has history, go back
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      // fallback route
+      router.push("/course");
+    }
+  };
 
   return (
     <div className="space-y-4">
 
-      {/* ✅ STICKY BACK BAR (INSIDE SCROLL CONTAINER) */}
+      {/* ✅ STICKY BACK BAR */}
       <div className="sticky top-0 z-40 bg-white border-b">
         <div className="px-4 py-3">
           <button
-            onClick={() => router.push("/course")}
+            onClick={handleBack}
             className="flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-black"
           >
             <HiArrowLeft />
-            Back to Courses
+            Back
           </button>
         </div>
       </div>
@@ -45,7 +52,9 @@ export default function CourseHero({ course }) {
         </div>
 
         <div className="p-6 space-y-4">
-          <p className="text-sm text-gray-600">{course.description}</p>
+          <p className="text-sm text-gray-600">
+            {course.description}
+          </p>
 
           <div className="flex flex-wrap gap-6 text-sm font-semibold text-gray-600">
             <span className="flex items-center gap-1">
