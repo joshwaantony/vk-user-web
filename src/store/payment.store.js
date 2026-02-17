@@ -1,29 +1,40 @@
+
+
+
 import { create } from "zustand";
-import { createOrder } from "@/services/payment.service";
+import {
+  createOrderAPI,
+  verifyPaymentAPI,
+} from "@/services/payment.service";
 
 export const usePaymentStore = create((set) => ({
   loading: false,
-  order: null,
   error: null,
 
-  createCourseOrder: async (courseId, token) => {
+  // ✅ CREATE ORDER
+  createOrder: async (courseId, token) => {
     try {
       set({ loading: true, error: null });
 
-      const data = await createOrder(courseId, token);
+      const order = await createOrderAPI(courseId, token);
 
-      set({
-        order: data,
-        loading: false,
-      });
+      set({ loading: false });
+      return order;
 
-      return data;
     } catch (error) {
       set({
-        error: error.response?.data?.message || "Something went wrong",
         loading: false,
+        error: error.message || "Order failed",
       });
+      throw error;
+    }
+  },
 
+  // ✅ VERIFY PAYMENT
+  verifyPayment: async (payload, token) => {
+    try {
+      return await verifyPaymentAPI(payload, token);
+    } catch (error) {
       throw error;
     }
   },

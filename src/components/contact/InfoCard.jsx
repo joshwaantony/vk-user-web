@@ -1,49 +1,6 @@
 
 
 
-// export default function InfoCard({ icon, title, desc, link }) {
-//   return (
-//     <div
-//       className="
-//         border border-[#C5CDD7]
-//         rounded-2xl
-//         p-6
-//         bg-white
-//       "
-//     >
-//       {/* Icon */}
-//       <div
-//         className="
-//           w-12 h-12
-//           mb-4
-//           flex items-center justify-center
-//           rounded-xl
-//           bg-[#E0EBFF]
-//           text-[#1E40E6]
-//         "
-//       >
-//         {icon}
-//       </div>
-
-//       {/* Title */}
-//       <h3 className="font-semibold text-black mb-1">
-//         {title}
-//       </h3>
-
-//       {/* Description */}
-//       <p className="text-sm text-[#475569] mb-2">
-//         {desc}
-//       </p>
-
-//       {/* Link */}
-//       <p className="text-sm font-medium text-[#1E40E6] hover:underline cursor-pointer">
-//         {link}
-//       </p>
-//     </div>
-//   );
-// }
-
-
 
 export default function InfoCard({ icon, title, desc, link }) {
   return (

@@ -1,23 +1,39 @@
+
+
+
+
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api/v1`,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+const baseURL = `${process.env.NEXT_PUBLIC_API_URL}/api/v1`;
 
-// ✅ Create Order API
-export const createOrder = async (courseId, token) => {
-  const response = await api.post(
-    "/payments/create-order",
+// ✅ CREATE ORDER API
+export const createOrderAPI = async (courseId, token) => {
+  const res = await axios.post(
+    `${baseURL}/payments/create-order`,
     { courseId },
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
     }
   );
 
-  return response.data;
+  return res.data.data; // returning only order object
+};
+
+// ✅ VERIFY PAYMENT API
+export const verifyPaymentAPI = async (payload, token) => {
+  const res = await axios.post(
+    `${baseURL}/payments/verify-payment`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return res.data;
 };

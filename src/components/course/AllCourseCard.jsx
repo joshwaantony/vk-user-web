@@ -1,17 +1,49 @@
 
 
 
+
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { FiClock, FiUser } from "react-icons/fi";
 import { HiStar } from "react-icons/hi";
+import { useAuthStore } from "@/store/auth.store";
 import CouponPopup from "../Coupon/CouponPopup";
 
 export default function AllCourseCard({ course }) {
   const router = useRouter();
-  const [showPopup, setShowPopup] = useState(false); // ✅ Popup state
+  const pathname = usePathname();
+
+  const token = useAuthStore((state) => state.token);
+
+  const isLoggedIn = !!token;
+
+  // ✅ USE BACKEND VALUE
+  const isEnrolled = course?.isEnrolled;
+
+  const [showPopup, setShowPopup] = useState(false);
+
+  const handleButtonClick = (e) => {
+    e.stopPropagation();
+
+    if (!isLoggedIn) {
+      router.push(`/login?redirect=${pathname}`);
+      return;
+    }
+
+    if (isEnrolled) {
+      router.push(`/learn/${course.id}`);
+    } else {
+      setShowPopup(true);
+    }
+  };
+
+  const getButtonText = () => {
+    if (!isLoggedIn) return "Login to Enroll";
+    if (isEnrolled) return "Watch Now";
+    return "Enroll Now";
+  };
 
   return (
     <>
@@ -19,22 +51,17 @@ export default function AllCourseCard({ course }) {
         onClick={() => router.push(`/course/${course.id}`)}
         className="cursor-pointer bg-white rounded-2xl border shadow-sm hover:shadow-md transition overflow-hidden"
       >
-        {/* Image */}
         <img
           src={course.thumbnail}
           alt={course.title}
           className="w-full h-48 object-cover"
         />
 
-        {/* Content */}
         <div className="p-5 flex flex-col gap-3">
-          
-          {/* Title */}
           <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 h-[60px]">
             {course.title}
           </h3>
 
-          {/* Rating */}
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <HiStar className="text-yellow-500" />
             <span>4.5</span>
@@ -42,7 +69,6 @@ export default function AllCourseCard({ course }) {
             <span>{course.totalStudents} students</span>
           </div>
 
-          {/* Instructor */}
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <FiUser />
             <span>{course.faculty?.[0]?.name || "Instructor"}</span>
@@ -50,7 +76,6 @@ export default function AllCourseCard({ course }) {
 
           <hr />
 
-          {/* Duration & Price */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <FiClock />
@@ -62,43 +87,25 @@ export default function AllCourseCard({ course }) {
             </span>
           </div>
 
-          {/* ✅ Enroll Button */}
           <button
-            onClick={(e) => {
-              e.stopPropagation(); // ❗ Prevent card click
-              setShowPopup(true);   // ✅ Open popup
-            }}
-            className="
-              mt-4
-              inline-flex
-              items-center
-              justify-center
-              w-full
-              px-6
-              py-3
-              rounded-xl
-              font-semibold
-              text-white
-              bg-gradient-to-r
-              from-blue-600
-              to-indigo-600
-              shadow-md
-              hover:from-blue-700
-              hover:to-indigo-700
-              hover:shadow-lg
-              active:scale-[0.98]
-              transition-all
-              duration-300
-            "
+            onClick={handleButtonClick}
+            className={`mt-4 w-full px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300
+              ${
+                isEnrolled
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+              } shadow-md`}
           >
-            Enroll Now
+            {getButtonText()}
           </button>
         </div>
       </div>
 
-      {/* ✅ Popup */}
-      {showPopup && (
-        <CouponPopup onClose={() => setShowPopup(false)} />
+      {showPopup && isLoggedIn && !isEnrolled && (
+        <CouponPopup
+          courseId={course.id}
+          onClose={() => setShowPopup(false)}
+        />
       )}
     </>
   );
