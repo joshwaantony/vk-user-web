@@ -5,6 +5,7 @@ import { create } from "zustand";
 import {
   createOrderAPI,
   verifyPaymentAPI,
+  verifyOrderAPI,
 } from "@/services/payment.service";
 
 export const usePaymentStore = create((set) => ({
@@ -34,6 +35,15 @@ export const usePaymentStore = create((set) => ({
   verifyPayment: async (payload, token) => {
     try {
       return await verifyPaymentAPI(payload, token);
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // ✅ VERIFY ORDER
+  verifyOrder: async (orderId, token) => {
+    try {
+      return await verifyOrderAPI(orderId, token);
     } catch (error) {
       throw error;
     }

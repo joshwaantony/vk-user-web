@@ -1,9 +1,51 @@
 
 
+// "use client";
+
+// import { useEffect } from "react";
+// import { useParams } from "next/navigation"; // ✅ FIX
+// import useCourseStore from "@/store/CourseStore";
+
+// import CourseHero from "@/components/course/course-details/CourseHero";
+// import WhatYouWillLearn from "@/components/course/course-details/WhatYouWillLearn";
+// import CourseContent from "@/components/course/course-details/CourseContent";
+// import CourseSidebar from "@/components/course/course-details/CourseSidebar";
+
+// export default function CourseDetailPage() {
+//   const { courseId } = useParams(); // now defined
+//   const { course, loading, fetchCourseById } = useCourseStore();
+
+//   useEffect(() => {
+//     if (courseId) fetchCourseById(courseId);
+//   }, [courseId]);
+
+//   if (loading) return <p className="p-10">Loading course...</p>;
+//   if (!course) return null;
+
+//   return (
+//     <div className="min-h-screen bg-[#EEF5FF]">
+//       <div
+//         className="
+//           max-w-7xl mx-auto px-4 py-8
+//           grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8
+//         "
+//       >
+//         {/* SCROLL AREA */}
+//         <div className="h-[800px] overflow-y-auto space-y-8">
+//           <CourseHero course={course} />
+//           <WhatYouWillLearn points={course.learningOutcomes} />
+//           <CourseContent sections={course.sections} />
+//         </div>
+
+//         <CourseSidebar course={course} />
+//       </div>
+//     </div>
+//   );
+// }
 "use client";
 
 import { useEffect } from "react";
-import { useParams } from "next/navigation"; // ✅ FIX
+import { useParams } from "next/navigation";
 import useCourseStore from "@/store/CourseStore";
 
 import CourseHero from "@/components/course/course-details/CourseHero";
@@ -12,15 +54,22 @@ import CourseContent from "@/components/course/course-details/CourseContent";
 import CourseSidebar from "@/components/course/course-details/CourseSidebar";
 
 export default function CourseDetailPage() {
-  const { courseId } = useParams(); // now defined
+  const { courseId } = useParams();
   const { course, loading, fetchCourseById } = useCourseStore();
 
   useEffect(() => {
-    if (courseId) fetchCourseById(courseId);
-  }, [courseId]);
+    if (courseId) {
+      fetchCourseById(courseId);
+    }
+  }, [courseId, fetchCourseById]);
 
-  if (loading) return <p className="p-10">Loading course...</p>;
-  if (!course) return null;
+  if (loading) {
+    return <p className="p-10">Loading course...</p>;
+  }
+
+  if (!course) {
+    return <p className="p-10">Course not found</p>;
+  }
 
   return (
     <div className="min-h-screen bg-[#EEF5FF]">
@@ -30,13 +79,17 @@ export default function CourseDetailPage() {
           grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8
         "
       >
-        {/* SCROLL AREA */}
-        <div className="h-[800px] overflow-y-auto space-y-8">
+        {/* LEFT CONTENT */}
+        <div className="h-[800px] overflow-y-auto space-y-8 pr-2">
           <CourseHero course={course} />
-          <WhatYouWillLearn points={course.learningOutcomes} />
-          <CourseContent sections={course.sections} />
+          <WhatYouWillLearn points={course.learningOutcomes || []} />
+          <CourseContent
+            sections={course.sections || []}
+            totalLessons={course.totalLessons}
+          />
         </div>
 
+        {/* RIGHT SIDEBAR */}
         <CourseSidebar course={course} />
       </div>
     </div>

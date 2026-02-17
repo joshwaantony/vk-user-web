@@ -17,7 +17,7 @@ export default function CouponPopup({ onClose, courseId }) {
   const [coupon, setCoupon] = useState("");
   const router = useRouter();
 
-  const { createOrder, verifyPayment, loading } =
+  const { createOrder, verifyPayment, verifyOrder, loading } =
     usePaymentStore();
   const { token, user } = useAuthStore();
   const { courses } = useCourseStore(); // ✅ get courses
@@ -46,8 +46,24 @@ export default function CouponPopup({ onClose, courseId }) {
         name: "VK Academy",
         description: "Course Purchase",
         handler: async function (response) {
-          await verifyPayment(response, token);
-          router.push("/payment-success");
+          // ✅ Verify order using the new API
+          const verifyResponse = await verifyOrder(order.id, token);
+
+          if (verifyResponse.success && verifyResponse.data.enrolled) {
+            // ✅ Get first lesson from the course
+            const firstLesson = selectedCourse?.sections?.[0]?.lessons?.[0];
+
+            if (firstLesson?.id) {
+              // ✅ Route to lesson watch page
+              router.push(`/lessons/${firstLesson.id}/watch`);
+            } else {
+              // Fallback to payment success page if no lesson found
+         router.push(`/lessons/${lessonId}/watch`);
+            }
+          } else {
+            console.error("Payment verification failed or not enrolled");
+            router.push("/payment-failed");
+          }
         },
         prefill: {
           name: user?.name || "",

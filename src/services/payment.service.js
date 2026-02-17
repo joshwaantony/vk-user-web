@@ -37,3 +37,17 @@ export const verifyPaymentAPI = async (payload, token) => {
 
   return res.data;
 };
+
+// ✅ VERIFY ORDER API
+export const verifyOrderAPI = async (orderId, token) => {
+  const res = await axios.get(
+    `${baseURL}/payments/verify-order?orderId=${orderId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return res.data;
+};

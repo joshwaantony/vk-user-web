@@ -8,12 +8,16 @@
     "start": "next start"
   },
   "dependencies": {
+    "@videojs/http-streaming": "^3.17.4",
+    "@videojs/themes": "^1.0.1",
     "axios": "^1.13.2",
+    "hls.js": "^1.6.15",
     "next": "16.1.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hot-toast": "^2.6.0",
     "react-icons": "^5.5.0",
+    "video.js": "^8.23.7",
     "zustand": "^5.0.10"
   },
   "devDependencies": {
