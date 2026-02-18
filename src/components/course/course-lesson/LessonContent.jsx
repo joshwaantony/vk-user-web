@@ -10,6 +10,7 @@ import {
   FiMaximize,
 } from "react-icons/fi";
 import { useRouter } from "next/navigation";
+import PromoLoader from "@/components/loader/PromoLoader";
 
 export default function LessonContent({ lesson }) {
   const router = useRouter();
@@ -95,8 +96,8 @@ export default function LessonContent({ lesson }) {
       <div className="relative bg-black">
 
         {videoLoading && (
-          <div className="absolute inset-0 flex items-center justify-center text-white bg-black/60 z-10">
-            Loading video...
+          <div className="absolute inset-0 flex items-center justify-center text-white bg-[#F3F8FF]">
+            <PromoLoader/>
           </div>
         )}
 

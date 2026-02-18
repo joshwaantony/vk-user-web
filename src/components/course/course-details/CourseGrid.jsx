@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import usePopularCourseStore from "@/store/CourseStore";
 import CourseCard from "./CourseCard";
 import PromoLoader from "@/components/loader/PromoLoader";
+import AllCourseCardSkeleton from "@/components/loader/AllCourseCardSkeleton";
 
 export default function CourseGrid() {
   const { courses, loading, fetchPopularCourses } =
@@ -24,12 +25,30 @@ export default function CourseGrid() {
   };
 
   if (loading) {
-    return (
-      <div>
-        <PromoLoader />
-      </div>
-    );
-  }
+  return (
+    <div
+        className="
+          mt-12
+          px-4
+          sm:px-10
+          lg:px-24
+          xl:px-32
+          grid
+          grid-cols-1
+          sm:grid-cols-2
+          lg:grid-cols-3
+          gap-6
+          lg:gap-8
+        "
+      >
+    
+      {Array.from({ length: 6 }).map((_, index) => (
+        <AllCourseCardSkeleton key={index} />
+      ))}
+    </div>
+  );
+}
+
 
   return (
     <>

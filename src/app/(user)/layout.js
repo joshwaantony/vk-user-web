@@ -8,16 +8,12 @@ import { Toaster } from "react-hot-toast";
 
 export default function Layout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>
-        <Toaster
-          position="top-center"
-          toastOptions={{ duration: 3000 }}
-        />
-        <Header />
-        {children}
-        <Footer />
-      </body>
-    </html>
+       <>
+
+
+      <Header />
+      {children}
+      <Footer />
+    </>
   );
 }

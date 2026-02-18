@@ -121,6 +121,25 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* #region agent log */}
+        {typeof window !== "undefined" &&
+          fetch(
+            "http://127.0.0.1:7242/ingest/0119ffd1-4c35-47dc-b064-ec4d389574d6",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                runId: "pre-fix",
+                hypothesisId: "E",
+                location: "src/app/layout.js:RootLayout",
+                message: "RootLayout render (client)",
+                data: {},
+                timestamp: Date.now(),
+              }),
+            }
+          ).catch(() => {})}
+        {/* #endregion */}
+
         {/* ✅ Razorpay SDK */}
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"

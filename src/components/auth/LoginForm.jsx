@@ -54,6 +54,26 @@ export default function LoginPage() {
       // 🔍 DEBUG LOG
       console.log("Login Response:", res);
 
+      // #region agent log
+      fetch("http://127.0.0.1:7242/ingest/0119ffd1-4c35-47dc-b064-ec4d389574d6", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          runId: "pre-fix",
+          hypothesisId: "C",
+          location: "src/components/auth/LoginForm.jsx:handleLogin",
+          message: "loginApi response shape (no secrets)",
+          data: {
+            resType: typeof res,
+            resKeys: res && typeof res === "object" ? Object.keys(res) : null,
+            hasTokenDirect: !!(res && typeof res === "object" && (res.accessToken || res.token)),
+            hasTokenNested: !!(res && typeof res === "object" && res.data && (res.data.accessToken || res.data.token)),
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
+
       const token = res?.data?.accessToken || res?.data?.token;
 
       if (token) {

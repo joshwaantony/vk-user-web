@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import useCourseStore from "@/store/CourseStore";
 import AllCourseCard from "./AllCourseCard";
 import PromoLoader from "../loader/PromoLoader";
+import AllCourseCardSkeleton from "../loader/AllCourseCardSkeleton";
 
 export default function AllCourses() {
   const { courses, fetchAllCourses, loading, error } = useCourseStore();
@@ -34,9 +35,16 @@ export default function AllCourses() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  if (loading) {
-    return <PromoLoader />;
-  }
+if (loading) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <AllCourseCardSkeleton key={index} />
+      ))}
+    </div>
+  );
+}
+
 
   if (error) {
     return (
@@ -55,11 +63,11 @@ export default function AllCourses() {
       </div>
 
       {/* Optional Loader while more loading */}
-      {visibleCount < courses.length && (
+      {/* {visibleCount < courses.length && (
         <div className="text-center mt-8">
           <PromoLoader />
         </div>
-      )}
+      )} */}
     </>
   );
 }

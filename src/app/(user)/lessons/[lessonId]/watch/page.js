@@ -67,6 +67,7 @@ import { useParams } from "next/navigation";
 import LessonContent from "@/components/course/course-lesson/LessonContent";
 import LessonSidebar from "@/components/course/course-lesson/LessonSidebar";
 import useLessonStore from "@/store/useLessonStore";
+import PromoLoader from "@/components/loader/PromoLoader";
 
 export default function LessonWatchPage() {
   const { lessonId } = useParams();
@@ -81,8 +82,9 @@ export default function LessonWatchPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading lesson...
+      <div className="min-h-screen bg-[#EEF5FF] flex items-center justify-center">
+       
+        <PromoLoader/>
       </div>
     );
   }
