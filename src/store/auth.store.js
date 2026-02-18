@@ -44,35 +44,77 @@ export const useAuthStore = create((set, get) => ({
   setUser: (user) => set({ user }),
 
   /* ================= SEND OTP ================= */
+  // sendOtp: async ({ phone, purpose }) => {
+  //   try {
+  //     set({ loading: true, error: null });
+
+  //     let res;
+
+  //     if (purpose === "FORGOT_PASSWORD") {
+  //       res = await sendForgotPasswordOtpApi({ phone, purpose });
+  //     } else {
+  //       res = await sendOtpApi({ phone, purpose });
+  //     }
+
+  //     set({
+  //       phone,
+  //       purpose,
+  //       expiresIn: res?.expiresIn || 600,
+  //       loading: false,
+  //     });
+
+  //     return true;
+  //   } catch (err) {
+  //     set({
+  //       error: err?.response?.data?.message || "Failed to send OTP",
+  //       loading: false,
+  //     });
+  //     return false;
+  //   }
+  // },
+
   sendOtp: async ({ phone, purpose }) => {
-    try {
-      set({ loading: true, error: null });
+  try {
+    set({ loading: true, error: null });
 
-      let res;
+    let res;
 
-      if (purpose === "FORGOT_PASSWORD") {
-        res = await sendForgotPasswordOtpApi({ phone, purpose });
-      } else {
-        res = await sendOtpApi({ phone, purpose });
-      }
-
-      set({
-        phone,
-        purpose,
-        expiresIn: res?.expiresIn || 600,
-        loading: false,
-      });
-
-      return true;
-    } catch (err) {
-      set({
-        error: err?.response?.data?.message || "Failed to send OTP",
-        loading: false,
-      });
-      return false;
+    if (purpose === "FORGOT_PASSWORD") {
+      res = await sendForgotPasswordOtpApi({ phone, purpose });
+    } else {
+      res = await sendOtpApi({ phone, purpose });
     }
-  },
 
+    set({
+      phone,
+      purpose,
+      expiresIn: res?.expiresIn || 600,
+      loading: false,
+    });
+
+    return {
+      success: true,
+    };
+
+  } catch (err) {
+    const status = err?.response?.status;
+    const message =
+      err?.response?.data?.message || "Failed to send OTP";
+
+    set({
+      error: message,
+      loading: false,
+    });
+
+    return {
+      success: false,
+      status,
+      message,
+    };
+  }
+},
+
+  
   /* ================= VERIFY OTP ================= */
  
 verifyOtp: async (otp) => {
@@ -208,7 +250,7 @@ register: async (payload) => {
     console.log("API RESPONSE:", res);
 
     set({ loading: false });
-
+ localStorage.setItem("token", accessToken);
     return true;
   } catch (err) {
     console.log("REGISTER ERROR:", err);

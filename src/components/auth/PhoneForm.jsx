@@ -29,25 +29,50 @@ export default function PhoneForm({
     return true;
   };
 
-  const handleSendOtp = async () => {
-    if (!validate()) return;
+  // const handleSendOtp = async () => {
+  //   if (!validate()) return;
 
-    const toastId = toast.loading("Sending OTP...");
+  //   const toastId = toast.loading("Sending OTP...");
 
-    const success = await sendOtp({
-      phone: `+91${phone}`,
-      purpose,
-    });
+  //   const success = await sendOtp({
+  //     phone: `+91${phone}`,
+  //     purpose,
+  //   });
 
-    toast.dismiss(toastId);
+  //   toast.dismiss(toastId);
 
-    if (success) {
-      toast.success("OTP sent successfully");
-      router.push(nextRoute);
-    } else {
-      toast.error("Failed to send OTP");
-    }
-  };
+  //   if (success) {
+  //     toast.success("OTP sent successfully");
+  //     router.push(nextRoute);
+  //   } else {
+  //     toast.error("Failed to send OTP");
+  //   }
+  // };
+const handleSendOtp = async () => {
+  if (!validate()) return;
+
+  const toastId = toast.loading("Sending OTP...");
+
+  const result = await sendOtp({
+    phone: `+91${phone}`,
+    purpose,
+  });
+
+  toast.dismiss(toastId);
+
+  if (result.success) {
+    toast.success("OTP sent successfully");
+    router.push(nextRoute);
+
+  } else if (result.status === 409) {
+    toast.error("Phone number already registered. Please login.");
+
+  } else {
+    toast.error(result.message); // ✅ show backend message
+  }
+};
+
+
 
   return (
     <main className="min-h-screen bg-[#F3F8FF] flex items-center justify-center px-4">
