@@ -53,10 +53,12 @@ export default function SlideDesign() {
 
   /* 🎨 Dynamic Backgrounds */
   const gradients = [
-    "linear-gradient(90deg, #F97316 0%, #FB923C 50%, #F97316 100%)",
-    "linear-gradient(90deg, #6366F1 0%, #8B5CF6 50%, #6366F1 100%)",
-    "linear-gradient(90deg, #10B981 0%, #34D399 50%, #10B981 100%)",
-    "linear-gradient(90deg, #EF4444 0%, #F87171 50%, #EF4444 100%)",
+"linear-gradient(90deg, #FB923C 0%, #FDBA74 50%, #FB923C 100%)",
+"linear-gradient(90deg, #818CF8 0%, #A78BFA 50%, #818CF8 100%)",
+"linear-gradient(90deg, #34D399 0%, #6EE7B7 50%, #34D399 100%)",
+"linear-gradient(90deg, #F87171 0%, #FCA5A5 50%, #F87171 100%)"
+   
+
   ];
 
   const bgStyle = gradients[activeIndex % gradients.length];
