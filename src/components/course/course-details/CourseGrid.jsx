@@ -7,7 +7,6 @@
 import { useEffect, useState } from "react";
 import usePopularCourseStore from "@/store/CourseStore";
 import CourseCard from "./CourseCard";
-import PromoLoader from "@/components/loader/PromoLoader";
 import AllCourseCardSkeleton from "@/components/loader/AllCourseCardSkeleton";
 
 export default function CourseGrid() {
@@ -67,19 +66,12 @@ export default function CourseGrid() {
           lg:gap-8
         "
       >
-        {courses.map((course) => (
-          <CourseCard
-            key={course.id}
-            id={course.id}
-            image={course.thumbnail}
-            title={course.title}
-            rating="4.8"
-            students={course.totalStudents}
-            instructor={course.faculty?.[0]?.name || "Instructor"}
-            duration={`${course.duration} mins`}
-            price={course.price}
-          />
-        ))}
+      {courses?.map((course) => (
+  <CourseCard
+    key={course.id}
+    course={course}
+  />
+))}
       </div>
 
       {/* 👇 Load More Button */}

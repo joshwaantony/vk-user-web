@@ -7,7 +7,6 @@
 import { useEffect, useState } from "react";
 import useCourseStore from "@/store/CourseStore";
 import AllCourseCard from "./AllCourseCard";
-import PromoLoader from "../loader/PromoLoader";
 import AllCourseCardSkeleton from "../loader/AllCourseCardSkeleton";
 
 export default function AllCourses() {
@@ -62,12 +61,7 @@ if (loading) {
         ))}
       </div>
 
-      {/* Optional Loader while more loading */}
-      {/* {visibleCount < courses.length && (
-        <div className="text-center mt-8">
-          <PromoLoader />
-        </div>
-      )} */}
+  
     </>
   );
 }

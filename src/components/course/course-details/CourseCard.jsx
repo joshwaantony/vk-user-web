@@ -1,40 +1,32 @@
 
-
-
 "use client";
 
 import { useState } from "react";
-import { FaStar, FaUser, FaClock } from "react-icons/fa";
+import { FaStar, FaClock } from "react-icons/fa";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import CouponPopup from "@/components/Coupon/CouponPopup";
 
-export default function CourseCard({
-  id,
-  image,
-  title,
-  rating,
-  students,
-  instructor,
-  duration,
-  price,
-}) {
+export default function CourseCard({ course }) {
+  
+  if (!course) return null;
+
   const router = useRouter();
   const pathname = usePathname();
 
   const token = useAuthStore((state) => state.token);
+  const isLoggedIn = !!token;
 
   const [showPopup, setShowPopup] = useState(false);
 
-  // ✅ Enroll Handler
-  const handleEnroll = (e) => {
-    e.stopPropagation(); // prevent card navigation
+  const faculty = course?.faculty?.[0];
 
-    if (token) {
-      // Logged in → open popup
+  const handleEnroll = (e) => {
+    e.stopPropagation();
+
+    if (isLoggedIn) {
       setShowPopup(true);
     } else {
-      // Not logged in → redirect to login with redirect param
       router.push(`/login?redirect=${pathname}`);
     }
   };
@@ -42,36 +34,52 @@ export default function CourseCard({
   return (
     <>
       <div
-        onClick={() => router.push(`/course/${id}`)}
+        onClick={() => router.push(`/course/${course?.id}`)}
         className="cursor-pointer bg-white border border-[#C5CDD7] rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition"
       >
-        {/* Image */}
+        {/* Thumbnail */}
         <img
-          src={image}
-          alt={title}
+          src={course?.thumbnail || "/fallback.jpg"}
+          alt={course?.title}
           className="h-[200px] w-full object-cover"
         />
 
         {/* Content */}
         <div className="p-6 flex flex-col flex-1">
-          <div className="h-[100px]">
+          <div className="min-h-[130px]">
+
             {/* Title */}
-            <h3 className="text-[16px] font-semibold text-[#0F172A] leading-snug">
-              {title}
+            <h3 className="text-[16px] font-semibold text-[#0F172A] line-clamp-2">
+              {course?.title}
             </h3>
 
             {/* Rating */}
             <div className="flex items-center gap-2 mt-3 text-sm text-[#475569]">
               <FaStar className="text-[#F59E0B]" />
-              <span className="font-medium">{rating}</span>
+              <span>4.5</span>
               <span>·</span>
-              <span>{students} students</span>
+              <span>{course?.totalStudents} students</span>
             </div>
 
-            {/* Instructor */}
-            <div className="flex items-center gap-2 mt-3 text-sm text-[#475569]">
-              <FaUser className="text-[#64748B]" />
-              <span>{instructor}</span>
+            {/* Faculty */}
+            <div className="flex items-center gap-3 mt-4">
+              <img
+                src={faculty?.imageUrl || "/avatar.png"}
+                alt={faculty?.name}
+                onError={(e) => {
+                  e.currentTarget.src = "/avatar.png";
+                }}
+                className="w-10 h-10 rounded-full object-cover border"
+              />
+
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-[#334155]">
+                  {faculty?.name || "Instructor"}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {faculty?.qualification || ""}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -81,38 +89,27 @@ export default function CourseCard({
           <div className="flex items-center justify-between text-sm text-[#475569]">
             <div className="flex items-center gap-2">
               <FaClock className="text-[#64748B]" />
-              <span>{duration}</span>
+              <span>{course?.duration} mins</span>
             </div>
 
             <span className="font-semibold text-[#1C3FD1]">
-              ${price}
+              ₹{course?.price}
             </span>
           </div>
 
-          {/* ✅ Enroll Button */}
+          {/* Button */}
           <button
             onClick={handleEnroll}
-            className="
-              mt-6
-              w-full
-              bg-[#1C3FD1]
-              text-white
-              py-3
-              rounded-xl
-              font-semibold
-              hover:bg-[#1733A5]
-              transition
-            "
+            className="mt-6 w-full bg-[#1C3FD1] text-white py-3 rounded-xl font-semibold hover:bg-[#1733A5] transition"
           >
-           Login to Enroll
+            {isLoggedIn ? "Enroll Now" : "Login to Enroll"}
           </button>
         </div>
       </div>
 
-      {/* ✅ Popup */}
-      {showPopup && (
+      {showPopup && isLoggedIn && (
         <CouponPopup
-          courseId={id}
+          courseId={course?.id}
           onClose={() => setShowPopup(false)}
         />
       )}

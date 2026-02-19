@@ -38,25 +38,7 @@ export default function HeroSection() {
                    
 
 
-    {/* <div className="w-full flex justify-center mt-12 sm:mt-14 md:mt-16">
-  <button
-    className="
-       mb-20 border-1 
-      border-[#1E40E6]
-      text-[#1E40E6]
-      font-semibold
-      text-base sm:text-lg
-      px-6 sm:px-8 md:px-10
-      py-3 sm:py-3.5 md:py-4
-      rounded-xl sm:rounded-xl
-      hover:bg-[#1E40E6]
-      hover:text-white
-      transition
-    "
-  >
-    View All Courses
-  </button>
-</div> */}
+
 
     </div>
     <div>
