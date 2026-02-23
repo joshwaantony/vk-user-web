@@ -9,18 +9,18 @@ import usePopularCourseStore from "@/store/CourseStore";
 import CourseCard from "./CourseCard";
 import AllCourseCardSkeleton from "@/components/loader/AllCourseCardSkeleton";
 
-export default function CourseGrid() {
+export default function  CourseGrid() {
   const { courses, loading, fetchPopularCourses } =
     usePopularCourseStore();
 
-  const [limit, setLimit] = useState(6); // 👈 initial 6
+  const [limit, setLimit] = useState(6); 
 
   useEffect(() => {
     fetchPopularCourses(limit);
   }, [limit]);
 
   const handleLoadMore = () => {
-    setLimit((prev) => prev + 3); // 👈 add 3 more
+    setLimit((prev) => prev + 3);
   };
 
   if (loading) {

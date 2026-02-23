@@ -25,7 +25,7 @@ export default function SlideDesign() {
     getPromos();
   }, [getPromos]);
 
-  /* AUTO SLIDE EVERY 30s */
+  /* AUTO SLIDE */
   useEffect(() => {
     if (!promos.length) return;
 
@@ -36,29 +36,25 @@ export default function SlideDesign() {
     return () => clearInterval(interval);
   }, [promos.length, nextPromo]);
 
-  const activePromo = promos[activeIndex];
-
   if (loading) {
     return (
-      <div className="">
-        <PromoLoader/>
+      <div>
+        <PromoLoader />
       </div>
     );
   }
 
+  const activePromo = promos[activeIndex];
   if (!activePromo) return null;
 
-  /* IMAGE */
   const imageUrl = activePromo.imageUrl || "/fallback.jpg";
 
-  /* 🎨 Dynamic Backgrounds */
+  /* 🎨 Light Pastel Gradients */
   const gradients = [
-"linear-gradient(90deg, #FB923C 0%, #FDBA74 50%, #FB923C 100%)",
-"linear-gradient(90deg, #818CF8 0%, #A78BFA 50%, #818CF8 100%)",
-"linear-gradient(90deg, #34D399 0%, #6EE7B7 50%, #34D399 100%)",
-"linear-gradient(90deg, #F87171 0%, #FCA5A5 50%, #F87171 100%)"
-   
-
+    "linear-gradient(90deg, #FFF7ED 0%, #FFEDD5 50%, #FFF7ED 100%)", // orange
+    "linear-gradient(90deg, #EEF2FF 0%, #E0E7FF 50%, #EEF2FF 100%)", // indigo
+    "linear-gradient(90deg, #ECFDF5 0%, #D1FAE5 50%, #ECFDF5 100%)", // green
+    "linear-gradient(90deg, #FEF2F2 0%, #FEE2E2 50%, #FEF2F2 100%)", // red
   ];
 
   const bgStyle = gradients[activeIndex % gradients.length];
@@ -71,54 +67,57 @@ export default function SlideDesign() {
         className="w-full rounded-3xl relative transition-all duration-700 ease-in-out"
         style={{ background: bgStyle }}
       >
-        <div className="max-w-[1400px] mx-auto px-8 py-10">
+        <div className="max-w-[1400px] mx-auto px-6 sm:px-8 py-10 sm:py-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
 
             {/* IMAGE */}
-            <div>
+            <div className="flex justify-center lg:justify-start">
               <div className="rounded-2xl bg-white overflow-hidden shadow-xl w-full max-w-[500px]">
                 <img
                   src={imageUrl}
                   alt={activePromo.title}
-                  className="w-full h-[240px] object-cover transition-opacity duration-700"
+                  className="w-full h-[220px] sm:h-[260px] md:h-[300px] object-cover transition-opacity duration-700"
                 />
               </div>
             </div>
 
             {/* CONTENT */}
-            <div className="text-white relative">
+            <div className="text-gray-900 relative text-center lg:text-left">
 
               {/* ARROWS */}
               <div className="absolute -top-4 right-0 flex gap-3">
                 <button
                   onClick={prevPromo}
-                  className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center shadow"
+                  className="w-9 h-9 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:scale-105 transition"
                 >
                   <HiChevronLeft size={16} />
                 </button>
 
                 <button
                   onClick={nextPromo}
-                  className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center shadow"
+                  className="w-9 h-9 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:scale-105 transition"
                 >
                   <HiChevronRight size={16} />
                 </button>
               </div>
 
-              <h1 className="text-3xl lg:text-4xl font-extrabold leading-tight mb-3 transition-all duration-500">
+              {/* TITLE */}
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold leading-tight mb-4">
                 {activePromo.title}
               </h1>
 
-              <p className="text-white/80 text-sm max-w-md mb-5 transition-all duration-500">
+              {/* DESCRIPTION */}
+              <p className="text-gray-600 text-sm sm:text-base max-w-md mx-auto lg:mx-0 mb-5">
                 {activePromo.description}
               </p>
             </div>
+
           </div>
         </div>
       </section>
 
-      {/* ================= BOTTOM SLIDER ================= */}
-      <section className="hidden md:block bg-white py-5">
+      {/* ================= BOTTOM INDICATOR ================= */}
+      <section className="hidden md:block bg-white py-6">
         <div className="max-w-5xl mx-auto text-center">
 
           <div className="flex justify-center gap-3 mb-2">
@@ -128,7 +127,7 @@ export default function SlideDesign() {
                 className={`h-2 rounded-full transition-all duration-300 ${
                   i === activeIndex
                     ? "bg-green-500 w-6"
-                    : "bg-gray-400 w-2"
+                    : "bg-gray-300 w-2"
                 }`}
               />
             ))}
