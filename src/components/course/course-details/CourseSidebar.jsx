@@ -1,33 +1,74 @@
 
 
-  import {
-    FiPlayCircle,
-    FiVideo,
-    FiDownload,
-    FiSmartphone
-  } from "react-icons/fi";
-  import { HiOutlineBadgeCheck } from "react-icons/hi";
-  import { BsInfinity } from "react-icons/bs";
-  import { BiSupport } from "react-icons/bi";
-  import Link from "next/link";
 
-  export default function CourseSidebar() {
-    return (
+
+  "use client";
+
+import {
+  FiPlayCircle,
+  FiVideo,
+  FiDownload,
+  FiSmartphone
+} from "react-icons/fi";
+import { HiOutlineBadgeCheck } from "react-icons/hi";
+import { BsInfinity } from "react-icons/bs";
+import { BiSupport } from "react-icons/bi";
+import { useRouter, usePathname } from "next/navigation";
+import { useAuthStore } from "@/store/auth.store";
+import { useState } from "react";
+import CouponPopup from "@/components/Coupon/CouponPopup";
+
+export default function CourseSidebar({ course }) {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const token = useAuthStore((state) => state.token);
+  const isLoggedIn = !!token;
+
+  const isEnrolled = course?.isEnrolled;
+
+  const [showPopup, setShowPopup] = useState(false);
+
+  /* ---------------- BUTTON CLICK ---------------- */
+  const handleButtonClick = () => {
+    if (!isLoggedIn) {
+      router.push(`/login?redirect=${pathname}`);
+      return;
+    }
+
+    if (isEnrolled) {
+      router.push(`/course/${course.id}`);
+    } else {
+      setShowPopup(true);
+    }
+  };
+
+  /* ---------------- BUTTON TEXT ---------------- */
+  const getButtonText = () => {
+    if (!isLoggedIn) return "Login to Enroll";
+    if (isEnrolled) return "Watch Now";
+    return "Enroll Now";
+  };
+
+  return (
+    <>
       <aside className="w-full lg:max-w-sm">
-        {/* ✅ Sticky wrapper (desktop only) */}
         <div className="space-y-8 lg:sticky lg:top-[120px]">
 
           {/* PRICE CARD */}
           <div className="bg-[#1F3FD7] text-white rounded-2xl p-8 text-center">
             <p className="text-sm opacity-80">Course Price</p>
-            <h2 className="text-3xl font-bold my-3">$149</h2>
+            <h2 className="text-3xl font-bold my-3">
+              ₹{course?.price}
+            </h2>
 
-            <Link href="/courseId/lesson">
-              <button className="w-full bg-white text-[#1F3FD7] py-3 rounded-xl font-semibold flex items-center justify-center gap-2">
-                <FiPlayCircle />
-                Continue Learning
-              </button>
-            </Link>
+            <button
+              onClick={handleButtonClick}
+              className="w-full bg-white text-[#1F3FD7] py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
+            >
+              <FiPlayCircle />
+              {getButtonText()}
+            </button>
           </div>
 
           {/* PROGRESS CARD */}
@@ -41,16 +82,22 @@
                 Course Completion
               </span>
               <span className="font-semibold text-black">
-                13%
+                {/* {course?.progress || 0}% */}
+                {course?.progress?.percent || 0}%
               </span>
             </div>
 
             <div className="h-2 bg-gray-200 rounded-full mb-4">
-              <div className="h-2 bg-[#1F3FD7] rounded-full w-[13%]" />
+              <div
+                className="h-2 bg-[#1F3FD7] rounded-full"
+                // style={{ width: `${course?.progress || 0}%` }}
+                style={{ width: `${course?.progress?.percent || 0}%` }}
+              />
             </div>
 
             <p className="text-sm text-gray-500 mb-6">
-              3 of 24 lessons completed
+              {/* {course?.completedLessons || 0} of {course?.totalLessons || 0} lessons completed */}
+              {course?.progress?.completedLessons || 0} of {course?.progress?.totalLessons || course?.totalLessons || 0}
             </p>
 
             <h5 className="font-semibold text-black mb-4">
@@ -58,22 +105,16 @@
             </h5>
 
             <ul className="space-y-4 text-sm text-gray-600">
-              <li className="flex items-center gap-3">
-                <FiVideo className="text-[#1F3FD7]" />
-                24 video lessons
-              </li>
-              <li className="flex items-center gap-3">
-                <FiDownload className="text-[#1F3FD7]" />
-                Downloadable resources
-              </li>
+         
+           <li className="flex items-center gap-3">
+  <FiVideo className="text-[#1F3FD7]" />
+  {course?.totalLessons || 0} video {course?.totalLessons === 1 ? "lesson" : "lessons"}
+</li>
               <li className="flex items-center gap-3">
                 <FiSmartphone className="text-[#1F3FD7]" />
                 Mobile access
               </li>
-              <li className="flex items-center gap-3">
-                <HiOutlineBadgeCheck className="text-[#1F3FD7]" />
-                Certificate
-              </li>
+           
               <li className="flex items-center gap-3">
                 <BsInfinity className="text-[#1F3FD7]" />
                 Lifetime access
@@ -87,5 +128,14 @@
 
         </div>
       </aside>
-    );
-  }
+
+      {/* COUPON POPUP */}
+      {showPopup && isLoggedIn && !isEnrolled && (
+        <CouponPopup
+          courseId={course.id}
+          onClose={() => setShowPopup(false)}
+        />
+      )}
+    </>
+  );
+}

@@ -4,7 +4,6 @@
 import { create } from "zustand";
 import {
   createOrderAPI,
-  verifyPaymentAPI,
   verifyOrderAPI,
 } from "@/services/payment.service";
 
@@ -27,15 +26,6 @@ export const usePaymentStore = create((set) => ({
         loading: false,
         error: error.message || "Order failed",
       });
-      throw error;
-    }
-  },
-
-  // ✅ VERIFY PAYMENT
-  verifyPayment: async (payload, token) => {
-    try {
-      return await verifyPaymentAPI(payload, token);
-    } catch (error) {
       throw error;
     }
   },
