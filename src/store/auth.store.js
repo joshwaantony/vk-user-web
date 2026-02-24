@@ -114,9 +114,9 @@
 //   }
 // },
 
-  
+
 //   /* ================= VERIFY OTP ================= */
- 
+
 // verifyOtp: async (otp) => {
 //   try {
 //     const { phone, purpose } = get();
@@ -240,7 +240,7 @@
 // //     return false;
 // //   }
 // // },
-  
+
 // register: async (payload) => {
 //   try {
 //     console.log("REGISTER CALLED");
@@ -293,7 +293,7 @@
 
 
 // /* ================= RESET PASSWORD ================= */
-  
+
 // resetPassword: async ({ newPassword }) => {
 //   try {
 //     const { passwordResetToken } = get();
@@ -549,6 +549,8 @@ export const useAuthStore = create(
             });
 
             localStorage.setItem("token", accessToken);
+            // ✅ Also set cookie so middleware can read it
+            document.cookie = `token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
 
             return true;
           }
@@ -603,6 +605,8 @@ export const useAuthStore = create(
       /* ================= LOGOUT ================= */
       logout: () => {
         localStorage.removeItem("token");
+        // ✅ Clear cookie so middleware stops allowing access
+        document.cookie = "token=; path=/; max-age=0; SameSite=Lax";
 
         set({
           user: null,
