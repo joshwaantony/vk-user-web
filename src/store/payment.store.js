@@ -4,6 +4,7 @@
 import { create } from "zustand";
 import {
   createOrderAPI,
+  verifyClientAPI,
   verifyOrderAPI,
 } from "@/services/payment.service";
 
@@ -12,11 +13,11 @@ export const usePaymentStore = create((set) => ({
   error: null,
 
   // ✅ CREATE ORDER
-  createOrder: async (courseId, token) => {
+  createOrder: async (courseId, token, idempotencyKey) => {
     try {
       set({ loading: true, error: null });
 
-      const order = await createOrderAPI(courseId, token);
+      const order = await createOrderAPI(courseId, token, idempotencyKey);
 
       set({ loading: false });
       return order;
@@ -26,6 +27,15 @@ export const usePaymentStore = create((set) => ({
         loading: false,
         error: error.message || "Order failed",
       });
+      throw error;
+    }
+  },
+
+  // ✅ VERIFY CLIENT
+  verifyClient: async (payload, token, idempotencyKey) => {
+    try {
+      return await verifyClientAPI(payload, token, idempotencyKey);
+    } catch (error) {
       throw error;
     }
   },

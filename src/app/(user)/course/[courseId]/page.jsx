@@ -31,9 +31,10 @@ export default function CourseDetailPage() {
   // ✅ Remove query param after load (clean URL)
   useEffect(() => {
     if (isFromPayment) {
+      fetchCourseById(courseId);
       router.replace(`/course/${courseId}`);
     }
-  }, [isFromPayment, router, courseId]);
+  }, [isFromPayment, router, courseId, fetchCourseById]);
 
   if (loading) {
     return (
