@@ -177,10 +177,10 @@ const router = useRouter();
                   </button>
                 </div>
 
-                <div className="absolute bottom-3 right-3 bg-black/70 px-3 py-1 rounded-full text-white text-xs sm:text-sm flex items-center gap-2">
+                {/* <div className="absolute bottom-3 right-3 bg-black/70 px-3 py-1 rounded-full text-white text-xs sm:text-sm flex items-center gap-2">
                   <HiOutlineClock />
                   14 weeks
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
