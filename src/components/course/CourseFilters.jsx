@@ -62,7 +62,7 @@ export default function CourseFilters() {
 
         {/* Category Buttons */}
         <div className="flex flex-wrap gap-4">
-          {["All Courses", "Finance", "Accounting", "Tax Planning"].map(
+          {["All Courses", "Popular Courses"].map(
             (item, i) => (
               <button
                 key={i}

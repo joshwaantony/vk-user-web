@@ -12,23 +12,23 @@ export default function PopularCoursesHeader() {
 
         {/* Badge */}
         <div className="flex justify-center mb-4 sm:mb-6">
-          <span
-            className="
-              inline-flex
-              items-center
-              gap-2
-              rounded-full
-              bg-[#DCE9FF]
-              px-4 sm:px-5
-              py-1.5 sm:py-2
-              text-xs sm:text-sm
-              font-semibold
-              text-[#1E40E6]
-            "
-          >
-            <span className="text-sm sm:text-base">🔥</span>
-            Most Popular
-          </span>
+       <span
+  className="
+    inline-flex
+    items-center
+    gap-2
+    mt-4 sm:mt-6 lg:mt-0
+    mb-5 sm:mb-6
+    text-sm sm:text-base
+    font-semibold
+    text-[#2563EB]
+    tracking-wide
+  "
+>
+  <span className="text-base">🔥</span>
+  Most Popular
+</span>
+
         </div>
 
         {/* Title */}

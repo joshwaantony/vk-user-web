@@ -1,0 +1,100 @@
+
+
+
+
+"use client";
+
+import { useEffect, useState } from "react";
+import usePopularCourseStore from "@/store/CourseStore";
+import CourseCard from "./CourseCard";
+import AllCourseCardSkeleton from "@/components/loader/AllCourseCardSkeleton";
+
+export default function  CourseGrid() {
+  const { courses, loading, fetchPopularCourses } =
+    usePopularCourseStore();
+
+  const [limit, setLimit] = useState(6); 
+
+  useEffect(() => {
+    fetchPopularCourses(limit);
+  }, [limit]);
+
+  const handleLoadMore = () => {
+    setLimit((prev) => prev + 3);
+  };
+
+  if (loading) {
+  return (
+    <div
+        className="
+          mt-12
+          px-4
+          sm:px-10
+          lg:px-24
+          xl:px-32
+          grid
+          grid-cols-1
+          sm:grid-cols-2
+          lg:grid-cols-3
+          gap-6
+          lg:gap-8
+        "
+      >
+    
+      {Array.from({ length: 6 }).map((_, index) => (
+        <AllCourseCardSkeleton key={index} />
+      ))}
+    </div>
+  );
+}
+
+
+  return (
+    <>
+      <div
+        className="
+          mt-12
+          px-4
+          sm:px-10
+          lg:px-24
+          xl:px-32
+          grid
+          grid-cols-1
+          sm:grid-cols-2
+          lg:grid-cols-3
+          gap-6
+          lg:gap-8
+        "
+      >
+      {courses?.map((course) => (
+  <CourseCard
+    key={course.id}
+    course={course}
+  />
+))}
+      </div>
+
+      {/* 👇 Load More Button */}
+      <div className="w-full flex justify-center mt-12 ">
+        <button
+          onClick={handleLoadMore}
+          className="
+            border
+            border-[#1E40E6]
+            text-[#1E40E6]
+            font-semibold
+            text-base sm:text-lg
+            px-6 sm:px-8 md:px-10
+            py-3
+            rounded-xl
+            hover:bg-[#1E40E6]
+            hover:text-white
+            transition
+          "
+        >
+          View All Courses
+        </button>
+      </div>
+    </>
+  );
+}

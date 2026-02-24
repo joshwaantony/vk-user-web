@@ -1,5 +1,10 @@
+
+
+
+
+import AllCourses from "./AllCourses";
 import CourseFilters from "./CourseFilters";
-import CourseGrid from "./CourseGrid";
+import SlideDesign from "./courseslide/SlideDesign";
 
 export default function CoursesSection() {
   return (
@@ -11,18 +16,23 @@ export default function CoursesSection() {
         </h2>
 
         <p className="text-center text-[#475569] mt-2">
-         Browse our extensive library of professional courses and find the right one to <br />elevate your career
+          Browse our extensive library of professional courses and find the right one to
+          <br />
+          elevate your career
         </p>
-
-        <CourseFilters />
-        <CourseGrid />
-
-        <div className="flex justify-center mt-10">
-          <button className="border-2 bg-white text-[#1C4ED8] font-semibold border-[#1C4ED8] px-6 py-2 rounded-lg">
-            Load More
-          </button>
+        <div className="pt-20">
+          <SlideDesign/>
         </div>
 
+        <CourseFilters />
+
+        {/* 👇 Course List */}
+        <div className="">
+          <AllCourses />
+        </div>
+        
+
+       
       </div>
     </section>
   );

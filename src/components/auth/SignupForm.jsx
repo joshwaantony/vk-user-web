@@ -63,32 +63,57 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return true;
   };
 
-  const handleSignup = async () => {
-    if (!validate()) return;
+//   const handleSignup = async () => {
+//     if (!validate()) return;
 
 
-    const success = await register({
-      name: form.name,
-      email: form.email,
-      address: form.address,
-      password: form.password,
-    });
+//     const success = await register({
+//       name: form.name,
+//       email: form.email,
+//       address: form.address,
+//       password: form.password,
+//     });
 
 
- if (success) {
+//  if (success) {
+//   toast.success("Account created successfully");
+//   router.replace("/course");
+// } else {
+//   // ✅ show backend validation message
+//   if (Array.isArray(error)) {
+//     error.forEach((e) => toast.error(e.message));
+//   } else {
+//     toast.error(error || "Registration failed");
+//   }
+// }
+
+//   };
+
+
+
+const handleSignup = async () => {
+  console.log("Signup clicked");   // 👈 add this
+
+  if (!validate()) return;
+
+  console.log("Validation passed");
+
+  const success = await register({
+    name: form.name,
+    email: form.email,
+    address: form.address,
+    password: form.password,
+  });
+
+  console.log("Register result:", success);
+  if (success) {
   toast.success("Account created successfully");
-  router.replace("/course");
-} else {
-  // ✅ show backend validation message
-  if (Array.isArray(error)) {
-    error.forEach((e) => toast.error(e.message));
-  } else {
-    toast.error(error || "Registration failed");
-  }
+
+  setTimeout(() => {
+    router.push("/course");
+  }, 500);
 }
-
-  };
-
+};
   return (
     <main className="min-h-screen bg-[#EEF4FF] flex flex-col items-center justify-center px-4">
       {/* Logo */}
@@ -241,3 +266,5 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     </main>
   );
 }
+
+

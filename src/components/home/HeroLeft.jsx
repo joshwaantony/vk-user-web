@@ -1,24 +1,22 @@
+import Link from "next/link";
 export default function HeroLeft() {
   return (
     <div className="w-full">
 
       {/* Badge */}
-      <span
-        className="
+<span
+  className="
     inline-block
     mt-4 sm:mt-6 lg:mt-0
     mb-5 sm:mb-6
-    rounded-full
-    bg-[#E0EBFF]
-    px-4 sm:px-5
-    py-1.5 sm:py-2
-    text-xs sm:text-sm
+    text-sm sm:text-base
     font-semibold
     text-[#2563EB]
+    tracking-wide
   "
-      >
-        Trusted by thousands of users
-      </span>
+>
+  Trusted by thousands of users
+</span>
 
       {/* Heading */}
       <h1
@@ -52,21 +50,23 @@ export default function HeroLeft() {
 
       {/* Buttons */}
       <div className="flex flex-wrap gap-4 mb-12 sm:mb-14">
-        <button
-          className="
-            bg-[#1E40E6]
-            text-white
-            px-6 sm:px-7
-            py-2.5 sm:py-3
-            rounded-xl
-            font-semibold
-            shadow-md
-            hover:bg-[#1a36c9]
-            transition
-          "
-        >
-          Get Started
-        </button>
+    <Link href="/phone/enter-phone">
+  <button
+    className="
+      bg-[#1E40E6]
+      text-white
+      px-6 sm:px-7
+      py-2.5 sm:py-3
+      rounded-xl
+      font-semibold
+      shadow-md
+      hover:bg-[#1a36c9]
+      transition
+    "
+  >
+    Get Started
+  </button>
+</Link>
 
         <button
           className="
