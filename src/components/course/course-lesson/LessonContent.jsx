@@ -11,13 +11,89 @@ import {
 } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import PromoLoader from "@/components/loader/PromoLoader";
+import { useProgressStore } from "@/store/progress.store";
 
-export default function LessonContent({ lesson }) {
+const PROGRESS_SAVE_INTERVAL_SECONDS = 10;
+
+export default function LessonContent({
+  lesson,
+  lessonId: lessonIdProp,
+}) {
   const router = useRouter();
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
+  const lastSavedTimeRef = useRef(0);
+  const hasResumedRef = useRef(false);
 
   const [videoLoading, setVideoLoading] = useState(true);
+  const lessonId =
+    lesson?.id || lesson?._id || lesson?.lessonId || lessonIdProp;
+
+  const {
+    updateProgress,
+    getLessonProgress,
+    lessonProgress,
+    setActiveLesson,
+    clearLessonProgress,
+    updateLoading,
+  } = useProgressStore();
+
+  // ================= FETCH SAVED PROGRESS =================
+  useEffect(() => {
+    if (!lessonId) return;
+
+    hasResumedRef.current = false;
+    lastSavedTimeRef.current = 0;
+    setActiveLesson(lessonId);
+    getLessonProgress(lessonId);
+
+    return () => {
+      clearLessonProgress();
+    };
+  }, [
+    lessonId,
+    setActiveLesson,
+    getLessonProgress,
+    clearLessonProgress,
+  ]);
+
+  // ================= RESUME PLAYBACK =================
+  useEffect(() => {
+    const video = videoRef.current;
+    const watchedSeconds = Math.floor(
+      Number(lessonProgress?.watchedSeconds || 0)
+    );
+
+    if (
+      !video ||
+      watchedSeconds <= 0 ||
+      hasResumedRef.current
+    ) {
+      return;
+    }
+
+    const applyResume = () => {
+      video.currentTime = watchedSeconds;
+      lastSavedTimeRef.current = watchedSeconds;
+      hasResumedRef.current = true;
+    };
+
+    if (video.readyState >= 1) {
+      applyResume();
+      return;
+    }
+
+    video.addEventListener("loadedmetadata", applyResume, {
+      once: true,
+    });
+
+    return () => {
+      video.removeEventListener(
+        "loadedmetadata",
+        applyResume
+      );
+    };
+  }, [lessonProgress?.watchedSeconds]);
 
   // ================= HLS PLAYER SETUP =================
   useEffect(() => {
@@ -38,7 +114,6 @@ export default function LessonContent({ lesson }) {
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         setVideoLoading(false);
-        video.play().catch(() => {});
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
@@ -47,12 +122,21 @@ export default function LessonContent({ lesson }) {
 
       hlsRef.current = hls;
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      // Safari Native Support
-      video.src = lesson.playbackUrl;
-      video.addEventListener("loadedmetadata", () => {
+      const handleLoadedMetadata = () => {
         setVideoLoading(false);
-        video.play().catch(() => {});
-      });
+      };
+      video.src = lesson.playbackUrl;
+      video.addEventListener(
+        "loadedmetadata",
+        handleLoadedMetadata
+      );
+
+      return () => {
+        video.removeEventListener(
+          "loadedmetadata",
+          handleLoadedMetadata
+        );
+      };
     }
 
     return () => {
@@ -61,7 +145,64 @@ export default function LessonContent({ lesson }) {
         hlsRef.current = null;
       }
     };
-  }, [lesson]);
+  }, [lesson?.playbackUrl]);
+
+  // ================= AUTO SAVE PROGRESS =================
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !lessonId) return;
+
+    const saveProgress = (force = false) => {
+      const currentTime = Math.floor(video.currentTime);
+      if (currentTime <= 0) return;
+      if (currentTime <= lastSavedTimeRef.current) return;
+
+      if (
+        !force &&
+        currentTime - lastSavedTimeRef.current <
+          PROGRESS_SAVE_INTERVAL_SECONDS
+      ) {
+        return;
+      }
+
+      lastSavedTimeRef.current = currentTime;
+      updateProgress(lessonId, currentTime);
+    };
+
+    const handleTimeUpdate = () => {
+      saveProgress(false);
+    };
+    const handlePause = () => saveProgress(true);
+    const handleEnded = () => saveProgress(true);
+
+    video.addEventListener("timeupdate", handleTimeUpdate);
+    video.addEventListener("pause", handlePause);
+    video.addEventListener("ended", handleEnded);
+
+    return () => {
+      video.removeEventListener("timeupdate", handleTimeUpdate);
+      video.removeEventListener("pause", handlePause);
+      video.removeEventListener("ended", handleEnded);
+      saveProgress(true);
+    };
+  }, [lessonId, updateProgress]);
+
+  const handleMarkCompleted = () => {
+    if (!lessonId) return;
+    const video = videoRef.current;
+    const duration = Math.floor(
+      Number(
+        lesson?.duration || video?.duration || video?.currentTime
+      )
+    );
+
+    if (duration > 0) {
+      lastSavedTimeRef.current = duration;
+      updateProgress(lessonId, duration, {
+        silent: false,
+      });
+    }
+  };
 
   // ================= FULLSCREEN =================
   const handleFullscreen = () => {
@@ -146,9 +287,16 @@ export default function LessonContent({ lesson }) {
             Previous Lesson
           </button>
 
-          <button className="px-5 py-3 rounded-lg bg-[#16A34A] text-white font-medium flex items-center gap-2 text-sm hover:bg-[#15803D] transition">
+          <button
+            type="button"
+            onClick={handleMarkCompleted}
+            disabled={updateLoading}
+            className="px-5 py-3 rounded-lg bg-[#16A34A] text-white font-medium flex items-center gap-2 text-sm hover:bg-[#15803D] transition disabled:opacity-70 disabled:cursor-not-allowed"
+          >
             <FiCheckCircle />
-            Mark as Completed
+            {updateLoading
+              ? "Saving..."
+              : "Mark as Completed"}
           </button>
 
           <button className="px-5 py-3 rounded-lg bg-[#2563EB] text-white font-medium flex items-center gap-2 text-sm hover:bg-[#1E4ED8] transition">
