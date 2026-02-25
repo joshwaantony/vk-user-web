@@ -50,7 +50,7 @@ export default function LessonWatchPage() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[#EEF5FF]">
-      <LessonContent lesson={lesson} />
+      <LessonContent lesson={lesson} lessonId={lessonId} />
       <LessonSidebar lesson={lesson} />
     </div>
   );

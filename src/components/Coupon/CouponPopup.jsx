@@ -9,6 +9,46 @@ import useCourseStore from "@/store/CourseStore";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
+const PENDING_PAYMENT_KEY = "vk_pending_payment";
+
+const generateIdempotencyKey = () => {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+
+  return `idem_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+};
+
+const setPendingPayment = (orderId, courseId) => {
+  if (typeof window === "undefined") return;
+
+  localStorage.setItem(
+    PENDING_PAYMENT_KEY,
+    JSON.stringify({
+      orderId,
+      courseId,
+      createdAt: Date.now(),
+    })
+  );
+};
+
+const getPendingPayment = () => {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const raw = localStorage.getItem(PENDING_PAYMENT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    console.error("Pending payment parse error:", error);
+    return null;
+  }
+};
+
+const clearPendingPayment = () => {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(PENDING_PAYMENT_KEY);
+};
+
 export default function CouponPopup({ onClose, courseId }) {
   const [coupon, setCoupon] = useState("");
   const [processingEnrollment, setProcessingEnrollment] = useState(false);
@@ -16,7 +56,7 @@ export default function CouponPopup({ onClose, courseId }) {
 
   const router = useRouter();
 
-  const { createOrder, verifyOrder, loading } = usePaymentStore();
+  const { createOrder, verifyClient, verifyOrder, loading } = usePaymentStore();
   const { token, user } = useAuthStore();
   const { courses } = useCourseStore();
 
@@ -30,37 +70,75 @@ export default function CouponPopup({ onClose, courseId }) {
     };
   }, []);
 
-  /* ================= VERIFY WITH RETRY ================= */
-  const verifyWithRetry = async (orderId, retries = 6) => {
-    for (let i = 0; i < retries; i++) {
-      const response = await verifyOrder(orderId, token);
+  /* ================= VERIFY FALLBACK ================= */
+  useEffect(() => {
+    let cancelled = false;
 
-      if (
-        response?.success &&
-        response?.data?.status === "COMPLETED" &&
-        response?.data?.enrolled === true
-      ) {
-        return true;
+    const verifyPendingOrder = async () => {
+      if (!token || !courseId) return;
+
+      const pending = getPendingPayment();
+      if (!pending || pending.courseId !== courseId || !pending.orderId) return;
+
+      try {
+        setProcessingEnrollment(true);
+
+        const response = await verifyOrder(pending.orderId, token);
+        if (cancelled) return;
+
+        if (
+          response?.success &&
+          response?.data?.status === "COMPLETED" &&
+          response?.data?.enrolled === true
+        ) {
+          clearPendingPayment();
+          toast.success("Payment already verified. Redirecting...");
+          onClose();
+          router.push(`/course/${courseId}?enrolled=true`);
+          return;
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Verify pending order error:", error);
+        }
+      } finally {
+        if (!cancelled) {
+          setProcessingEnrollment(false);
+        }
       }
+    };
 
-      // wait 2 seconds before retry
-      await new Promise((res) => setTimeout(res, 2000));
-    }
+    verifyPendingOrder();
 
-    return false;
-  };
+    return () => {
+      cancelled = true;
+    };
+  }, [courseId, onClose, router, token, verifyOrder]);
 
   /* ================= PAYMENT HANDLER ================= */
   const handleSkip = async () => {
     if (razorLoading) return; // prevent double click
+    if (!token) {
+      toast.error("Please login first.");
+      return;
+    }
 
     try {
       setRazorLoading(true);
 
-      const order = await createOrder(courseId, token);
+      const createOrderKey = generateIdempotencyKey();
+      const order = await createOrder(courseId, token, createOrderKey);
+      const orderId = order?.id || order?.orderId;
+
+      if (!orderId) {
+        throw new Error("Order ID missing in create-order response.");
+      }
+
+      setPendingPayment(orderId, courseId);
 
       if (!window.Razorpay) {
         toast.error("Payment gateway not loaded.");
+        clearPendingPayment();
         setRazorLoading(false);
         return;
       }
@@ -69,30 +147,35 @@ export default function CouponPopup({ onClose, courseId }) {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: order.currency,
-        order_id: order.id,
+        order_id: orderId,
         name: "VK Academy",
         description: "Course Purchase",
 
-        handler: async function () {
+        handler: async function (response) {
           try {
+            setRazorLoading(false);
             setProcessingEnrollment(true);
 
-            const success = await verifyWithRetry(order.id);
+            const verifyClientKey = generateIdempotencyKey();
+            await verifyClient(
+              {
+                razorpayOrderId: response?.razorpay_order_id || orderId,
+                razorpayPaymentId: response?.razorpay_payment_id,
+                razorpaySignature: response?.razorpay_signature,
+              },
+              token,
+              verifyClientKey
+            );
 
-            if (success) {
-              toast.success("Enrollment successful 🎉");
-
-              onClose();
-              router.push(`/course/${courseId}`);
-
-              return;
-            }
-
-            toast.error("Payment verification failed.");
-            setProcessingEnrollment(false);
+            clearPendingPayment();
+            toast.success("Enrollment successful 🎉");
+            onClose();
+            router.push(`/course/${courseId}?enrolled=true`);
           } catch (error) {
             console.error(error);
-            toast.error("Verification failed.");
+            toast.error(
+              "Payment succeeded, but verification is pending. Reopen this course to continue."
+            );
             setProcessingEnrollment(false);
           }
         },
@@ -111,6 +194,7 @@ export default function CouponPopup({ onClose, courseId }) {
 
       razorpay.on("payment.failed", function () {
         toast.error("Payment failed. Please try again.");
+        clearPendingPayment();
         setRazorLoading(false);
       });
 
@@ -123,6 +207,7 @@ export default function CouponPopup({ onClose, courseId }) {
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Failed to initiate payment.");
+      clearPendingPayment();
       setRazorLoading(false);
     }
   };
@@ -191,7 +276,7 @@ export default function CouponPopup({ onClose, courseId }) {
                 disabled={loading || razorLoading}
                 className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60"
               >
-                {loading || razorLoading ? "Processing..." : "Skip & Continue"}
+                {loading || razorLoading ? "Processing..." : "Buy Now"}
                 <HiArrowRight size={18} />
               </button>
             </>

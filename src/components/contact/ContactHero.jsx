@@ -1,7 +1,6 @@
 
 
 
-
 import ContactCards from "./ContactCards";
 
 export default function ContactHero() {
@@ -12,40 +11,47 @@ export default function ContactHero() {
         min-h-[520px]
         sm:min-h-[480px]
         lg:min-h-[420px]
-
-        
         max-[650px]:pt-10
-        
-        /* Gradient only below 650px */
         max-[650px]:bg-gradient-to-br
         max-[650px]:from-[#1E40E6]
         max-[650px]:via-[#1e3a8a]
-        max-[650px]:to-[#0f172a] py-20
+        max-[650px]:to-[#0f172a]
+        py-20
       "
     >
       {/* BACKGROUND IMAGE (>=651px) */}
       <div
-        className="absolute inset-0 bg-cover bg-center hidden min-[651px]:block"
+        className="absolute inset-0 bg-cover bg-center hidden min-[651px]:block brightness-75"
         style={{
           backgroundImage: "url('/contact.png')",
           backgroundPosition: "center 20%",
         }}
       />
 
-      {/* OVERLAY */}
-      <div className="absolute inset-0 bg-[#1e3fe676] hidden min-[651px]:block" />
+      {/* DARK GRADIENT OVERLAY */}
+      <div
+        className="
+          absolute inset-0 hidden min-[651px]:block
+          bg-gradient-to-b
+          from-black/50
+          via-black/0
+          to-black/50
+        "
+      />
 
       {/* CONTENT */}
-      <div className="
-        relative z-10
-        max-w-7xl mx-auto
-        w-full
-        px-5 sm:px-8 lg:px-10
-        grid grid-cols-1 lg:grid-cols-2
-        gap-8 lg:gap-12
-        items-center
-        text-white
-      ">
+      <div
+        className="
+          relative z-10
+          max-w-7xl mx-auto
+          w-full
+          px-5 sm:px-8 lg:px-10
+          grid grid-cols-1 lg:grid-cols-2
+          gap-8 lg:gap-12
+          items-center
+          text-white
+        "
+      >
         <div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4">
             Contact Us
