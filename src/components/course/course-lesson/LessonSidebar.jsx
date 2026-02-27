@@ -8,9 +8,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { FiChevronDown, FiClock, FiCheck } from "react-icons/fi";
+import {
+  FiChevronDown,
+  FiClock,
+  FiCheck,
+  FiLock,
+} from "react-icons/fi";
 import useCourseStore from "@/store/CourseStore";
 import { useProgressStore } from "@/store/progress.store";
+import toast from "react-hot-toast";
 
 const isLessonDebugEnabled =
   process.env.NODE_ENV !== "production" ||
@@ -42,6 +48,7 @@ export default function LessonSidebar({
   lesson,
   fallbackCourseId,
 }) {
+  const unlockMessage = "Complete previous section to unlock";
   const { course, loading, fetchCourseById } = useCourseStore();
   const {
     courseProgress,
@@ -176,11 +183,21 @@ export default function LessonSidebar({
     0,
     Math.min(100, percentToShow)
   );
+  const isEnrolled = Boolean(
+    sidebarCourse?.isEnrolled ?? lesson?.isEnrolled
+  );
 
   const shouldWaitForCourse =
     sections.length === 0 &&
     Boolean(lessonCourseId) &&
     storeCourseId !== lessonCourseId;
+  const sortedSections = useMemo(
+    () =>
+      [...sections].sort(
+        (a, b) => (a?.order || 0) - (b?.order || 0)
+      ),
+    [sections]
+  );
 
   useEffect(() => {
     debugLesson("Incoming lesson payload", {
@@ -271,11 +288,27 @@ export default function LessonSidebar({
       </div>
 
       {/* ================= SECTIONS ================= */}
-      {[...sections]
-        .sort((a, b) => a.order - b.order)
-        .map((section, index) => {
+      {sortedSections.map((section, index) => {
+          const previousSection =
+            index > 0 ? sortedSections[index - 1] : null;
+          const previousSectionCompleted = previousSection
+            ? previousSection.isCompleted ||
+              (Number(previousSection.completedLessons || 0) >=
+                Number(previousSection.totalLessons || 0))
+            : true;
+          const sectionUnlockedByApi =
+            section.isUnlocked !== false;
+          const isSectionUnlocked = isEnrolled
+            ? index === 0
+              ? sectionUnlockedByApi
+              : sectionUnlockedByApi &&
+                previousSectionCompleted
+            : true;
+
           const sectionId = section.id || section._id || `${index}`;
-          const isOpen = openSections[sectionId] ?? index === 0;
+          const isOpen =
+            openSections[sectionId] ??
+            (index === 0 && isSectionUnlocked);
 
           return (
             <div
@@ -284,18 +317,30 @@ export default function LessonSidebar({
             >
               {/* SECTION HEADER */}
               <button
-                onClick={() => toggleSection(sectionId)}
+                onClick={() => {
+                  if (isSectionUnlocked) {
+                    toggleSection(sectionId);
+                    return;
+                  }
+                  toast.error(unlockMessage);
+                }}
                 className="w-full flex justify-between items-center mb-4"
               >
                 <h4 className="font-semibold text-left text-sm">
                   Section {index + 1}: {section.title}
                 </h4>
 
-                <FiChevronDown
-                  className={`transition-transform ${
-                    isOpen ? "rotate-180" : ""
-                  }`}
-                />
+                {isSectionUnlocked ? (
+                  <FiChevronDown
+                    className={`transition-transform ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                ) : (
+                  <span className="w-8 h-8 rounded-full bg-[#EF4444] text-white ring-2 ring-[#FCA5A5] flex items-center justify-center">
+                    <FiLock size={14} />
+                  </span>
+                )}
               </button>
 
               {/* LESSON LIST */}

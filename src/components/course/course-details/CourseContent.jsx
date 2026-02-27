@@ -17,17 +17,21 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import useCourseStore from "@/store/CourseStore";
+import { watchLesson } from "@/services/lesson.service";
+import toast from "react-hot-toast";
 
 /* ================= MAIN COMPONENT ================= */
 
 export default function CourseContent() {
   const [openSections, setOpenSections] = useState({});
+  const unlockMessage = "Complete previous section to unlock";
 
-  const { course } = useCourseStore();
+  const { course, refreshCourseById } = useCourseStore();
 
   if (!course) return null;
 
   const sections = course.sections || [];
+  const isEnrolled = Boolean(course.isEnrolled);
 
   const toggleSection = (id) => {
     setOpenSections((prev) => ({
@@ -52,8 +56,22 @@ export default function CourseContent() {
       </p>
 
       {sortedSections.map((section, index) => {
+        const previousSection = index > 0 ? sortedSections[index - 1] : null;
+        const previousSectionCompleted = previousSection
+          ? previousSection.isCompleted ||
+            (Number(previousSection.completedLessons || 0) >=
+              Number(previousSection.totalLessons || 0))
+          : true;
+        const sectionUnlockedByApi = section.isUnlocked !== false;
+        const isSectionUnlocked = isEnrolled
+          ? index === 0
+            ? sectionUnlockedByApi
+            : sectionUnlockedByApi && previousSectionCompleted
+          : true;
+
         const isOpen =
-          openSections[section.id] ?? index === 0;
+          openSections[section.id] ??
+          (index === 0 && isSectionUnlocked);
 
         const sortedLessons = [...(section.lessons || [])].sort(
           (a, b) => a.order - b.order
@@ -95,17 +113,29 @@ export default function CourseContent() {
                 )}
 
                 <button
-                  onClick={() =>
-                    toggleSection(section.id)
-                  }
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F4F9] hover:bg-[#E7EBF3] transition"
+                  onClick={() => {
+                    if (isSectionUnlocked) {
+                      toggleSection(section.id);
+                      return;
+                    }
+                    toast.error(unlockMessage);
+                  }}
+                  className={`w-8 h-8 flex items-center justify-center rounded-full transition ${
+                    isSectionUnlocked
+                      ? "bg-[#F1F4F9] hover:bg-[#E7EBF3]"
+                      : "bg-[#EF4444] text-white ring-2 ring-[#FCA5A5] hover:bg-[#DC2626]"
+                  }`}
                 >
-                  <FiChevronDown
-                    size={16}
-                    className={`text-[#495565] transition-transform duration-300 ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
-                  />
+                  {isSectionUnlocked ? (
+                    <FiChevronDown
+                      size={16}
+                      className={`text-[#495565] transition-transform duration-300 ${
+                        isOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  ) : (
+                    <FiLock size={14} />
+                  )}
                 </button>
               </div>
             </div>
@@ -124,7 +154,18 @@ export default function CourseContent() {
                     )} min`}
                     locked={lesson.locked}
                     isCompleted={lesson.isCompleted}
+                    isEnrolled={isEnrolled}
+                    isSectionUnlocked={isSectionUnlocked}
                     thumbnail={lesson.thumbnail}
+                    onAccessDenied={async (message) => {
+                      toast.error(
+                        message ||
+                          unlockMessage
+                      );
+                      await refreshCourseById(
+                        course.id || course._id
+                      );
+                    }}
                   />
                 ))}
               </div>
@@ -192,17 +233,43 @@ function Lesson({
   time,
   locked,
   isCompleted,
+  isEnrolled,
+  isSectionUnlocked,
   thumbnail,
+  onAccessDenied,
 }) {
   const router = useRouter();
+  const canWatchLesson =
+    !locked && (!isEnrolled || isSectionUnlocked);
 
-  const handleWatch = () => {
-    const url = courseId
-      ? `/lessons/${lessonId}/watch?courseId=${encodeURIComponent(
-          courseId
-        )}`
-      : `/lessons/${lessonId}/watch`;
-    router.push(url);
+  const handleWatch = async () => {
+    if (!canWatchLesson) {
+      onAccessDenied?.();
+      return;
+    }
+
+    try {
+      await watchLesson(lessonId);
+
+      const url = courseId
+        ? `/lessons/${lessonId}/watch?courseId=${encodeURIComponent(
+            courseId
+          )}`
+        : `/lessons/${lessonId}/watch`;
+      router.push(url);
+    } catch (error) {
+      const status = error?.response?.status;
+      const message = error?.response?.data?.message;
+
+      if (status === 403) {
+        onAccessDenied?.(message);
+        return;
+      }
+
+      toast.error(
+        message || "Unable to open this lesson right now"
+      );
+    }
   };
 
   return (
@@ -245,15 +312,21 @@ function Lesson({
         </span>
 
         <button
-          onClick={locked ? undefined : handleWatch}
+          onClick={handleWatch}
           className={`w-8 h-8 flex items-center justify-center rounded-full text-white transition-all ${
-            locked
-              ? "bg-gray-400 cursor-not-allowed"
+            !canWatchLesson
+              ? "bg-[#EF4444] ring-2 ring-[#FCA5A5] hover:bg-[#DC2626]"
               : "bg-[#1F3FD7] hover:bg-[#1630A8]"
           }`}
-          disabled={locked}
+          aria-label={
+            canWatchLesson ? "Watch lesson" : "Locked lesson"
+          }
         >
-          {locked ? <FiLock size={14} /> : <FiPlay size={14} />}
+          {!canWatchLesson ? (
+            <FiLock size={14} />
+          ) : (
+            <FiPlay size={14} />
+          )}
         </button>
       </div>
     </div>

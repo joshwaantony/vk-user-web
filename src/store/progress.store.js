@@ -4,6 +4,7 @@ import {
   getLessonProgressAPI,
   getCourseProgressAPI,
 } from "@/services/progress.service";
+import toast from "react-hot-toast";
 
 const normalizeResponse = (response) => {
   if (response?.success === false) {
@@ -116,13 +117,18 @@ export const useProgressStore = create((set) => ({
         },
       }));
     } catch (error) {
+      const message = getErrorMessage(
+        error,
+        "Failed to update lesson progress"
+      );
+      if (error?.response?.status === 403) {
+        toast.error(message);
+      }
+
       if (!silent) {
         set({
           updateLoading: false,
-          error: getErrorMessage(
-            error,
-            "Failed to update lesson progress"
-          ),
+          error: message,
         });
       } else {
         set({ updateLoading: false });
