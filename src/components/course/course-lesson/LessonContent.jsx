@@ -366,7 +366,7 @@
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Hls from "hls.js";
 import useCourseStore from "@/store/CourseStore";
 import {
@@ -425,6 +425,55 @@ export default function LessonContent({
 
   const lessonId =
     lesson?.id || lesson?._id || lesson?.lessonId || lessonIdProp;
+  const resolvedCourseId =
+    resolveId(fallbackCourseId) ||
+    resolveId(lesson?.courseId) ||
+    resolveId(lesson?.course) ||
+    resolveId(lesson?.courseDetails) ||
+    resolveId(course);
+
+  const orderedLessons = useMemo(() => {
+    const sectionsFromCourse = Array.isArray(course?.sections)
+      ? course.sections
+      : [];
+    const sectionsFromLessonCourse = Array.isArray(
+      lesson?.courseDetails?.sections
+    )
+      ? lesson.courseDetails.sections
+      : Array.isArray(lesson?.course?.sections)
+        ? lesson.course.sections
+        : [];
+    const sections =
+      sectionsFromCourse.length > 0
+        ? sectionsFromCourse
+        : sectionsFromLessonCourse;
+
+    return [...sections]
+      .sort((a, b) => (a?.order || 0) - (b?.order || 0))
+      .flatMap((section) =>
+        [...(section?.lessons || [])].sort(
+          (a, b) => (a?.order || 0) - (b?.order || 0)
+        )
+      );
+  }, [course?.sections, lesson?.courseDetails?.sections, lesson?.course?.sections]);
+
+  const currentLessonIndex = useMemo(
+    () =>
+      orderedLessons.findIndex(
+        (item) => resolveId(item) === resolveId(lessonId)
+      ),
+    [orderedLessons, lessonId]
+  );
+
+  const previousLesson =
+    currentLessonIndex > 0
+      ? orderedLessons[currentLessonIndex - 1]
+      : null;
+  const nextLesson =
+    currentLessonIndex >= 0 &&
+    currentLessonIndex < orderedLessons.length - 1
+      ? orderedLessons[currentLessonIndex + 1]
+      : null;
 
   /* ================= FETCH COURSE ================= */
   useEffect(() => {
@@ -572,6 +621,19 @@ export default function LessonContent({
     }
   };
 
+  const navigateToLesson = (targetLesson) => {
+    const targetLessonId = resolveId(targetLesson);
+    if (!targetLessonId) return;
+
+    const url = resolvedCourseId
+      ? `/lessons/${targetLessonId}/watch?courseId=${encodeURIComponent(
+          resolvedCourseId
+        )}`
+      : `/lessons/${targetLessonId}/watch`;
+
+    router.push(url);
+  };
+
   return (
     <div className="flex-1 flex flex-col bg-[#EEF5FF]">
 
@@ -640,22 +702,32 @@ export default function LessonContent({
         {/* ================= ACTION BUTTONS (UNCHANGED UI) ================= */}
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
 
-          <button className="px-5 py-3 rounded-lg bg-[#1E293B] text-gray-400 flex items-center gap-2 text-sm">
+          <button
+            type="button"
+            onClick={() => navigateToLesson(previousLesson)}
+            disabled={!previousLesson}
+            className={`px-5 py-3 rounded-lg flex items-center gap-2 text-sm transition ${
+              previousLesson
+                ? "bg-[#1E293B] text-white hover:bg-[#111827]"
+                : "bg-[#1E293B] text-gray-400 cursor-not-allowed"
+            }`}
+          >
             <FiArrowLeft />
             Previous Lesson
           </button>
 
-          {/* <button
-            type="button"
-            onClick={handleMarkCompleted}
-            disabled={updateLoading}
-            className="px-5 py-3 rounded-lg bg-[#16A34A] text-white font-medium flex items-center gap-2 text-sm hover:bg-[#15803D] transition disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            <FiCheckCircle />
-            {updateLoading ? "Saving..." : "Mark as Completed"}
-          </button> */}
+     
 
-          <button className="px-5 py-3 rounded-lg bg-[#2563EB] text-white font-medium flex items-center gap-2 text-sm hover:bg-[#1E4ED8] transition">
+          <button
+            type="button"
+            onClick={() => navigateToLesson(nextLesson)}
+            disabled={!nextLesson}
+            className={`px-5 py-3 rounded-lg font-medium flex items-center gap-2 text-sm transition ${
+              nextLesson
+                ? "bg-[#2563EB] text-white hover:bg-[#1E4ED8]"
+                : "bg-[#93C5FD] text-white cursor-not-allowed"
+            }`}
+          >
             Next Lesson
             <FiArrowRight />
           </button>
