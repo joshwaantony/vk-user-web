@@ -10,13 +10,9 @@ import AllCourseCard from "./AllCourseCard";
 import AllCourseCardSkeleton from "../loader/AllCourseCardSkeleton";
 
 export default function AllCourses() {
-  const { courses, fetchAllCourses, loading, error } = useCourseStore();
+  const { courses, loading, error } = useCourseStore();
 
   const [visibleCount, setVisibleCount] = useState(6);
-
-  useEffect(() => {
-    fetchAllCourses();
-  }, []);
 
   // 👇 Infinite Scroll Logic
   useEffect(() => {
