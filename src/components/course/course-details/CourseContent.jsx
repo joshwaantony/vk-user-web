@@ -52,6 +52,16 @@ export default function CourseContent() {
         const sortedLessons = [...(section.lessons || [])].sort(
           (a, b) => a.order - b.order
         );
+        const completedLessons = sortedLessons.filter(
+          (lesson) => lesson.isCompleted
+        ).length;
+        const sectionPercent =
+          sortedLessons.length > 0
+            ? Math.round(
+                (completedLessons / sortedLessons.length) *
+                  100
+              )
+            : 0;
 
         return (
           <div
@@ -74,7 +84,7 @@ export default function CourseContent() {
                 {/* ✅ Show circle ONLY if enrolled */}
                 {course.isEnrolled && (
                   <CircleProgress
-                    percentage={course.progress?.percent || 0}
+                    percentage={sectionPercent}
                   />
                 )}
 
@@ -101,6 +111,7 @@ export default function CourseContent() {
                   <Lesson
                     key={lesson.id}
                     lessonId={lesson.id}
+                    courseId={course.id || course._id}
                     title={lesson.title}
                     time={`${Math.round(
                       lesson.duration / 60
@@ -169,6 +180,7 @@ function CircleProgress({ percentage }) {
 
 function Lesson({
   lessonId,
+  courseId,
   title,
   time,
   locked,
@@ -177,7 +189,12 @@ function Lesson({
   const router = useRouter();
 
   const handleWatch = () => {
-    router.push(`/lessons/${lessonId}/watch`);
+    const url = courseId
+      ? `/lessons/${lessonId}/watch?courseId=${encodeURIComponent(
+          courseId
+        )}`
+      : `/lessons/${lessonId}/watch`;
+    router.push(url);
   };
 
   return (
@@ -221,6 +238,4 @@ function Lesson({
     </div>
   );
 }
-
-
 

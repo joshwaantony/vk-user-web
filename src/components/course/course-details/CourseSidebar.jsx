@@ -27,6 +27,7 @@ export default function CourseSidebar({ course }) {
 
   const {
     courseProgress,
+    courseProgressCourseId,
     getCourseProgress,
   } = useProgressStore();
 
@@ -63,21 +64,36 @@ export default function CourseSidebar({ course }) {
   };
 
   /* ================= SAFE VALUES ================= */
+  const courseId = course?.id || course?._id;
+  const shouldUseStoreProgress =
+    String(courseProgressCourseId || "") ===
+    String(courseId || "");
+
   const percent =
-    courseProgress?.percent ??
+    (shouldUseStoreProgress
+      ? courseProgress?.percent
+      : undefined) ??
     course?.progress?.percent ??
     0;
 
   const completedLessons =
-    courseProgress?.completedLessons ??
+    (shouldUseStoreProgress
+      ? courseProgress?.completedLessons
+      : undefined) ??
     course?.progress?.completedLessons ??
     0;
 
   const totalLessons =
-    courseProgress?.totalLessons ??
+    (shouldUseStoreProgress
+      ? courseProgress?.totalLessons
+      : undefined) ??
     course?.progress?.totalLessons ??
     course?.totalLessons ??
     0;
+  const safePercent = Math.max(
+    0,
+    Math.min(100, Number(percent) || 0)
+  );
 
   return (
     <>
@@ -106,19 +122,19 @@ export default function CourseSidebar({ course }) {
               Your Progress
             </h4>
 
-            <div className="flex justify-between text-sm mb-2">
+            <div className="flex justify-between text-sm mb-3">
               <span className="text-[#3C3B3B]">
                 Course Completion
               </span>
               <span className="font-semibold text-black">
-                {percent}%
+                {safePercent}%
               </span>
             </div>
 
             <div className="h-2 bg-gray-200 rounded-full mb-4">
               <div
                 className="h-2 bg-[#1F3FD7] rounded-full transition-all duration-300"
-                style={{ width: `${percent}%` }}
+                style={{ width: `${safePercent}%` }}
               />
             </div>
 
@@ -169,5 +185,3 @@ export default function CourseSidebar({ course }) {
     </>
   );
 }
-
-

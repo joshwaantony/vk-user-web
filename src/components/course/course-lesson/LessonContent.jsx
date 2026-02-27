@@ -381,10 +381,26 @@ import PromoLoader from "@/components/loader/PromoLoader";
 import { useProgressStore } from "@/store/progress.store";
 
 const PROGRESS_SAVE_INTERVAL_SECONDS = 10;
+const resolveId = (value) => {
+  if (!value) return null;
+  if (typeof value === "string" || typeof value === "number") {
+    return String(value);
+  }
+  if (typeof value === "object") {
+    return (
+      value.id?.toString?.() ||
+      value._id?.toString?.() ||
+      value.courseId?.toString?.() ||
+      null
+    );
+  }
+  return null;
+};
 
 export default function LessonContent({
   lesson,
   lessonId: lessonIdProp,
+  fallbackCourseId,
 }) {
   const router = useRouter();
 
@@ -412,10 +428,18 @@ export default function LessonContent({
 
   /* ================= FETCH COURSE ================= */
   useEffect(() => {
-    if (lesson?.courseId) {
-      fetchCourseById(lesson.courseId);
-    }
-  }, [lesson?.courseId, fetchCourseById]);
+    const lessonCourseId =
+      resolveId(fallbackCourseId) ||
+      resolveId(lesson?.courseId) ||
+      resolveId(lesson?.course) ||
+      resolveId(lesson?.courseDetails);
+    const currentCourseId = resolveId(course);
+
+    if (!lessonCourseId) return;
+    if (currentCourseId === lessonCourseId) return;
+
+    fetchCourseById(lessonCourseId);
+  }, [fallbackCourseId, lesson, course, fetchCourseById]);
 
   /* ================= FETCH PROGRESS ================= */
   useEffect(() => {
