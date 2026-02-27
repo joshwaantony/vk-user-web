@@ -36,6 +36,7 @@ export const useProgressStore = create((set) => ({
   lessonProgress: null,
   lessonProgressByLessonId: {},
   courseProgress: null,
+  courseProgressCourseId: null,
   loading: false,
   updateLoading: false,
   error: null,
@@ -196,6 +197,7 @@ export const useProgressStore = create((set) => ({
 
       set({
         courseProgress: progress,
+        courseProgressCourseId: String(courseId),
         loading: false,
         error: null,
       });

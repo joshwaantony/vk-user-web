@@ -5,7 +5,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 import LessonContent from "@/components/course/course-lesson/LessonContent";
 import LessonSidebar from "@/components/course/course-lesson/LessonSidebar";
@@ -14,8 +14,22 @@ import PromoLoader from "@/components/loader/PromoLoader";
 
 export default function LessonWatchPage() {
   const { lessonId } = useParams();
+  const searchParams = useSearchParams();
+  const fallbackCourseId = searchParams.get("courseId");
 
   const { lesson, loading, error, fetchLesson } = useLessonStore();
+  const hasLessonData = Boolean(
+    lesson &&
+      (lesson?.id ||
+        lesson?._id ||
+        lesson?.lessonId ||
+        lesson?.title ||
+        lesson?.playbackUrl ||
+        lesson?.courseId ||
+        lesson?.course ||
+        (Array.isArray(lesson?.sections) &&
+          lesson.sections.length > 0))
+  );
 
   useEffect(() => {
     if (lessonId) {
@@ -40,7 +54,7 @@ export default function LessonWatchPage() {
     );
   }
 
-  if (!lesson) {
+  if (!hasLessonData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         Lesson not found
@@ -50,8 +64,15 @@ export default function LessonWatchPage() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[#EEF5FF]">
-      <LessonContent lesson={lesson} lessonId={lessonId} />
-      <LessonSidebar lesson={lesson} />
+      <LessonContent
+        lesson={lesson}
+        lessonId={lessonId}
+        fallbackCourseId={fallbackCourseId}
+      />
+      <LessonSidebar
+        lesson={lesson}
+        fallbackCourseId={fallbackCourseId}
+      />
     </div>
   );
 }

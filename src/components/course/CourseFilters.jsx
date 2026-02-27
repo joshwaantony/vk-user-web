@@ -1,4 +1,37 @@
+
+
+
+"use client";
+
+import { useEffect, useState } from "react";
+import useCourseStore from "@/store/CourseStore";
+
 export default function CourseFilters() {
+  const [activeFilter, setActiveFilter] = useState("all");
+
+  const {
+    fetchAllCourses,
+    fetchPopularCourses,
+    courses,
+    loading,
+  } = useCourseStore();
+
+  /* ================= INITIAL LOAD ================= */
+  useEffect(() => {
+    fetchAllCourses();
+  }, []);
+
+  /* ================= HANDLE FILTER ================= */
+  const handleFilterChange = async (type) => {
+    setActiveFilter(type);
+
+    if (type === "all") {
+      fetchAllCourses();
+    } else {
+      fetchPopularCourses();
+    }
+  };
+
   return (
     <div className="mt-10 space-y-6">
       
@@ -25,7 +58,7 @@ export default function CourseFilters() {
           />
         </div>
 
-        {/* All Categories Dropdown */}
+        {/* Category Dropdown */}
         <div className="relative w-full lg:w-[260px]">
           <select
             className="
@@ -39,13 +72,11 @@ export default function CourseFilters() {
               focus:outline-none
             "
           >
-            <option>All Categories</option>
-            <option>Finance</option>
-            <option>Accounting</option>
-            <option>Tax Planning</option>
+            <option>All Courses</option>
+            <option>Popular Courses</option>
+          
           </select>
 
-          {/* Dropdown Arrow */}
           <span className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-600 pointer-events-none">
             ▼
           </span>
@@ -57,32 +88,52 @@ export default function CourseFilters() {
         
         {/* Showing Results */}
         <p className="text-sm text-[#475569]">
-          Showing <span className="font-semibold">9</span> Results
+          Showing{" "}
+          <span className="font-semibold">
+            {loading ? "..." : courses.length}
+          </span>{" "}
+          Results
         </p>
 
-        {/* Category Buttons */}
+        {/* Filter Buttons */}
         <div className="flex flex-wrap gap-4">
-          {["All Courses", "Popular Courses"].map(
-            (item, i) => (
-              <button
-                key={i}
-                className={`
-                  px-6 py-3
-                  rounded-xl
-                  text-sm
-                  font-medium
-                  transition
-                  ${
-                    i === 0
-                      ? "bg-[#1C3FD1] text-white"
-                      : "bg-white border border-[#C5CDD7] text-black hover:bg-[#F1F5F9]"
-                  }
-                `}
-              >
-                {item}
-              </button>
-            )
-          )}
+
+          <button
+            onClick={() => handleFilterChange("all")}
+            className={`
+              px-6 py-3
+              rounded-xl
+              text-sm
+              font-medium
+              transition
+              ${
+                activeFilter === "all"
+                  ? "bg-[#1C3FD1] text-white"
+                  : "bg-white border border-[#C5CDD7] text-black hover:bg-[#F1F5F9]"
+              }
+            `}
+          >
+            All Courses
+          </button>
+
+          <button
+            onClick={() => handleFilterChange("popular")}
+            className={`
+              px-6 py-3
+              rounded-xl
+              text-sm
+              font-medium
+              transition
+              ${
+                activeFilter === "popular"
+                  ? "bg-[#1C3FD1] text-white"
+                  : "bg-white border border-[#C5CDD7] text-black hover:bg-[#F1F5F9]"
+              }
+            `}
+          >
+            Popular Courses
+          </button>
+
         </div>
       </div>
     </div>
