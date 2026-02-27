@@ -7,7 +7,13 @@
 "use client";
 
 import { useState } from "react";
-import { FiClock, FiChevronDown, FiPlay, FiLock } from "react-icons/fi";
+import {
+  FiClock,
+  FiChevronDown,
+  FiPlay,
+  FiLock,
+  FiCheck,
+} from "react-icons/fi";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import useCourseStore from "@/store/CourseStore";
@@ -117,6 +123,7 @@ export default function CourseContent() {
                       lesson.duration / 60
                     )} min`}
                     locked={lesson.locked}
+                    isCompleted={lesson.isCompleted}
                     thumbnail={lesson.thumbnail}
                   />
                 ))}
@@ -184,6 +191,7 @@ function Lesson({
   title,
   time,
   locked,
+  isCompleted,
   thumbnail,
 }) {
   const router = useRouter();
@@ -198,7 +206,13 @@ function Lesson({
   };
 
   return (
-    <div className="flex justify-between items-center p-4 hover:bg-gray-50 transition">
+    <div
+      className={`flex justify-between items-center p-4 transition ${
+        isCompleted
+          ? "bg-emerald-50/70 border-l-4 border-emerald-500"
+          : "hover:bg-gray-50"
+      }`}
+    >
       <div className="flex gap-4 items-center">
         <Image
           src={thumbnail || "/thumb-line.avif"}
@@ -209,10 +223,17 @@ function Lesson({
         />
 
         <div>
-          <p className="text-sm font-medium text-[#1E293B]">
-            {title}
+          <p className="text-sm font-medium text-[#1E293B] flex items-center gap-2">
+            {isCompleted && (
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 text-white">
+                <FiCheck size={12} />
+              </span>
+            )}
+            <span>{title}</span>
           </p>
           <p className="text-xs text-gray-500">
+            {isCompleted && "Completed"}
+            {isCompleted && locked && " • "}
             {locked && "Locked lesson"}
           </p>
         </div>
@@ -238,4 +259,3 @@ function Lesson({
     </div>
   );
 }
-

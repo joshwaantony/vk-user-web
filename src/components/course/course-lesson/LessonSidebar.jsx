@@ -8,7 +8,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { FiChevronDown, FiClock } from "react-icons/fi";
+import { FiChevronDown, FiClock, FiCheck } from "react-icons/fi";
 import useCourseStore from "@/store/CourseStore";
 import { useProgressStore } from "@/store/progress.store";
 
@@ -310,7 +310,11 @@ export default function LessonSidebar({
                           lesson._id ||
                           `${sectionId}-${lessonIndex}`
                         }
-                        className="flex justify-between items-start gap-3 py-3 border-t border-[#EDEDED]"
+                        className={`flex justify-between items-start gap-3 py-3 border-t border-[#EDEDED] transition ${
+                          lesson.isCompleted
+                            ? "bg-emerald-50/60 border-l-4 border-emerald-500 pl-2 rounded-sm"
+                            : ""
+                        }`}
                       >
                         {/* LEFT */}
                         <div className="flex gap-3">
@@ -330,8 +334,13 @@ export default function LessonSidebar({
                           />
 
                           <div>
-                            <p className="text-sm font-medium">
-                              {lesson.title}
+                            <p className="text-sm font-medium flex items-center gap-2">
+                              {lesson.isCompleted && (
+                                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 text-white">
+                                  <FiCheck size={12} />
+                                </span>
+                              )}
+                              <span>{lesson.title}</span>
                             </p>
 
                             {lesson.isCompleted && (
