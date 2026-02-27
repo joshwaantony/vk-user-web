@@ -3,33 +3,85 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useCourseStore from "@/store/CourseStore";
+import { FiChevronDown } from "react-icons/fi";
 
 export default function CourseFilters() {
   const [activeFilter, setActiveFilter] = useState("all");
+  const [query, setQuery] = useState("");
+  const [sortOption, setSortOption] = useState("");
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const sortRef = useRef(null);
 
   const {
-    fetchAllCourses,
-    fetchPopularCourses,
+    fetchCourses,
     courses,
     loading,
   } = useCourseStore();
 
-  /* ================= INITIAL LOAD ================= */
+  const sortOptions = [
+    { value: "", label: "All" },
+    { value: "latest", label: "Latest" },
+    { value: "oldest", label: "Oldest" },
+    { value: "popular", label: "Popular" },
+  ];
+
+  const resolveSortBy = (filterType, optionValue) => {
+    if (filterType === "popular") return "POPULAR";
+    if (optionValue === "latest") return "LATEST";
+    if (optionValue === "oldest") return "OLDEST";
+    if (optionValue === "popular") return "POPULAR";
+    return "POPULAR";
+  };
+
   useEffect(() => {
-    fetchAllCourses();
+    const handleClickOutside = (event) => {
+      if (!sortRef.current?.contains(event.target)) {
+        setIsSortOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+      );
+    };
   }, []);
 
-  /* ================= HANDLE FILTER ================= */
-  const handleFilterChange = async (type) => {
-    setActiveFilter(type);
+  /* ================= SEARCH ================= */
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      fetchCourses({
+        q: query.trim(),
+        categoryId: "",
+        level: "",
+        minPrice: 0,
+        maxPrice: 10000,
+        sortBy: resolveSortBy(activeFilter, sortOption),
+        page: 1,
+        limit: 9,
+      });
+    }, 350);
 
-    if (type === "all") {
-      fetchAllCourses();
-    } else {
-      fetchPopularCourses();
-    }
+    return () => clearTimeout(timerId);
+  }, [query, sortOption, activeFilter, fetchCourses]);
+
+  /* ================= HANDLE FILTER ================= */
+  const handleFilterChange = (type) => {
+    setActiveFilter(type);
+    fetchCourses({
+      q: query.trim(),
+      categoryId: "",
+      level: "",
+      minPrice: 0,
+      maxPrice: 10000,
+      sortBy: resolveSortBy(type, sortOption),
+      page: 1,
+      limit: 9,
+    });
   };
 
   return (
@@ -44,6 +96,8 @@ export default function CourseFilters() {
             🔍
           </span>
           <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
             placeholder="Search Courses..."
             className="
               w-full
@@ -58,28 +112,78 @@ export default function CourseFilters() {
           />
         </div>
 
-        {/* Category Dropdown */}
-        <div className="relative w-full lg:w-[260px]">
-          <select
+        {/* Sort Dropdown */}
+        <div className="relative w-full lg:w-[260px]" ref={sortRef}>
+          <button
+            type="button"
+            onClick={() => setIsSortOpen((prev) => !prev)}
             className="
               w-full
               bg-[#F8FAFC]
               border border-[#C5CDD7]
               rounded-xl
               px-4 py-3
-              text-black
-              appearance-none
+              text-sm font-medium text-[#0F172A]
+              transition
+              hover:border-[#9AA6B2]
               focus:outline-none
+              focus:ring-2 focus:ring-[#1C3FD1]/20 focus:border-[#1C3FD1]
+              flex items-center justify-between
             "
+            aria-haspopup="listbox"
+            aria-expanded={isSortOpen}
           >
-            <option>All Courses</option>
-            <option>Popular Courses</option>
-          
-          </select>
+            <span>
+              {sortOptions.find((opt) => opt.value === sortOption)
+                ?.label || "All"}
+            </span>
+            <FiChevronDown
+              className={`text-[#1C3FD1] transition-transform ${
+                isSortOpen ? "rotate-180" : ""
+              }`}
+              size={18}
+            />
+          </button>
 
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-600 pointer-events-none">
-            ▼
-          </span>
+          {isSortOpen && (
+            <div
+              className="
+                absolute z-30 mt-2 w-full
+                rounded-xl border border-[#C5CDD7]
+                bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)]
+                p-1
+              "
+              role="listbox"
+              aria-label="Sort courses"
+            >
+              {sortOptions.map((option) => {
+                const isActive = sortOption === option.value;
+
+                return (
+                  <button
+                    key={option.value || "all"}
+                    type="button"
+                    onClick={() => {
+                      setSortOption(option.value);
+                      setIsSortOpen(false);
+                    }}
+                    className={`
+                      w-full text-left px-3 py-2.5 rounded-lg text-sm transition
+                      ${
+                        isActive
+                          ? "bg-[#1C3FD1] text-white"
+                          : "text-[#0F172A] hover:bg-[#F1F5F9]"
+                      }
+                    `}
+                    role="option"
+                    aria-selected={isActive}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 

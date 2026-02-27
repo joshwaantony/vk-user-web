@@ -4,23 +4,66 @@
 
 import { create } from "zustand";
 import {
+  getCourses,
   getPopularCourses,
   getCourseById,
-  getAllCourses, // 👈 ADD THIS
+  getAllCourses,
 } from "@/services/course.service";
 
-const useCourseStore = create((set) => ({
+const useCourseStore = create((set, get) => ({
   /* =====================
      STATE
   ===================== */
   courses: [],
   course: null,
+  filters: {
+    q: "",
+    categoryId: "",
+    level: "",
+    minPrice: 0,
+    maxPrice: 10000,
+    sortBy: "POPULAR",
+    page: 1,
+    limit: 9,
+  },
   loading: false,
   error: null,
 
   /* =====================
      ACTIONS
   ===================== */
+
+  // 🔎 FILTER + SEARCH COURSES
+  fetchCourses: async (params = {}) => {
+    try {
+      set((state) => ({
+        loading: true,
+        error: null,
+        filters: {
+          ...state.filters,
+          ...params,
+        },
+      }));
+
+      const nextFilters = {
+        ...get().filters,
+        ...params,
+      };
+      const courses = await getCourses(nextFilters);
+
+      set({
+        courses,
+        loading: false,
+      });
+    } catch (err) {
+      set({
+        error:
+          err?.response?.data?.message ||
+          "Failed to load courses",
+        loading: false,
+      });
+    }
+  },
 
   // 📚 ALL COURSES (from /courses)
   fetchAllCourses: async () => {
