@@ -4,6 +4,7 @@ import {
   getLessonProgressAPI,
   getCourseProgressAPI,
 } from "@/services/progress.service";
+import toast from "react-hot-toast";
 
 const normalizeResponse = (response) => {
   if (response?.success === false) {
@@ -66,7 +67,7 @@ export const useProgressStore = create((set) => ({
     options = { silent: true }
   ) => {
     if (!lessonId || !Number.isFinite(watchedSeconds)) {
-      return;
+      return null;
     }
 
     const { silent = true } = options;
@@ -115,19 +116,35 @@ export const useProgressStore = create((set) => ({
           },
         },
       }));
+
+      return nextProgress;
     } catch (error) {
+      const message = getErrorMessage(
+        error,
+        "Failed to update lesson progress"
+      );
+      const isNetworkError =
+        !error?.response &&
+        (error?.message === "Network Error" ||
+          error?.code === "ERR_NETWORK");
+      if (error?.response?.status === 403) {
+        toast.error(message);
+      }
+
       if (!silent) {
         set({
           updateLoading: false,
-          error: getErrorMessage(
-            error,
-            "Failed to update lesson progress"
-          ),
+          error: message,
         });
       } else {
         set({ updateLoading: false });
       }
-      console.error("Progress update failed:", error);
+
+      // Avoid noisy console spam for background autosave when network is temporarily unavailable.
+      if (!silent || !isNetworkError) {
+        console.error("Progress update failed:", error);
+      }
+      return null;
     }
   },
 

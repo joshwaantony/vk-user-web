@@ -128,6 +128,24 @@ const useCourseStore = create((set, get) => ({
     }
   },
 
+  // 🔄 REFRESH COURSE STATE (unlock/progress sync without page loader)
+  refreshCourseById: async (courseId) => {
+    if (!courseId) return null;
+
+    try {
+      const course = await getCourseById(courseId);
+      set({ course, error: null });
+      return course;
+    } catch (err) {
+      set({
+        error:
+          err?.response?.data?.message ||
+          "Failed to refresh course",
+      });
+      return null;
+    }
+  },
+
   // 🧹 CLEAR SINGLE COURSE
   clearCourse: () => set({ course: null }),
 }));

@@ -8,9 +8,17 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { FiChevronDown, FiClock } from "react-icons/fi";
+import {
+  FiChevronDown,
+  FiClock,
+  FiCheck,
+  FiLock,
+  FiPlay,
+} from "react-icons/fi";
 import useCourseStore from "@/store/CourseStore";
 import { useProgressStore } from "@/store/progress.store";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const isLessonDebugEnabled =
   process.env.NODE_ENV !== "production" ||
@@ -42,6 +50,8 @@ export default function LessonSidebar({
   lesson,
   fallbackCourseId,
 }) {
+  const router = useRouter();
+  const unlockMessage = "Complete previous section to unlock";
   const { course, loading, fetchCourseById } = useCourseStore();
   const {
     courseProgress,
@@ -176,11 +186,21 @@ export default function LessonSidebar({
     0,
     Math.min(100, percentToShow)
   );
+  const isEnrolled = Boolean(
+    sidebarCourse?.isEnrolled ?? lesson?.isEnrolled
+  );
 
   const shouldWaitForCourse =
     sections.length === 0 &&
     Boolean(lessonCourseId) &&
     storeCourseId !== lessonCourseId;
+  const sortedSections = useMemo(
+    () =>
+      [...sections].sort(
+        (a, b) => (a?.order || 0) - (b?.order || 0)
+      ),
+    [sections]
+  );
 
   useEffect(() => {
     debugLesson("Incoming lesson payload", {
@@ -244,6 +264,18 @@ export default function LessonSidebar({
     }));
   };
 
+  const handleWatchLesson = (targetLessonId) => {
+    if (!targetLessonId) return;
+
+    const url = lessonCourseId
+      ? `/lessons/${targetLessonId}/watch?courseId=${encodeURIComponent(
+          lessonCourseId
+        )}`
+      : `/lessons/${targetLessonId}/watch`;
+
+    router.push(url);
+  };
+
   return (
     <div className="w-full lg:w-[360px] bg-white text-black min-h-screen">
 
@@ -271,11 +303,27 @@ export default function LessonSidebar({
       </div>
 
       {/* ================= SECTIONS ================= */}
-      {[...sections]
-        .sort((a, b) => a.order - b.order)
-        .map((section, index) => {
+      {sortedSections.map((section, index) => {
+          const previousSection =
+            index > 0 ? sortedSections[index - 1] : null;
+          const previousSectionCompleted = previousSection
+            ? previousSection.isCompleted ||
+              (Number(previousSection.completedLessons || 0) >=
+                Number(previousSection.totalLessons || 0))
+            : true;
+          const sectionUnlockedByApi =
+            section.isUnlocked !== false;
+          const isSectionUnlocked = isEnrolled
+            ? index === 0
+              ? sectionUnlockedByApi
+              : sectionUnlockedByApi &&
+                previousSectionCompleted
+            : true;
+
           const sectionId = section.id || section._id || `${index}`;
-          const isOpen = openSections[sectionId] ?? index === 0;
+          const isOpen =
+            openSections[sectionId] ??
+            (index === 0 && isSectionUnlocked);
 
           return (
             <div
@@ -284,18 +332,30 @@ export default function LessonSidebar({
             >
               {/* SECTION HEADER */}
               <button
-                onClick={() => toggleSection(sectionId)}
+                onClick={() => {
+                  if (isSectionUnlocked) {
+                    toggleSection(sectionId);
+                    return;
+                  }
+                  toast.error(unlockMessage);
+                }}
                 className="w-full flex justify-between items-center mb-4"
               >
                 <h4 className="font-semibold text-left text-sm">
                   Section {index + 1}: {section.title}
                 </h4>
 
-                <FiChevronDown
-                  className={`transition-transform ${
-                    isOpen ? "rotate-180" : ""
-                  }`}
-                />
+                {isSectionUnlocked ? (
+                  <FiChevronDown
+                    className={`transition-transform ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                ) : (
+                  <span className="w-8 h-8 rounded-full bg-[#EF4444] text-white ring-2 ring-[#FCA5A5] flex items-center justify-center">
+                    <FiLock size={14} />
+                  </span>
+                )}
               </button>
 
               {/* LESSON LIST */}
@@ -303,14 +363,23 @@ export default function LessonSidebar({
                 <div className="space-y-3">
                   {[...(section.lessons || [])]
                     .sort((a, b) => a.order - b.order)
-                    .map((lesson, lessonIndex) => (
+                    .map((lesson, lessonIndex) => {
+                      const lessonId =
+                        lesson.id ||
+                        lesson._id ||
+                        `${sectionId}-${lessonIndex}`;
+                      const canWatchLesson =
+                        !lesson.locked &&
+                        (!isEnrolled || isSectionUnlocked);
+
+                      return (
                       <div
-                        key={
-                          lesson.id ||
-                          lesson._id ||
-                          `${sectionId}-${lessonIndex}`
-                        }
-                        className="flex justify-between items-start gap-3 py-3 border-t border-[#EDEDED]"
+                        key={lessonId}
+                        className={`flex justify-between items-start gap-3 py-3 border-t border-[#EDEDED] transition ${
+                          lesson.isCompleted
+                            ? "bg-emerald-50/60 border-l-4 border-emerald-500 pl-2 rounded-sm"
+                            : ""
+                        }`}
                       >
                         {/* LEFT */}
                         <div className="flex gap-3">
@@ -330,8 +399,13 @@ export default function LessonSidebar({
                           />
 
                           <div>
-                            <p className="text-sm font-medium">
-                              {lesson.title}
+                            <p className="text-sm font-medium flex items-center gap-2">
+                              {lesson.isCompleted && (
+                                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 text-white">
+                                  <FiCheck size={12} />
+                                </span>
+                              )}
+                              <span>{lesson.title}</span>
                             </p>
 
                             {lesson.isCompleted && (
@@ -343,15 +417,45 @@ export default function LessonSidebar({
                         </div>
 
                         {/* RIGHT */}
-                        <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
-                          <FiClock />
-                          {Math.floor(lesson.duration / 60)}:
-                          {String(
-                            lesson.duration % 60
-                          ).padStart(2, "0")}
+                        <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                          <span className="flex items-center gap-1">
+                            <FiClock />
+                            {Math.floor(lesson.duration / 60)}:
+                            {String(
+                              lesson.duration % 60
+                            ).padStart(2, "0")}
+                          </span>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!canWatchLesson) {
+                                toast.error(unlockMessage);
+                                return;
+                              }
+                              handleWatchLesson(lesson.id || lesson._id);
+                            }}
+                            className={`w-8 h-8 flex items-center justify-center rounded-full text-white transition-all ${
+                              !canWatchLesson
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-[#1F3FD7] hover:bg-[#1630A8]"
+                            }`}
+                            aria-label={
+                              canWatchLesson
+                                ? "Watch lesson"
+                                : "Locked lesson"
+                            }
+                          >
+                            {canWatchLesson ? (
+                              <FiPlay size={14} />
+                            ) : (
+                              <FiLock size={14} />
+                            )}
+                          </button>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                 </div>
               )}
             </div>
