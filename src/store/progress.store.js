@@ -67,7 +67,7 @@ export const useProgressStore = create((set) => ({
     options = { silent: true }
   ) => {
     if (!lessonId || !Number.isFinite(watchedSeconds)) {
-      return;
+      return null;
     }
 
     const { silent = true } = options;
@@ -116,11 +116,17 @@ export const useProgressStore = create((set) => ({
           },
         },
       }));
+
+      return nextProgress;
     } catch (error) {
       const message = getErrorMessage(
         error,
         "Failed to update lesson progress"
       );
+      const isNetworkError =
+        !error?.response &&
+        (error?.message === "Network Error" ||
+          error?.code === "ERR_NETWORK");
       if (error?.response?.status === 403) {
         toast.error(message);
       }
@@ -133,7 +139,12 @@ export const useProgressStore = create((set) => ({
       } else {
         set({ updateLoading: false });
       }
-      console.error("Progress update failed:", error);
+
+      // Avoid noisy console spam for background autosave when network is temporarily unavailable.
+      if (!silent || !isNetworkError) {
+        console.error("Progress update failed:", error);
+      }
+      return null;
     }
   },
 

@@ -13,10 +13,12 @@ import {
   FiClock,
   FiCheck,
   FiLock,
+  FiPlay,
 } from "react-icons/fi";
 import useCourseStore from "@/store/CourseStore";
 import { useProgressStore } from "@/store/progress.store";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const isLessonDebugEnabled =
   process.env.NODE_ENV !== "production" ||
@@ -48,6 +50,7 @@ export default function LessonSidebar({
   lesson,
   fallbackCourseId,
 }) {
+  const router = useRouter();
   const unlockMessage = "Complete previous section to unlock";
   const { course, loading, fetchCourseById } = useCourseStore();
   const {
@@ -261,6 +264,18 @@ export default function LessonSidebar({
     }));
   };
 
+  const handleWatchLesson = (targetLessonId) => {
+    if (!targetLessonId) return;
+
+    const url = lessonCourseId
+      ? `/lessons/${targetLessonId}/watch?courseId=${encodeURIComponent(
+          lessonCourseId
+        )}`
+      : `/lessons/${targetLessonId}/watch`;
+
+    router.push(url);
+  };
+
   return (
     <div className="w-full lg:w-[360px] bg-white text-black min-h-screen">
 
@@ -348,13 +363,18 @@ export default function LessonSidebar({
                 <div className="space-y-3">
                   {[...(section.lessons || [])]
                     .sort((a, b) => a.order - b.order)
-                    .map((lesson, lessonIndex) => (
+                    .map((lesson, lessonIndex) => {
+                      const lessonId =
+                        lesson.id ||
+                        lesson._id ||
+                        `${sectionId}-${lessonIndex}`;
+                      const canWatchLesson =
+                        !lesson.locked &&
+                        (!isEnrolled || isSectionUnlocked);
+
+                      return (
                       <div
-                        key={
-                          lesson.id ||
-                          lesson._id ||
-                          `${sectionId}-${lessonIndex}`
-                        }
+                        key={lessonId}
                         className={`flex justify-between items-start gap-3 py-3 border-t border-[#EDEDED] transition ${
                           lesson.isCompleted
                             ? "bg-emerald-50/60 border-l-4 border-emerald-500 pl-2 rounded-sm"
@@ -397,15 +417,45 @@ export default function LessonSidebar({
                         </div>
 
                         {/* RIGHT */}
-                        <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
-                          <FiClock />
-                          {Math.floor(lesson.duration / 60)}:
-                          {String(
-                            lesson.duration % 60
-                          ).padStart(2, "0")}
+                        <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                          <span className="flex items-center gap-1">
+                            <FiClock />
+                            {Math.floor(lesson.duration / 60)}:
+                            {String(
+                              lesson.duration % 60
+                            ).padStart(2, "0")}
+                          </span>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!canWatchLesson) {
+                                toast.error(unlockMessage);
+                                return;
+                              }
+                              handleWatchLesson(lesson.id || lesson._id);
+                            }}
+                            className={`w-8 h-8 flex items-center justify-center rounded-full text-white transition-all ${
+                              !canWatchLesson
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-[#1F3FD7] hover:bg-[#1630A8]"
+                            }`}
+                            aria-label={
+                              canWatchLesson
+                                ? "Watch lesson"
+                                : "Locked lesson"
+                            }
+                          >
+                            {canWatchLesson ? (
+                              <FiPlay size={14} />
+                            ) : (
+                              <FiLock size={14} />
+                            )}
+                          </button>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                 </div>
               )}
             </div>

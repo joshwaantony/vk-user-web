@@ -49,7 +49,7 @@ export default function CourseCard({ course }) {
       {/* ================= CONTENT ================= */}
       <div className="p-4 sm:p-5">
         <h3
-          className="
+          className="h-14
             font-semibold 
             text-base sm:text-lg 
             text-gray-900

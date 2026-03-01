@@ -3,12 +3,16 @@
 
 import axios from "axios";
 
+const API_ORIGIN =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
 /* -------------------------------------------------
    AXIOS INSTANCE
 ------------------------------------------------- */
 const api = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api/v1`,
+  baseURL: `${API_ORIGIN}/api/v1`,
   withCredentials: true,
+  timeout: 15000,
   headers: {
     "Content-Type": "application/json",
     "X-Client-Type": "web",

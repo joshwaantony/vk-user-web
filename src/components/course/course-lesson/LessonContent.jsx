@@ -258,14 +258,42 @@ export default function LessonContent({
       scheduleCourseRefresh();
     };
 
-    video.addEventListener("timeupdate", () => saveProgress(false));
-    video.addEventListener("pause", () => saveProgress(true));
-    video.addEventListener("ended", () => saveProgress(true));
+    const handleTimeUpdate = () => saveProgress(false);
+    const handlePause = () => saveProgress(true);
+    const handleEnded = async () => {
+      const completionSeconds = Math.floor(
+        Number(
+          lesson?.duration ||
+            video.duration ||
+            video.currentTime
+        )
+      );
 
-    return () => saveProgress(true);
-  }, [lessonId, updateProgress]);
+      if (completionSeconds > 0) {
+        lastSavedTimeRef.current = completionSeconds;
+        await updateProgress(lessonId, completionSeconds, {
+          silent: false,
+        });
+        await refreshCourseNow();
+        return;
+      }
 
-  const handleMarkCompleted = () => {
+      saveProgress(true);
+    };
+
+    video.addEventListener("timeupdate", handleTimeUpdate);
+    video.addEventListener("pause", handlePause);
+    video.addEventListener("ended", handleEnded);
+
+    return () => {
+      video.removeEventListener("timeupdate", handleTimeUpdate);
+      video.removeEventListener("pause", handlePause);
+      video.removeEventListener("ended", handleEnded);
+      saveProgress(true);
+    };
+  }, [lessonId, lesson?.duration, updateProgress]);
+
+  const handleMarkCompleted = async () => {
     if (!lessonId) return;
 
     const video = videoRef.current;
@@ -277,8 +305,10 @@ export default function LessonContent({
 
     if (duration > 0) {
       lastSavedTimeRef.current = duration;
-      updateProgress(lessonId, duration, { silent: false });
-      scheduleCourseRefresh();
+      await updateProgress(lessonId, duration, {
+        silent: false,
+      });
+      await refreshCourseNow();
     }
   };
 
@@ -298,6 +328,12 @@ export default function LessonContent({
     refreshCourseTimerRef.current = setTimeout(() => {
       refreshCourseById(resolvedCourseId);
     }, 400);
+  };
+
+  const refreshCourseNow = async () => {
+    if (!resolvedCourseId) return;
+    await refreshCourseById(resolvedCourseId);
+    scheduleCourseRefresh();
   };
 
   useEffect(
@@ -431,26 +467,35 @@ export default function LessonContent({
 
       {/* ================= INSTRUCTOR ================= */}
       {course?.faculty?.length > 0 && (
-        <div className="px-4 sm:px-8 py-6 border-t flex gap-4 pb-20">
+        <div className="px-4 sm:px-8 pb-20">
+          <div className="relative overflow-hidden rounded-2xl border border-[#D7E3F5] bg-gradient-to-r from-[#F7FAFF] via-[#EDF3FF] to-[#E3EDFF] p-5 sm:p-6">
+            <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-[#1F3FD7]/10 blur-2xl" />
+            <div className="absolute -bottom-8 -left-8 w-28 h-28 rounded-full bg-[#60A5FA]/15 blur-2xl" />
 
-          <img
-            src={
-              course.faculty[0]?.imageUrl ||
-              "https://randomuser.me/api/portraits/men/32.jpg"
-            }
-            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
-            alt={course.faculty[0]?.name}
-          />
+            <p className="relative text-xs font-semibold tracking-[0.18em] uppercase text-[#1F3FD7] mb-4">
+              Instructor
+            </p>
 
-          <div>
-            <p className="font-semibold text-black">
-              {course.faculty[0]?.name}
-            </p>
-            <p className="text-sm font-semibold text-gray-500">
-              {course.faculty[0]?.qualification}
-            </p>
+            <div className="relative flex items-center gap-4">
+              <img
+                src={
+                  course.faculty[0]?.imageUrl ||
+                  "https://randomuser.me/api/portraits/men/32.jpg"
+                }
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border-2 border-white shadow-md"
+                alt={course.faculty[0]?.name}
+              />
+
+              <div>
+                <p className="text-lg font-bold text-[#0F172A] leading-tight">
+                  {course.faculty[0]?.name}
+                </p>
+                <p className="text-sm font-medium text-[#475569] mt-1">
+                  {course.faculty[0]?.qualification || "Course Instructor"}
+                </p>
+              </div>
+            </div>
           </div>
-
         </div>
       )}
     </div>
