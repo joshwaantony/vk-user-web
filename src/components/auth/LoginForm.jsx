@@ -99,17 +99,37 @@ export default function LoginPage() {
     }
   };
 
+  
   // 🔹 OTP LOGIN
-  const handleOtpLogin = () => {
-    setFlow({
-      purpose: "REGISTER",
-      title: "What’s your phone number?",
-      subtitle:
-        "We’ll send you a one-time verification code to confirm your number.",
-    });
+  // const handleOtpLogin = () => {
+  //   setFlow({
+  //     purpose: "REGISTER",
+  //     title: "What’s your phone number?",
+  //     subtitle:
+  //       "We’ll send you a one-time verification code to confirm your number.",
+  //   });
 
-    router.push("/phone/enter-phone");
-  };
+  //   router.push("/phone/enter-phone");
+  // };
+  const handleOtpLogin = () => {
+  setFlow({
+    purpose: "LOGIN",
+    title: "Login with OTP",
+    subtitle: "We’ll send you a one-time verification code to log you in.",
+  });
+
+  router.push("/phone/enter-phone");
+};
+
+const handleRegister = () => {
+  setFlow({
+    purpose: "REGISTER",
+    title: "Create Account",
+    subtitle: "Enter your phone number to create a new account.",
+  });
+
+  router.push("/phone/enter-phone");
+};
 
   // 🔹 FORGOT PASSWORD
   const handleForgotPassword = () => {

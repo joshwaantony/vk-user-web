@@ -2,55 +2,34 @@
 
 
 
+
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CourseCard from "./CourseCard";
 import CompletedCourses from "./CompletedCourses";
-
-const courses = [
-  {
-    id: 1,
-    title: "Financial Accounting Fundamentals",
-    instructor: "Dr. Sarah Johnson",
-    lessons: "16/24 lessons",
-    progress: 65,
-    duration: "8 weeks",
-    lastAccessed: "2 days ago",
-    category: "Accounting",
-    status: "progress",
-    image: "/course/course1.png",
-  },
-  {
-    id: 2,
-    title: "Advanced Tax Strategies",
-    instructor: "Michael Chen",
-    lessons: "9/30 lessons",
-    progress: 30,
-    duration: "10 weeks",
-    lastAccessed: "1 week ago",
-    category: "Taxation",
-    status: "progress",
-    image: "/course/course2.png",
-  },
-  {
-    id: 3,
-    title: "Bookkeeping Essentials",
-    instructor: "James Wilson",
-    lessons: "15/18 lessons",
-    progress: 85,
-    duration: "6 weeks",
-    lastAccessed: "3 days ago",
-    category: "Accounting",
-    status: "progress",
-    image: "/course/course3.png",
-  },
-];
+import useEnrollmentStore from "@/store/useEnrollmentStore";
 
 export default function MyCourses() {
+  const { enrollments, fetchEnrollments, loading } =
+    useEnrollmentStore();
+
   const [tab, setTab] = useState("progress");
 
-  const inProgress = courses.filter(c => c.status === "progress");
+  useEffect(() => {
+    fetchEnrollments();
+  }, []);
+
+  /* ------------------------------------
+     Separate ACTIVE & COMPLETED
+  ------------------------------------- */
+  const inProgress = enrollments.filter(
+    (item) => item.status === "ACTIVE"
+  );
+
+  const completed = enrollments.filter(
+    (item) => item.status === "COMPLETED"
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
@@ -70,7 +49,7 @@ export default function MyCourses() {
         <div className="flex gap-6 sm:gap-10">
           <div className="text-center">
             <p className="text-xl sm:text-2xl font-bold text-blue-600">
-              {courses.length}
+              {enrollments.length}
             </p>
             <p className="text-xs sm:text-sm text-gray-500">
               Total Courses
@@ -78,7 +57,7 @@ export default function MyCourses() {
           </div>
           <div className="text-center">
             <p className="text-xl sm:text-2xl font-bold text-green-600">
-              2
+              {completed.length}
             </p>
             <p className="text-xs sm:text-sm text-gray-500">
               Completed
@@ -108,24 +87,45 @@ export default function MyCourses() {
               : "text-gray-500"
           }`}
         >
-          Completed (2)
+          Completed ({completed.length})
         </button>
       </div>
+
+      {/* ================= LOADING ================= */}
+      {loading && (
+        <p className="text-gray-500 text-sm">
+          Loading courses...
+        </p>
+      )}
 
       {/* ================= TAB CONTENT ================= */}
       {tab === "progress" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {inProgress.map(course => (
-            <CourseCard key={course.id} course={course} />
+          {inProgress.map((item) => (
+            <CourseCard
+              key={item.enrollmentId}
+              course={{
+                id: item.course.id,
+                title: item.course.title,
+                instructor: item.course.instructor.name,
+                lessons: `${item.progress.completedLessons}/${item.progress.totalLessons} lessons`,
+                progress: item.progress.percentage,
+                duration: "—",
+                lastAccessed: "Recently",
+                category: "Course",
+                image: item.course.thumbnail,
+              }}
+            />
           ))}
         </div>
       )}
 
       {tab === "completed" && (
         <div className="mt-4 sm:mt-6">
-          <CompletedCourses />
+          <CompletedCourses data={completed} />
         </div>
       )}
     </div>
   );
 }
+

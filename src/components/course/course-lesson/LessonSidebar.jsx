@@ -70,6 +70,7 @@ export default function LessonSidebar({
     [lesson, fallbackCourseId]
   );
   const storeCourseId = useMemo(() => resolveId(course), [course]);
+console.log(lessonCourseId);
 
   useEffect(() => {
     if (!lessonCourseId) {
