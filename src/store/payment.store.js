@@ -8,6 +8,9 @@ import {
   verifyOrderAPI,
 } from "@/services/payment.service";
 
+const getErrorMessage = (error, fallback = "Something went wrong") =>
+  error?.message || fallback;
+
 export const usePaymentStore = create((set) => ({
   loading: false,
   error: null,
@@ -25,7 +28,7 @@ export const usePaymentStore = create((set) => ({
     } catch (error) {
       set({
         loading: false,
-        error: error.message || "Order failed",
+        error: getErrorMessage(error, "Order failed"),
       });
       throw error;
     }

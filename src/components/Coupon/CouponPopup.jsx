@@ -10,6 +10,8 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 const PENDING_PAYMENT_KEY = "vk_pending_payment";
+const getErrorMessage = (error, fallback) =>
+  error?.message || fallback;
 
 const generateIdempotencyKey = () => {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -60,7 +62,11 @@ export default function CouponPopup({ onClose, courseId }) {
   const { token, user } = useAuthStore();
   const { courses } = useCourseStore();
 
-  const selectedCourse = courses.find((c) => c.id === courseId);
+  const selectedCourse = courses.find(
+    (c) =>
+      String(c?.id || c?._id || "") ===
+      String(courseId || "")
+  );
 
   /* ================= DISABLE BODY SCROLL ================= */
   useEffect(() => {
@@ -118,6 +124,10 @@ export default function CouponPopup({ onClose, courseId }) {
   /* ================= PAYMENT HANDLER ================= */
   const handleSkip = async () => {
     if (razorLoading) return; // prevent double click
+    if (!courseId) {
+      toast.error("Course not found. Please refresh and try again.");
+      return;
+    }
     if (!token) {
       toast.error("Please login first.");
       return;
@@ -127,7 +137,15 @@ export default function CouponPopup({ onClose, courseId }) {
       setRazorLoading(true);
 
       const createOrderKey = generateIdempotencyKey();
-      const order = await createOrder(courseId, token, createOrderKey);
+      const createOrderResponse = await createOrder(
+        courseId,
+        token,
+        createOrderKey
+      );
+      const order =
+        createOrderResponse?.order ||
+        createOrderResponse?.data?.order ||
+        createOrderResponse;
       const orderId = order?.id || order?.orderId;
 
       if (!orderId) {
@@ -206,7 +224,9 @@ export default function CouponPopup({ onClose, courseId }) {
 
     } catch (error) {
       console.error("Payment error:", error);
-      toast.error("Failed to initiate payment.");
+      toast.error(
+        getErrorMessage(error, "Failed to initiate payment.")
+      );
       clearPendingPayment();
       setRazorLoading(false);
     }
