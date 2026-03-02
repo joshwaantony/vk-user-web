@@ -106,7 +106,7 @@ export default function CourseDetailPage() {
         "
       >
         {/* LEFT CONTENT */}
-        <div className="h-[800px] overflow-y-auto space-y-8 pr-2">
+        <div className="min-h-[800px] overflow-y-auto space-y-8 pr-2">
           <CourseHero course={course} />
           <WhatYouWillLearn points={course.learningOutcomes || []} />
           <CourseContent

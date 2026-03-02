@@ -241,7 +241,7 @@ export default function LessonContent({
     const video = videoRef.current;
     if (!video || !lessonId) return;
 
-    const saveProgress = (force = false) => {
+    const saveProgress = async (force = false) => {
       const currentTime = Math.floor(video.currentTime);
 
       if (currentTime <= 0) return;
@@ -254,7 +254,7 @@ export default function LessonContent({
       ) return;
 
       lastSavedTimeRef.current = currentTime;
-      updateProgress(lessonId, currentTime);
+      await updateProgress(lessonId, currentTime);
       scheduleCourseRefresh();
     };
 
