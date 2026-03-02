@@ -1,4 +1,6 @@
 
+"use client";
+
 // import { FiCheckCircle, FiClock } from "react-icons/fi";
 
 // export default function CompletedCourses() {
@@ -138,9 +140,17 @@
 
 
 
+import { useRouter } from "next/navigation";
 import { FiCheckCircle, FiClock } from "react-icons/fi";
 
 export default function CompletedCourses({ data = [] }) {
+  const router = useRouter();
+
+  const handleGoToCourse = (courseId) => {
+    if (!courseId) return;
+    router.push(`/course/${courseId}`);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
       {/* Heading */}
@@ -160,7 +170,9 @@ export default function CompletedCourses({ data = [] }) {
         {data.map((item) => (
           <div
             key={item.enrollmentId}
+            onClick={() => handleGoToCourse(item?.course?.id)}
             className="
+              cursor-pointer
               bg-white rounded-2xl border overflow-hidden
               transition-all duration-300 ease-out
               hover:-translate-y-1
@@ -244,7 +256,7 @@ export default function CompletedCourses({ data = [] }) {
                   {item.progress.totalLessons} Lessons
                 </span>
 
-                <span className="text-[11px] sm:text-xs">
+                <span className="text-[11px] text-green-600 font-semibold sm:text-xs">
                   Completed
                 </span>
               </div>

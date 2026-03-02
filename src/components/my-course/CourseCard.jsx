@@ -2,14 +2,25 @@
 
 
 
+"use client";
+
+import { useRouter } from "next/navigation";
 import { FiInfo, FiClock } from "react-icons/fi";
 
 export default function CourseCard({ course }) {
   if (!course) return null;
+  const router = useRouter();
+
+  const handleGoToCourse = () => {
+    if (!course?.id) return;
+    router.push(`/course/${course.id}`);
+  };
 
   return (
     <div
+      onClick={handleGoToCourse}
       className="
+        cursor-pointer
         bg-white rounded-2xl border overflow-hidden
         transition-all duration-300 ease-out
         hover:-translate-y-1
@@ -105,6 +116,7 @@ export default function CourseCard({ course }) {
         {/* ================= ACTIONS ================= */}
         <div className="flex items-center gap-3 mt-5">
           <button
+            onClick={handleGoToCourse}
             className="
               flex-1 
               bg-blue-600 text-white 
@@ -123,6 +135,7 @@ export default function CourseCard({ course }) {
           </button>
 
           <button
+            onClick={(e) => e.stopPropagation()}
             className="
               w-9 h-9 sm:w-10 sm:h-10 
               border rounded-lg 
