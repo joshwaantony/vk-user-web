@@ -50,7 +50,7 @@ export default function HeroLeft() {
 
       {/* Buttons */}
       <div className="flex flex-wrap gap-4 mb-12 sm:mb-14">
-    <Link href="/phone/enter-phone">
+    <Link href="/phone/enter-phone?purpose=REGISTER">
   <button
     className="
       bg-[#1E40E6]

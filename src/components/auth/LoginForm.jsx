@@ -111,25 +111,36 @@ export default function LoginPage() {
 
   //   router.push("/phone/enter-phone");
   // };
-  const handleOtpLogin = () => {
+//   const handleOtpLogin = () => {
+//   setFlow({
+//     purpose: "LOGIN",
+//     title: "Login with OTP",
+//     subtitle: "We’ll send you a one-time verification code to log you in.",
+//   });
+
+//   router.push("/phone/enter-phone");
+// };
+
+const handleOtpLogin = () => {
   setFlow({
     purpose: "LOGIN",
     title: "Login with OTP",
-    subtitle: "We’ll send you a one-time verification code to log you in.",
+    subtitle: "Enter your phone number to login.",
   });
 
-  router.push("/phone/enter-phone");
+  router.push("/phone/enter-phone?purpose=LOGIN");
 };
 
-const handleRegister = () => {
-  setFlow({
-    purpose: "REGISTER",
-    title: "Create Account",
-    subtitle: "Enter your phone number to create a new account.",
-  });
+  const handleCreateAccount = () => {
+    setFlow({
+      purpose: "REGISTER",
+      title: "What’s your phone number?",
+      subtitle:
+        "We’ll send you a one-time verification code to confirm your number.",
+    });
 
-  router.push("/phone/enter-phone");
-};
+    router.push("/phone/enter-phone?purpose=REGISTER");
+  };
 
   // 🔹 FORGOT PASSWORD
   const handleForgotPassword = () => {
@@ -140,7 +151,7 @@ const handleRegister = () => {
         "We’ll send you a one-time verification code to confirm your number.",
     });
 
-    router.push("/phone/enter-phone");
+    router.push("/phone/enter-phone?purpose=FORGOT_PASSWORD");
   };
 
   return (
@@ -265,12 +276,13 @@ const handleRegister = () => {
 
         <p className="mt-8 text-[#64748B] mb-10">
           Don&apos;t have an account?{" "}
-          <Link
-            href="/phone/enter-phone"
+          <button
+            type="button"
+            onClick={handleCreateAccount}
             className="text-[#2457E6] font-semibold"
           >
             Sign Up
-          </Link>
+          </button>
         </p>
       </div>
     </main>

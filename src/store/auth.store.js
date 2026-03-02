@@ -354,6 +354,8 @@ import {
   resetPasswordApi,
 } from "@/services/auth.service";
 
+const getAuthPayload = (res) => res?.data ?? res ?? {};
+
 export const useAuthStore = create(
   persist(
     (set, get) => ({
@@ -384,6 +386,7 @@ export const useAuthStore = create(
       /* ================= MANUAL SETTERS ================= */
       setToken: (token) => {
         localStorage.setItem("token", token);
+        document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax`;
         set({ token });
       },
 
@@ -447,7 +450,8 @@ export const useAuthStore = create(
             purpose,
           });
 
-          const verificationToken = res?.data?.verificationToken;
+          const payload = getAuthPayload(res);
+          const verificationToken = payload?.verificationToken;
 
           if (purpose === "FORGOT_PASSWORD") {
             set({
@@ -466,6 +470,33 @@ export const useAuthStore = create(
             });
             return true;
           }
+          if (purpose === "LOGIN") {
+            const accessToken =
+              payload?.accessToken ||
+              payload?.token;
+            const user = payload?.user || null;
+
+            if (!accessToken) {
+              set({
+                error: "Token missing in OTP login response",
+                loading: false,
+              });
+              return false;
+            }
+
+            localStorage.setItem("token", accessToken);
+            document.cookie = `token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
+
+            set({
+              token: accessToken,
+              user,
+              verificationToken: null,
+              expiresIn: null,
+              loading: false,
+            });
+            return true;
+          }
+
 
           set({ loading: false });
           return true;
@@ -490,11 +521,12 @@ export const useAuthStore = create(
             purpose: "LOGIN",
           });
 
+          const payload = getAuthPayload(res);
           const accessToken =
-            res?.accessToken ||
-            res?.token;
+            payload?.accessToken ||
+            payload?.token;
 
-          const user = res?.user;
+          const user = payload?.user || null;
 
           if (!accessToken) {
             set({ loading: false });
@@ -502,10 +534,11 @@ export const useAuthStore = create(
           }
 
           localStorage.setItem("token", accessToken);
+          document.cookie = `token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
 
           set({
             token: accessToken,
-            user: user || null,
+            user,
             loading: false,
           });
 

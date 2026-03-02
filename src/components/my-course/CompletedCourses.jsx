@@ -141,7 +141,7 @@
 
 
 import { useRouter } from "next/navigation";
-import { FiCheckCircle, FiClock } from "react-icons/fi";
+import { FiCheckCircle, FiClock, FiAward } from "react-icons/fi";
 
 export default function CompletedCourses({ data = [] }) {
   const router = useRouter();
@@ -160,9 +160,17 @@ export default function CompletedCourses({ data = [] }) {
 
       {/* Empty State */}
       {data.length === 0 && (
-        <p className="text-gray-500 text-sm">
-          No completed courses yet.
-        </p>
+        <div className="rounded-2xl border border-green-100 bg-gradient-to-br from-green-50 to-white p-8 sm:p-10 text-center">
+          <div className="w-14 h-14 rounded-full bg-green-100 text-green-600 mx-auto flex items-center justify-center">
+            <FiAward size={24} />
+          </div>
+          <h3 className="mt-4 text-lg sm:text-xl font-semibold text-gray-900">
+            No completed courses yet
+          </h3>
+          <p className="mt-2 text-sm sm:text-base text-gray-600 max-w-md mx-auto">
+            Keep learning. Completed courses will appear here with your progress details.
+          </p>
+        </div>
       )}
 
       {/* Grid */}

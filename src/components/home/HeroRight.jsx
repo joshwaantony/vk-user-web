@@ -79,7 +79,7 @@ export default function HeroRight() {
 
         {/* SECONDARY BUTTON */}
         <Link
-          href="/phone/enter-phone"
+          href="/phone/enter-phone?purpose=REGISTER"
           className="
             block w-full
             border border-[#1E40E6]

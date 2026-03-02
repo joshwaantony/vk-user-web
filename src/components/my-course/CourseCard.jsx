@@ -5,11 +5,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FiInfo, FiClock } from "react-icons/fi";
+import { FiInfo, FiClock, FiAlertCircle } from "react-icons/fi";
 
 export default function CourseCard({ course }) {
-  if (!course) return null;
   const router = useRouter();
+
+  if (!course) {
+    return (
+      <div className="bg-white rounded-2xl  overflow-hidden">
+
+      </div>
+    );
+  }
 
   const handleGoToCourse = () => {
     if (!course?.id) return;

@@ -61,10 +61,12 @@ export default function RootLayout({ children }) {
         />
 
         {/* ✅ Auth Initialization */}
-        <AuthProvider />
+        <AuthProvider>
 
         {/* ✅ App Content */}
         {children}
+      </AuthProvider>
+      
       </body>
     </html>
   );

@@ -49,7 +49,7 @@ export default function WhyChooseVK() {
           </p>
 
      
-<Link href="/phone/enter-phone">
+<Link href="/phone/enter-phone?purpose=REGISTER">
   <button className="bg-white text-[#1E40E6] px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition">
     Get Started Today
   </button>
