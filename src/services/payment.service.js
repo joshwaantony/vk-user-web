@@ -3,6 +3,10 @@
 import axios from "axios";
 
 const baseURL = `${process.env.NEXT_PUBLIC_API_URL}/api/v1`;
+const getErrorMessage = (error, fallback) =>
+  error?.response?.data?.message ||
+  error?.message ||
+  fallback;
 
 /* =====================================================
    CREATE ORDER API
@@ -21,10 +25,11 @@ export const createOrderAPI = async (courseId, token, idempotencyKey) => {
       }
     );
 
-    return res.data.data; // return only order object
+    // Support both: { data: { order, pricing } } and { data: { ...orderFields } }
+    return res.data?.data;
   } catch (error) {
     console.error("Create Order Error:", error?.response?.data || error);
-    throw error?.response?.data || error;
+    throw new Error(getErrorMessage(error, "Unable to create order"));
   }
 };
 
@@ -52,7 +57,7 @@ export const verifyClientAPI = async (
     return res.data;
   } catch (error) {
     console.error("Verify Client Error:", error?.response?.data || error);
-    throw error?.response?.data || error;
+    throw new Error(getErrorMessage(error, "Unable to verify payment"));
   }
 };
 
@@ -74,6 +79,6 @@ export const verifyOrderAPI = async (orderId, token) => {
     return res.data;
   } catch (error) {
     console.error("Verify Order Error:", error?.response?.data || error);
-    throw error?.response?.data || error;
+    throw new Error(getErrorMessage(error, "Unable to verify order"));
   }
 };
