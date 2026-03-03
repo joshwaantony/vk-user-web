@@ -10,6 +10,7 @@ import { FiBookOpen } from "react-icons/fi";
 import CourseCard from "./CourseCard";
 import CompletedCourses from "./CompletedCourses";
 import useEnrollmentStore from "@/store/useEnrollmentStore";
+import PromoLoader from "../loader/PromoLoader";
 
 export default function MyCourses() {
   const { enrollments, fetchEnrollments, loading } =
@@ -95,7 +96,7 @@ export default function MyCourses() {
       {/* ================= LOADING ================= */}
       {loading && (
         <p className="text-gray-500 text-sm">
-          Loading courses...
+         <PromoLoader/>
         </p>
       )}
 

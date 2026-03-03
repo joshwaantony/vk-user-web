@@ -352,6 +352,7 @@ import {
   sendForgotPasswordOtpApi,
   registerApi,
   resetPasswordApi,
+  getMeApi,
 } from "@/services/auth.service";
 
 const getAuthPayload = (res) => res?.data ?? res ?? {};
@@ -391,6 +392,32 @@ export const useAuthStore = create(
       },
 
       setUser: (user) => set({ user }),
+
+      fetchMe: async () => {
+        try {
+          const { token } = get();
+          if (!token) return null;
+
+          set({ loading: true, error: null });
+
+          const res = await getMeApi();
+          const user = res?.data ?? null;
+
+          set({
+            user,
+            loading: false,
+            error: null,
+          });
+
+          return user;
+        } catch (err) {
+          set({
+            error: err?.response?.data?.message || "Failed to fetch user",
+            loading: false,
+          });
+          return null;
+        }
+      },
 
       /* ================= SEND OTP ================= */
       sendOtp: async ({ phone, purpose }) => {
