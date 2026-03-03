@@ -11,11 +11,20 @@ const getErrorMessage = (error, fallback) =>
 /* =====================================================
    CREATE ORDER API
 ===================================================== */
-export const createOrderAPI = async (courseId, token, idempotencyKey) => {
+export const createOrderAPI = async (
+  courseId,
+  token,
+  idempotencyKey,
+  couponCode
+) => {
   try {
+    const payload = couponCode
+      ? { courseId, couponCode }
+      : { courseId };
+
     const res = await axios.post(
       `${baseURL}/payments/create-order`,
-      { courseId },
+      payload,
       {
         headers: {
           Authorization: `Bearer ${token}`,

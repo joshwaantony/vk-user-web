@@ -16,11 +16,21 @@ export const usePaymentStore = create((set) => ({
   error: null,
 
   // ✅ CREATE ORDER
-  createOrder: async (courseId, token, idempotencyKey) => {
+  createOrder: async (
+    courseId,
+    token,
+    idempotencyKey,
+    couponCode
+  ) => {
     try {
       set({ loading: true, error: null });
 
-      const order = await createOrderAPI(courseId, token, idempotencyKey);
+      const order = await createOrderAPI(
+        courseId,
+        token,
+        idempotencyKey,
+        couponCode
+      );
 
       set({ loading: false });
       return order;
