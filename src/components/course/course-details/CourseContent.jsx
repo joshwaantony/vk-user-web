@@ -156,6 +156,7 @@ export default function CourseContent() {
                     isCompleted={lesson.isCompleted}
                     isEnrolled={isEnrolled}
                     isSectionUnlocked={isSectionUnlocked}
+                    isFirstSection={index === 0}
                     thumbnail={lesson.thumbnail}
                     onAccessDenied={async (message) => {
                       toast.error(
@@ -235,6 +236,7 @@ function Lesson({
   isCompleted,
   isEnrolled,
   isSectionUnlocked,
+  isFirstSection,
   thumbnail,
   onAccessDenied,
 }) {
@@ -244,6 +246,10 @@ function Lesson({
 
   const handleWatch = async () => {
     if (!canWatchLesson) {
+      if (!isEnrolled && isFirstSection) {
+        toast.error("Enroll to Course");
+        return;
+      }
       onAccessDenied?.();
       return;
     }
