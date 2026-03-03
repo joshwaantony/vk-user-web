@@ -417,6 +417,10 @@ export default function CouponPopup({ onClose, courseId }) {
           response?.data?.enrolled === true
         ) {
           clearPendingPayment();
+          clearCoupon();
+          setCoupon("");
+          setRazorLoading(false);
+          setProcessingEnrollment(false);
           toast.success("Payment already verified.");
           onClose();
           router.push(`/course/${courseId}?enrolled=true`);
@@ -509,6 +513,10 @@ export default function CouponPopup({ onClose, courseId }) {
             );
 
             clearPendingPayment();
+            clearCoupon();
+            setCoupon("");
+            setRazorLoading(false);
+            setProcessingEnrollment(false);
             toast.success("Enrollment successful 🎉");
             onClose();
             router.push(`/course/${courseId}?enrolled=true`);
@@ -587,6 +595,33 @@ export default function CouponPopup({ onClose, courseId }) {
                     : "Loading..."}
                 </span>
               </div>
+
+              {couponData && (
+                <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Base Price</span>
+                    <span className="font-medium text-gray-900">
+                      ₹{couponData.basePrice ?? selectedCourse?.price ?? 0}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Coupon Discount</span>
+                    <span className="font-medium text-green-700">
+                      -₹{couponData.couponDiscount ?? 0}
+                    </span>
+                  </div>
+
+                  <div className="h-px bg-green-200" />
+
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-700 font-semibold">Final Amount</span>
+                    <span className="font-bold text-gray-900">
+                      ₹{couponData.finalAmount ?? couponData.finalPrice ?? 0}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="text-sm font-medium text-gray-700">
