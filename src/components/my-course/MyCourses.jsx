@@ -95,9 +95,9 @@ export default function MyCourses() {
 
       {/* ================= LOADING ================= */}
       {loading && (
-        <p className="text-gray-500 text-sm">
+        <div className="text-gray-500 text-sm">
          <PromoLoader/>
-        </p>
+        </div>
       )}
 
       {/* ================= TAB CONTENT ================= */}
