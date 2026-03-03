@@ -8,7 +8,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FiMenu, FiUser } from "react-icons/fi";
+import { FiLogOut, FiMenu, FiUser } from "react-icons/fi";
 import { useAuthStore } from "@/store/auth.store";
 
 export default function Header() {
@@ -220,33 +220,40 @@ export default function Header() {
       {showLogoutModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center">
           <div
-            className="absolute inset-0 bg-black/50"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setShowLogoutModal(false)}
           />
 
-          <div className="relative bg-white w-[90%] max-w-md rounded-2xl p-6 shadow-xl">
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">
-              Confirm Logout
-            </h2>
+          <div className="relative w-[94%] max-w-[460px] rounded-2xl overflow-hidden shadow-2xl">
+            <div className="bg-[#00B975] px-6 py-7 text-white flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                <FiLogOut size={22} />
+              </div>
+              <h2 className="text-3xl leading-none font-semibold">
+                Confirm Logout
+              </h2>
+            </div>
 
-            <p className="text-sm text-gray-500 mb-6">
-              Are you sure you want to logout from your account?
-            </p>
+            <div className="bg-[#F3F4F6] px-6 py-7">
+              <p className="text-lg leading-snug text-[#334155]">
+                Are you sure you want to logout? You will need to sign in again to access your courses.
+              </p>
 
-            <div className="flex justify-end gap-3">
+              <div className="mt-7 grid grid-cols-2 gap-4">
               <button
                 onClick={() => setShowLogoutModal(false)}
-                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+                className="py-2 rounded-2xl border border-[#CDD5DF] text-[#334155] text-[18px] font-semibold bg-[#F8FAFC] hover:bg-white transition"
               >
                 Cancel
               </button>
 
               <button
                 onClick={confirmLogout}
-                className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
+                className="py-2 rounded-2xl bg-[#f04444d8] text-white text-[18px] font-semibold hover:bg-[#DC2626] transition"
               >
                 Logout
               </button>
+              </div>
             </div>
           </div>
         </div>
