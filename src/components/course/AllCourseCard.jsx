@@ -10,6 +10,7 @@ import { FiClock } from "react-icons/fi";
 import { HiStar } from "react-icons/hi";
 import { useAuthStore } from "@/store/auth.store";
 import CouponPopup from "../Coupon/CouponPopup";
+import { FaUsers } from "react-icons/fa";
 
 export default function AllCourseCard({ course }) {
   const router = useRouter();
@@ -71,6 +72,7 @@ export default function AllCourseCard({ course }) {
             <HiStar className="text-yellow-500" />
             <span>4.5</span>
             <span>•</span>
+            <FaUsers  className="text-gray-500" />
             <span>{course.totalStudents} students</span>
           </div>
 

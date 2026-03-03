@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { FaStar, FaClock } from "react-icons/fa";
+import { FaStar, FaClock, FaUsers } from "react-icons/fa";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import CouponPopup from "@/components/Coupon/CouponPopup";
@@ -58,6 +58,7 @@ export default function CourseCard({ course }) {
               <FaStar className="text-[#F59E0B]" />
               <span>4.5</span>
               <span>·</span>
+              <FaUsers className="text-[#64748B]" />
               <span>{course?.totalStudents} students</span>
             </div>
 
