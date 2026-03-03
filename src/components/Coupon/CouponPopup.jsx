@@ -467,7 +467,7 @@ export default function CouponPopup({ onClose, courseId }) {
         courseId,
         token,
         createOrderKey,
-        couponData?.code // pass coupon
+        couponData?.code
       );
 
       const order =
@@ -582,7 +582,7 @@ export default function CouponPopup({ onClose, courseId }) {
                 <span className="text-lg font-bold text-gray-900">
                   {selectedCourse
                     ? couponData
-                      ? `₹${couponData.finalPrice}`
+                      ? `₹${couponData.finalAmount ?? couponData.finalPrice}`
                       : `₹${selectedCourse.price}`
                     : "Loading..."}
                 </span>
