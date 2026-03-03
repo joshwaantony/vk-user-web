@@ -6,6 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Hls from "hls.js";
 import useCourseStore from "@/store/CourseStore";
+import { watchLesson } from "@/services/lesson.service";
 import {
   FiArrowLeft,
   FiArrowRight,
@@ -17,6 +18,7 @@ import { useRouter } from "next/navigation";
 import PromoLoader from "@/components/loader/PromoLoader";
 import { useProgressStore } from "@/store/progress.store";
 import WhatYouWillLearn from "@/components/course/course-details/WhatYouWillLearn";
+import toast from "react-hot-toast";
 
 const PROGRESS_SAVE_INTERVAL_SECONDS = 10;
 const resolveId = (value) => {
@@ -41,6 +43,7 @@ export default function LessonContent({
   fallbackCourseId,
 }) {
   const router = useRouter();
+  const unlockMessage = "Complete previous section to unlock";
 
   // ✅ MUST BE INSIDE COMPONENT
   const { course, fetchCourseById, refreshCourseById } =
@@ -345,17 +348,36 @@ export default function LessonContent({
     []
   );
 
-  const navigateToLesson = (targetLesson) => {
+  const navigateToLesson = async (targetLesson) => {
     const targetLessonId = resolveId(targetLesson);
     if (!targetLessonId) return;
 
-    const url = resolvedCourseId
-      ? `/lessons/${targetLessonId}/watch?courseId=${encodeURIComponent(
-          resolvedCourseId
-        )}`
-      : `/lessons/${targetLessonId}/watch`;
+    try {
+      await watchLesson(targetLessonId);
 
-    router.push(url);
+      const url = resolvedCourseId
+        ? `/lessons/${targetLessonId}/watch?courseId=${encodeURIComponent(
+            resolvedCourseId
+          )}`
+        : `/lessons/${targetLessonId}/watch`;
+
+      router.push(url);
+    } catch (error) {
+      const status = error?.response?.status;
+      const message = error?.response?.data?.message;
+
+      if (status === 403) {
+        toast.error(message || unlockMessage);
+        if (resolvedCourseId) {
+          refreshCourseById(resolvedCourseId);
+        }
+        return;
+      }
+
+      toast.error(
+        message || "Unable to open this lesson right now"
+      );
+    }
   };
 
   return (
