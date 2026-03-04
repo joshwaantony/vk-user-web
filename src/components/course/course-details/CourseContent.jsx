@@ -317,23 +317,29 @@ function Lesson({
           <FiClock /> {time}
         </span>
 
-        <button
-          onClick={handleWatch}
-          className={`w-8 h-8 flex items-center justify-center rounded-full text-white transition-all ${
-            !canWatchLesson
-              ? "bg-[#EF4444] ring-2 ring-[#FCA5A5] hover:bg-[#DC2626]"
-              : "bg-[#1F3FD7] hover:bg-[#1630A8]"
-          }`}
-          aria-label={
-            canWatchLesson ? "Watch lesson" : "Locked lesson"
-          }
-        >
-          {!canWatchLesson ? (
-            <FiLock size={14} />
-          ) : (
-            <FiPlay size={14} />
-          )}
-        </button>
+        <div className="relative group">
+          <button
+            onClick={handleWatch}
+            className={`w-8 h-8 flex items-center justify-center rounded-full text-white transition-all duration-300 transform group-hover:-translate-y-0.5 group-hover:scale-110 ${
+              !canWatchLesson
+                ? "bg-[#EF4444] ring-2 ring-[#FCA5A5] hover:bg-[#DC2626]"
+                : "bg-[#1F3FD7] hover:bg-[#1630A8]"
+            }`}
+            aria-label={
+              canWatchLesson ? "Watch lesson" : "Locked lesson"
+            }
+          >
+            {!canWatchLesson ? (
+              <FiLock size={14} />
+            ) : (
+              <FiPlay size={14} />
+            )}
+          </button>
+
+          <span className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-[#111827] px-2 py-1 text-[11px] text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            {canWatchLesson ? "Watch lesson" : "Locked lesson"}
+          </span>
+        </div>
       </div>
     </div>
   );
