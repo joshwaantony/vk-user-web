@@ -53,7 +53,8 @@ export default function Header() {
     logout();
     setShowLogoutModal(false);
     setOpen(false);
-    router.push("/home");
+    router.replace("/home");
+    router.refresh();
   };
 
   if (!mounted) {

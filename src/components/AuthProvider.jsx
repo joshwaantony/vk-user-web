@@ -43,8 +43,8 @@ export default function AuthProvider({ children }) {
 
     const isLoggedIn = !!token;
 
-    // ✅ If logged in and trying to access home
-    if (isLoggedIn && pathname === "/") {
+    // ✅ If logged in and trying to access public home pages
+    if (isLoggedIn && (pathname === "/" || pathname === "/home")) {
       router.replace("/course");
     }
 
