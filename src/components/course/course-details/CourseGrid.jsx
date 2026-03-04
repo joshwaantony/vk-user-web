@@ -85,7 +85,7 @@ export default function  CourseGrid() {
             font-semibold
             text-base sm:text-lg
             px-6 sm:px-8 md:px-10
-            py-3
+            py-3 mb-6
             rounded-xl
             hover:bg-[#1E40E6]
             hover:text-white

@@ -12,7 +12,7 @@ import AllCourseCardSkeleton from "../loader/AllCourseCardSkeleton";
 export default function AllCourses() {
   const { courses, loading, error } = useCourseStore();
 
-  const [visibleCount, setVisibleCount] = useState(6);
+  const [visibleCount, setVisibleCount] = useState(9);
 
   // 👇 Infinite Scroll Logic
   useEffect(() => {
@@ -32,8 +32,8 @@ export default function AllCourses() {
 
 if (loading) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {Array.from({ length: 6 }).map((_, index) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+      {Array.from({ length: 9 }).map((_, index) => (
         <AllCourseCardSkeleton key={index} />
       ))}
     </div>
