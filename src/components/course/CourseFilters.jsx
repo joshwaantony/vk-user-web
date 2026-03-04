@@ -32,7 +32,8 @@ export default function CourseFilters() {
     if (optionValue === "latest") return "LATEST";
     if (optionValue === "oldest") return "OLDEST";
     if (optionValue === "popular") return "POPULAR";
-    return "POPULAR";
+    if (filterType === "all") return "LATEST";
+    return "LATEST";
   };
 
   useEffect(() => {
