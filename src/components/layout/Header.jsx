@@ -190,6 +190,12 @@ export default function Header() {
               </Link>
             )}
 
+            {isLoggedIn && (
+              <Link href="/profile" onClick={() => setOpen(false)}>
+                Profile
+              </Link>
+            )}
+
             <Link href="/contact" onClick={() => setOpen(false)}>
               Contact
             </Link>
