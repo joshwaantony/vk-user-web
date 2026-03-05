@@ -415,12 +415,12 @@ export default function LessonContent({
           className="w-full h-[240px] sm:h-[320px] lg:h-[480px]"
         />
 
-        <button
+        {/* <button
           onClick={handleFullscreen}
           className="absolute bottom-4 right-4 bg-black/60 hover:bg-black/80 text-white p-2.5 rounded-lg transition"
         >
           <FiMaximize size={18} />
-        </button>
+        </button> */}
       </div>
 
       {/* ================= LESSON DETAILS ================= */}
