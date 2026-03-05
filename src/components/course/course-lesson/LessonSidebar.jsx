@@ -427,32 +427,38 @@ console.log(lessonCourseId);
                             ).padStart(2, "0")}
                           </span>
 
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (!canWatchLesson) {
-                                toast.error(unlockMessage);
-                                return;
+                          <div className="relative group">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (!canWatchLesson) {
+                                  toast.error(unlockMessage);
+                                  return;
+                                }
+                                handleWatchLesson(lesson.id || lesson._id);
+                              }}
+                              className={`w-8 h-8 flex items-center justify-center rounded-full text-white transition-all duration-300 transform group-hover:-translate-y-0.5 group-hover:scale-110 ${
+                                !canWatchLesson
+                                  ? "bg-gray-400 cursor-not-allowed"
+                                  : "bg-[#1F3FD7] hover:bg-[#1630A8]"
+                              }`}
+                              aria-label={
+                                canWatchLesson
+                                  ? "Watch lesson"
+                                  : "Locked lesson"
                               }
-                              handleWatchLesson(lesson.id || lesson._id);
-                            }}
-                            className={`w-8 h-8 flex items-center justify-center rounded-full text-white transition-all ${
-                              !canWatchLesson
-                                ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-[#1F3FD7] hover:bg-[#1630A8]"
-                            }`}
-                            aria-label={
-                              canWatchLesson
-                                ? "Watch lesson"
-                                : "Locked lesson"
-                            }
-                          >
-                            {canWatchLesson ? (
-                              <FiPlay size={14} />
-                            ) : (
-                              <FiLock size={14} />
-                            )}
-                          </button>
+                            >
+                              {canWatchLesson ? (
+                                <FiPlay size={14} />
+                              ) : (
+                                <FiLock size={14} />
+                              )}
+                            </button>
+
+                            <span className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-[#111827] px-2 py-1 text-[11px] text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                              {canWatchLesson ? "Watch lesson" : "Locked lesson"}
+                            </span>
+                          </div>
                         </div>
                       </div>
                       );
