@@ -28,7 +28,7 @@ export default function FeatureBadges() {
     <div className="flex flex-wrap gap-4 sm:gap-6 justify-start">
       {items.map((item, i) => (
         <div
-          key={i}
+          key={`${item.label}-${i}`}
           className="relative group"
           onClick={() => setActive(active === i ? null : i)}
         >

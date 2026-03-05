@@ -12,7 +12,7 @@ export default function WhatYouWillLearn({ points = [] }) {
 
       <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-5">
         {points.map((item, i) => (
-          <li key={i} className="flex gap-3 text-sm text-gray-700">
+          <li key={`${item}-${i}`} className="flex gap-3 text-sm text-gray-700">
             <span className="text-[#1F3FD7] font-bold">✓</span>
             {item}
           </li>

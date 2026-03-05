@@ -69,7 +69,7 @@ function FooterColumn({ title, links }) {
       <ul className="space-y-3 text-sm text-white/70">
         {links.map((link, i) => (
           <li
-            key={i}
+            key={`${title}-${link}-${i}`}
             className="hover:text-white cursor-pointer transition"
           >
             {link}
