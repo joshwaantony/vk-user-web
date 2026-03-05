@@ -50,18 +50,29 @@ export default function HeroLeft() {
 
       {/* Buttons */}
       <div className="flex flex-wrap gap-4 mb-12 sm:mb-14">
-    <Link href="/phone/enter-phone?purpose=REGISTER">
+<Link href="/phone/enter-phone?purpose=REGISTER">
   <button
     className="
-      bg-[#1E40E6]
+      relative
+      overflow-hidden
+      bg-gradient-to-r
+      from-[#1E40E6]
+      to-[#3B82F6]
       text-white
       px-6 sm:px-7
       py-2.5 sm:py-3
       rounded-xl
       font-semibold
-      shadow-md
-      hover:bg-[#1a36c9]
-      transition
+      shadow-[0_10px_30px_rgba(30,64,230,0.35)]
+      transition-all
+      duration-300
+      ease-out
+      hover:-translate-y-1
+      hover:scale-[1.03]
+      hover:shadow-[0_16px_40px_rgba(30,64,230,0.55)]
+      hover:from-[#1D4ED8]
+      hover:to-[#60A5FA]
+      active:scale-[0.99]
     "
   >
     Get Started
@@ -73,16 +84,26 @@ export default function HeroLeft() {
           className="
             inline-flex
             items-center
-            bg-white
+            bg-white/90
             text-black
             px-6 sm:px-7
             py-2.5 sm:py-3
             rounded-xl
             font-semibold
             border
-            border-gray-300
-            hover:bg-gray-50
-            transition
+            border-blue-200
+            backdrop-blur-sm
+            shadow-[0_8px_24px_rgba(37,99,235,0.12)]
+            transition-all
+            duration-300
+            ease-out
+            hover:-translate-y-1
+            hover:scale-[1.03]
+            hover:bg-white
+            hover:border-blue-400
+            hover:text-[#1D4ED8]
+            hover:shadow-[0_14px_34px_rgba(37,99,235,0.28)]
+            active:scale-[0.99]
           "
         >
           Learn More
