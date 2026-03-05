@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function WhyChooseVK() {
   return (
-    <section className="w-full bg-white py-20 px-4">
+    <section id="why-choose-vk" className="w-full scroll-mt-24 bg-white py-20 px-4">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}

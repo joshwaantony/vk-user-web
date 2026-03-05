@@ -68,8 +68,11 @@ export default function HeroLeft() {
   </button>
 </Link>
 
-        <button
+        <a
+          href="/home#why-choose-vk"
           className="
+            inline-flex
+            items-center
             bg-white
             text-black
             px-6 sm:px-7
@@ -83,7 +86,7 @@ export default function HeroLeft() {
           "
         >
           Learn More
-        </button>
+        </a>
       </div>
 
       {/* Stats */}
