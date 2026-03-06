@@ -185,7 +185,7 @@ export default function SlideDesign() {
             {/* CONTENT */}
             <div className="text-gray-900 relative text-center lg:text-left">
 
-              <div className="absolute -top-4 right-0 flex gap-3">
+              <div className="absolute -top-4 right-0 hidden lg:flex gap-3">
                 <button onClick={prevPromo} className="w-9 h-9 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:scale-105 transition">
                   <HiChevronLeft size={16} />
                 </button>
