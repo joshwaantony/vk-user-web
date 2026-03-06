@@ -11,8 +11,7 @@ import {
   FiArrowLeft,
   FiArrowRight,
   FiBookOpen,
-  FiCheckCircle,
-  FiMaximize,
+  
 } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import PromoLoader from "@/components/loader/PromoLoader";
@@ -21,6 +20,8 @@ import WhatYouWillLearn from "@/components/course/course-details/WhatYouWillLear
 import toast from "react-hot-toast";
 
 const PROGRESS_SAVE_INTERVAL_SECONDS = 10;
+const SEEK_FORWARD_TOLERANCE_SECONDS = 1;
+const LESSON_PROGRESS_CACHE_PREFIX = "lesson-progress:";
 const resolveId = (value) => {
   if (!value) return null;
   if (typeof value === "string" || typeof value === "number") {
@@ -61,6 +62,9 @@ export default function LessonContent({
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
   const lastSavedTimeRef = useRef(0);
+  const maxAllowedTimeRef = useRef(0);
+  const isInternalSeekRef = useRef(false);
+  const lastSeekWarningAtRef = useRef(0);
   const hasResumedRef = useRef(false);
   const refreshCourseTimerRef = useRef(null);
 
@@ -68,6 +72,29 @@ export default function LessonContent({
 
   const lessonId =
     lesson?.id || lesson?._id || lesson?.lessonId || lessonIdProp;
+  const progressCacheKey = lessonId
+    ? `${LESSON_PROGRESS_CACHE_PREFIX}${lessonId}`
+    : null;
+
+  const getCachedWatchedSeconds = () => {
+    if (!progressCacheKey || typeof window === "undefined") return 0;
+    const rawValue = window.localStorage.getItem(progressCacheKey);
+    const parsedValue = Number(rawValue);
+    if (!Number.isFinite(parsedValue) || parsedValue <= 0) return 0;
+    return Math.floor(parsedValue);
+  };
+
+  const cacheWatchedSeconds = (seconds) => {
+    if (!progressCacheKey || typeof window === "undefined") return;
+    const safeSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
+    if (safeSeconds <= 0) return;
+
+    const existing = Number(window.localStorage.getItem(progressCacheKey) || 0);
+    if (safeSeconds > existing) {
+      window.localStorage.setItem(progressCacheKey, String(safeSeconds));
+    }
+  };
+
   const resolvedCourseId =
     resolveId(fallbackCourseId) ||
     resolveId(lesson?.courseId) ||
@@ -164,6 +191,9 @@ export default function LessonContent({
 
     hasResumedRef.current = false;
     lastSavedTimeRef.current = 0;
+    maxAllowedTimeRef.current = 0;
+    isInternalSeekRef.current = false;
+    lastSeekWarningAtRef.current = 0;
 
     setActiveLesson(lessonId);
     getLessonProgress(lessonId);
@@ -176,15 +206,19 @@ export default function LessonContent({
   /* ================= RESUME VIDEO ================= */
   useEffect(() => {
     const video = videoRef.current;
-    const watchedSeconds = Math.floor(
-      Number(lessonProgress?.watchedSeconds || 0)
+    const watchedSeconds = Math.max(
+      Math.floor(Number(lessonProgress?.watchedSeconds || 0)),
+      getCachedWatchedSeconds()
     );
 
     if (!video || watchedSeconds <= 0 || hasResumedRef.current) return;
 
     const applyResume = () => {
+      isInternalSeekRef.current = true;
       video.currentTime = watchedSeconds;
       lastSavedTimeRef.current = watchedSeconds;
+      maxAllowedTimeRef.current = watchedSeconds;
+      cacheWatchedSeconds(watchedSeconds);
       hasResumedRef.current = true;
     };
 
@@ -198,7 +232,7 @@ export default function LessonContent({
     return () => {
       video.removeEventListener("loadedmetadata", applyResume);
     };
-  }, [lessonProgress?.watchedSeconds]);
+  }, [lessonProgress?.watchedSeconds, progressCacheKey]);
 
   /* ================= HLS PLAYER ================= */
   useEffect(() => {
@@ -257,11 +291,46 @@ export default function LessonContent({
       ) return;
 
       lastSavedTimeRef.current = currentTime;
+      if (currentTime > maxAllowedTimeRef.current) {
+        maxAllowedTimeRef.current = currentTime;
+      }
+      cacheWatchedSeconds(currentTime);
       await updateProgress(lessonId, currentTime);
       scheduleCourseRefresh();
     };
 
-    const handleTimeUpdate = () => saveProgress(false);
+    const handleTimeUpdate = () => {
+      const current = Math.floor(Number(video.currentTime || 0));
+
+      // Extra guard: if native controls allow a forward jump somehow,
+      // immediately roll back to the max watched point.
+      if (
+        !isInternalSeekRef.current &&
+        current >
+          maxAllowedTimeRef.current + SEEK_FORWARD_TOLERANCE_SECONDS
+      ) {
+        isInternalSeekRef.current = true;
+        video.currentTime = maxAllowedTimeRef.current;
+        const now = Date.now();
+        if (now - lastSeekWarningAtRef.current > 1200) {
+          toast.error(
+           "Forward seeking is not allowed. You can only go backward."
+          );
+          lastSeekWarningAtRef.current = now;
+        }
+        return;
+      }
+
+      if (isInternalSeekRef.current) {
+        isInternalSeekRef.current = false;
+      }
+
+      if (current > maxAllowedTimeRef.current) {
+        maxAllowedTimeRef.current = current;
+      }
+      cacheWatchedSeconds(current);
+      saveProgress(false);
+    };
     const handlePause = () => saveProgress(true);
     const handleEnded = async () => {
       const completionSeconds = Math.floor(
@@ -274,6 +343,11 @@ export default function LessonContent({
 
       if (completionSeconds > 0) {
         lastSavedTimeRef.current = completionSeconds;
+        maxAllowedTimeRef.current = Math.max(
+          maxAllowedTimeRef.current,
+          completionSeconds
+        );
+        cacheWatchedSeconds(completionSeconds);
         await updateProgress(lessonId, completionSeconds, {
           silent: false,
         });
@@ -292,9 +366,77 @@ export default function LessonContent({
       video.removeEventListener("timeupdate", handleTimeUpdate);
       video.removeEventListener("pause", handlePause);
       video.removeEventListener("ended", handleEnded);
+      cacheWatchedSeconds(video.currentTime);
       saveProgress(true);
     };
-  }, [lessonId, lesson?.duration, updateProgress]);
+  }, [lessonId, lesson?.duration, updateProgress, progressCacheKey]);
+
+  /* ================= SEEK LOCK (FORWARD BLOCK ONLY) ================= */
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !lessonId) return;
+
+    const handleSeeking = () => {
+      if (isInternalSeekRef.current) {
+        isInternalSeekRef.current = false;
+        return;
+      }
+
+      const safeMaxAllowed =
+        maxAllowedTimeRef.current + SEEK_FORWARD_TOLERANCE_SECONDS;
+      if (video.currentTime <= safeMaxAllowed) {
+        return;
+      }
+
+      isInternalSeekRef.current = true;
+      video.currentTime = maxAllowedTimeRef.current;
+
+      const now = Date.now();
+      if (now - lastSeekWarningAtRef.current > 1200) {
+        toast.error(
+          "Forward seek അനുവദിക്കില്ല. പിന്നിലേക്ക് മാത്രം പോകാം."
+        );
+        lastSeekWarningAtRef.current = now;
+      }
+    };
+
+    video.addEventListener("seeking", handleSeeking);
+    return () => {
+      video.removeEventListener("seeking", handleSeeking);
+    };
+  }, [lessonId]);
+
+  /* ================= SAVE ON TAB/CLOSE ================= */
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !lessonId) return;
+
+    const persistNow = () => {
+      const currentTime = Math.floor(Number(video.currentTime || 0));
+      if (currentTime <= 0) return;
+      cacheWatchedSeconds(currentTime);
+      if (currentTime > lastSavedTimeRef.current) {
+        lastSavedTimeRef.current = currentTime;
+        void updateProgress(lessonId, currentTime);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        persistNow();
+      }
+    };
+
+    window.addEventListener("pagehide", persistNow);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      window.removeEventListener("pagehide", persistNow);
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange
+      );
+    };
+  }, [lessonId, updateProgress, progressCacheKey]);
 
   const handleMarkCompleted = async () => {
     if (!lessonId) return;
