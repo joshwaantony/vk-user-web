@@ -37,6 +37,11 @@ export default function ProfilePage() {
   const error = useAuthStore((state) => state.error);
   const fetchMe = useAuthStore((state) => state.fetchMe);
 
+  const enrolledCourses =
+    user?.totalEnrolledCourses ?? user?.enrolledCount ?? 0;
+  const completedCourses =
+    user?.totalCompletedCourses ?? user?.completedCount ?? 0;
+
   useEffect(() => {
     if (!token) {
       router.replace("/login?redirect=/profile");
@@ -97,7 +102,7 @@ export default function ProfilePage() {
               <div className="flex justify-center gap-10 sm:gap-16">
                 <div>
                   <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-emerald-600">
-                    {user?.enrolledCount || 0}
+                    {enrolledCourses}
                   </p>
                   <p className="text-gray-500 text-xs sm:text-sm">
                     Enrolled
@@ -105,7 +110,7 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-emerald-600">
-                    {user?.completedCount || 0}
+                    {completedCourses}
                   </p>
                   <p className="text-gray-500 text-xs sm:text-sm">
                     Completed
