@@ -29,8 +29,11 @@ const getFlowCopy = (purposeParam) => {
   };
 };
 
-export default function Page({ searchParams }) {
-  const { title, subtitle, purpose } = getFlowCopy(searchParams?.purpose);
+export default async function Page({ searchParams }) {
+  const resolvedSearchParams = await searchParams;
+  const { title, subtitle, purpose } = getFlowCopy(
+    resolvedSearchParams?.purpose
+  );
 
   return (
     <PhoneForm
