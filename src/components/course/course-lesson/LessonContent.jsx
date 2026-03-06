@@ -394,7 +394,7 @@ export default function LessonContent({
       const now = Date.now();
       if (now - lastSeekWarningAtRef.current > 1200) {
         toast.error(
-          "Forward seek അനുവദിക്കില്ല. പിന്നിലേക്ക് മാത്രം പോകാം."
+          "Forward seeking is not allowed. You can only go backward."
         );
         lastSeekWarningAtRef.current = now;
       }
