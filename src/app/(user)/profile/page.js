@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
@@ -15,6 +15,7 @@ import {
   FiEdit,
 } from "react-icons/fi";
 import { useAuthStore } from "@/store/auth.store";
+import { updateMeApi } from "@/services/auth.service";
 
 const formatDate = (value) => {
   if (!value) return "-";
@@ -36,6 +37,17 @@ export default function ProfilePage() {
   const loading = useAuthStore((state) => state.loading);
   const error = useAuthStore((state) => state.error);
   const fetchMe = useAuthStore((state) => state.fetchMe);
+  const setUser = useAuthStore((state) => state.setUser);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [saveSuccess, setSaveSuccess] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    address: "",
+  });
 
   const enrolledCourses =
     user?.totalEnrolledCourses ?? user?.enrolledCount ?? 0;
@@ -49,6 +61,66 @@ export default function ProfilePage() {
     }
     fetchMe();
   }, [token, router, fetchMe]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    setFormData({
+      name: user?.name || "",
+      email: user?.email || "",
+      address: user?.address || "",
+    });
+  }, [user]);
+
+  const handleInputChange = (field) => (event) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: event.target.value,
+    }));
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setSaveError("");
+    setSaveSuccess("");
+    setFormData({
+      name: user?.name || "",
+      email: user?.email || "",
+      address: user?.address || "",
+    });
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      setIsSaving(true);
+      setSaveError("");
+      setSaveSuccess("");
+
+      const payload = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        address: formData.address.trim(),
+      };
+
+      const res = await updateMeApi(payload);
+      const updatedUser = res?.data ?? res ?? null;
+
+      if (updatedUser) {
+        setUser(updatedUser);
+      } else {
+        await fetchMe();
+      }
+
+      setSaveSuccess("Profile updated successfully.");
+      setIsEditing(false);
+    } catch (err) {
+      setSaveError(
+        err?.response?.data?.message || "Failed to update profile"
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (!token) return null;
 
@@ -127,8 +199,10 @@ export default function ProfilePage() {
             Personal Information
           </h3>
 
-          {error && (
-            <p className="text-red-500 text-sm mb-4">{error}</p>
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          {saveError && <p className="text-red-500 text-sm mb-4">{saveError}</p>}
+          {saveSuccess && (
+            <p className="text-emerald-600 text-sm mb-4">{saveSuccess}</p>
           )}
 
           {/* Grid */}
@@ -136,7 +210,19 @@ export default function ProfilePage() {
             <InfoField
               icon={<FiUser />}
               label="Full Name"
-              value={user?.name || "-"}
+              value={
+                isEditing ? (
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={handleInputChange("name")}
+                    className="w-full bg-transparent outline-none"
+                    placeholder="Enter full name"
+                  />
+                ) : (
+                  user?.name || "-"
+                )
+              }
             />
             <InfoField
               icon={<FiCalendar />}
@@ -151,7 +237,19 @@ export default function ProfilePage() {
             <InfoField
               icon={<FiMail />}
               label="Email Address"
-              value={user?.email || "-"}
+              value={
+                isEditing ? (
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange("email")}
+                    className="w-full bg-transparent outline-none"
+                    placeholder="Enter email address"
+                  />
+                ) : (
+                  user?.email || "-"
+                )
+              }
             />
           </div>
 
@@ -164,7 +262,17 @@ export default function ProfilePage() {
               Address
             </p>
             <div className="bg-gray-100 border border-gray-200 rounded-xl px-4 py-4 text-gray-700 break-words text-sm sm:text-base">
-              {user?.address || "-"}
+              {isEditing ? (
+                <textarea
+                  value={formData.address}
+                  onChange={handleInputChange("address")}
+                  rows={3}
+                  className="w-full bg-transparent outline-none resize-none"
+                  placeholder="Enter address"
+                />
+              ) : (
+                user?.address || "-"
+              )}
             </div>
           </div>
 
@@ -180,13 +288,38 @@ export default function ProfilePage() {
               My Courses
             </button>
 
-            <button
-              onClick={() => router.push("/profile/edit")}
-              className="w-full border border-gray-300 text-black hover:text-[#009966] hover:border-emerald-600  py-3 sm:py-4 rounded-xl flex items-center justify-center gap-2 transition text-sm sm:text-base"
-            >
-              <FiEdit />
-              Edit Profile
-            </button>
+            {isEditing ? (
+              <>
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={isSaving}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white py-3 sm:py-4 rounded-xl flex items-center justify-center gap-2 transition text-sm sm:text-base"
+                >
+                  <FiEdit />
+                  {isSaving ? "Saving..." : "Save"}
+                </button>
+
+                <button
+                  onClick={handleCancelEdit}
+                  disabled={isSaving}
+                  className="w-full border border-gray-300 text-black hover:text-[#009966] hover:border-emerald-600 py-3 sm:py-4 rounded-xl flex items-center justify-center gap-2 transition text-sm sm:text-base"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  setIsEditing(true);
+                  setSaveError("");
+                  setSaveSuccess("");
+                }}
+                className="w-full border border-gray-300 text-black hover:text-[#009966] hover:border-emerald-600 py-3 sm:py-4 rounded-xl flex items-center justify-center gap-2 transition text-sm sm:text-base"
+              >
+                <FiEdit />
+                Edit Profile
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -201,7 +334,7 @@ function InfoField({ icon, label, value }) {
         <span className="text-emerald-600 text-base">{icon}</span>
         {label}
       </p>
-      <div className="bg-gray-100 border border-gray-200 rounded-xl px-3 sm:px-4 py-3 sm:py-4 text-gray-700 break-words text-sm sm:text-base">
+      <div className="bg-gray-100 border border-gray-200 rounded-xl px-3 sm:px-4 py-3 sm:py-4 text-gray-700 break-words text-sm sm:text-base min-h-[52px] flex items-center">
         {value}
       </div>
     </div>
