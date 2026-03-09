@@ -7,6 +7,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
+import toast from "react-hot-toast";
 
 export default function OtpVerifyPage() {
   const router = useRouter();
@@ -23,26 +24,35 @@ export default function OtpVerifyPage() {
 
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [timeLeft, setTimeLeft] = useState(expiresIn || 0);
+  const [showResendAttention, setShowResendAttention] = useState(false);
 
   const inputsRef = useRef([]);
 
   useEffect(() => {
     if (!expiresIn) return;
-
     setTimeLeft(expiresIn);
+  }, [expiresIn]);
 
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          return 0;
-        }
-        return prev - 1;
-      });
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+
+    const timeout = setTimeout(() => {
+      setTimeLeft((prev) => Math.max(prev - 1, 0));
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [expiresIn]);
+    return () => clearTimeout(timeout);
+  }, [timeLeft]);
+
+  useEffect(() => {
+    if (timeLeft !== 0) return;
+
+    setShowResendAttention(true);
+    const timeout = setTimeout(() => {
+      setShowResendAttention(false);
+    }, 3500);
+
+    return () => clearTimeout(timeout);
+  }, [timeLeft]);
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -70,10 +80,14 @@ export default function OtpVerifyPage() {
 
   const handleVerify = async () => {
     const otpValue = otp.join("");
-    if (otpValue.length !== 4) return;
+    if (otpValue.length !== 4) {
+      toast.error("Please enter OTP");
+      return;
+    }
 
     const success = await verifyOtp(otpValue);
     if (!success) return;
+    toast.success("OTP verified successfully");
 
     if (purpose === "FORGOT_PASSWORD") {
       router.replace("/reset-password");
@@ -89,9 +103,12 @@ export default function OtpVerifyPage() {
 
     setOtp(["", "", "", ""]);
     inputsRef.current[0]?.focus();
-    setTimeLeft(1);
+    setTimeLeft(0);
 
-    await sendOtp({ phone, purpose });
+    const result = await sendOtp({ phone, purpose });
+    if (result?.success) {
+      setTimeLeft(Number(result?.expiresIn) || 180);
+    }
   };
 
   return (
@@ -124,7 +141,7 @@ export default function OtpVerifyPage() {
         <button
           onClick={handleResendOtp}
           disabled={loading}
-          className="text-sm text-[#1E40D8] font-semibold mb-4 hover:underline"
+          className={`text-sm text-[#1E40D8] font-semibold mb-4 transition-all duration-200 hover:-translate-y-0.5 hover:text-[#1637b8] hover:underline disabled:opacity-60 disabled:hover:translate-y-0 ${showResendAttention ? "animate-pulse scale-105" : ""}`}
         >
           Resend OTP
         </button>

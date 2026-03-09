@@ -166,7 +166,7 @@ export default function ProfilePage() {
                 {loading && !user ? "Loading..." : user?.name || "-"}
               </h2>
               <p className="text-gray-500 mt-1 capitalize text-sm">
-                {user?.role || "-"}
+                {/* {user?.role || "-"} */}
               </p>
 
               <div className="border-t my-5"></div>
