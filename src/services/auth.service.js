@@ -43,3 +43,9 @@ export const getMeApi = async () => {
   const response = await api.get("/auth/me");
   return response.data;
 };
+
+/* ================= UPDATE CURRENT USER ================= */
+export const updateMeApi = async (payload) => {
+  const response = await api.patch("/auth/me", payload);
+  return response.data;
+};
