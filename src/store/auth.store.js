@@ -204,16 +204,26 @@ export const useAuthStore = create(
           } else {
             res = await sendOtpApi({ phone, purpose });
           }
+          const payload = getAuthPayload(res);
+          const otpExpiry = Number(payload?.expiresIn);
 
           set({
             phone,
             purpose,
-            expiresIn: res?.expiresIn || 600,
+            expiresIn: Number.isFinite(otpExpiry) && otpExpiry > 0
+              ? otpExpiry
+              : 180,
             loading: false,
           });
 
+          const nextExpiresIn =
+            Number.isFinite(otpExpiry) && otpExpiry > 0
+              ? otpExpiry
+              : 180;
+
           return {
             success: true,
+            expiresIn: nextExpiresIn,
           };
 
         } catch (err) {
