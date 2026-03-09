@@ -60,3 +60,9 @@ export const refreshSessionApi = async (payload) => {
   const response = await api.post("/auth/refresh", {}, { headers });
   return response.data;
 };
+
+/* ================= LOGOUT ================= */
+export const logoutApi = async () => {
+  const response = await api.post("/auth/logout", {});
+  return response.data;
+};

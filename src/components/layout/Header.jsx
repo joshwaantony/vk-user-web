@@ -10,12 +10,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FiLogOut, FiMenu, FiUser } from "react-icons/fi";
 import { useAuthStore } from "@/store/auth.store";
+import { logoutApi } from "@/services/auth.service";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [shrink, setShrink] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -49,12 +51,22 @@ export default function Header() {
       ? "text-[#1C4ED8] font-semibold"
       : "text-[#475569] hover:text-[#1C4ED8] transition-colors duration-200";
 
-  const confirmLogout = () => {
-    logout();
-    setShowLogoutModal(false);
-    setOpen(false);
-    router.replace("/home");
-    router.refresh();
+  const confirmLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+
+    try {
+      await logoutApi();
+    } catch (error) {
+      console.error("Logout API failed:", error);
+    } finally {
+      logout();
+      setShowLogoutModal(false);
+      setOpen(false);
+      setIsLoggingOut(false);
+      router.replace("/home");
+      router.refresh();
+    }
   };
 
   if (!mounted) {
@@ -249,6 +261,7 @@ export default function Header() {
               <div className="mt-7 grid grid-cols-2 gap-4">
               <button
                 onClick={() => setShowLogoutModal(false)}
+                disabled={isLoggingOut}
                 className="py-2 rounded-2xl border border-[#CDD5DF] text-[#334155] text-[18px] font-semibold bg-[#F8FAFC] hover:bg-white transition"
               >
                 Cancel
@@ -256,9 +269,10 @@ export default function Header() {
 
               <button
                 onClick={confirmLogout}
+                disabled={isLoggingOut}
                 className="py-2 rounded-2xl bg-[#f04444d8] text-white text-[18px] font-semibold hover:bg-[#DC2626] transition"
               >
-                Logout
+                {isLoggingOut ? "Logging out..." : "Logout"}
               </button>
               </div>
             </div>
