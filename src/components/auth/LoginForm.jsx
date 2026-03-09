@@ -17,6 +17,7 @@ export default function LoginPage() {
   const router = useRouter();
   const setFlow = useAuthFlowStore((state) => state.setFlow);
   const setToken = useAuthStore((state) => state.setToken);
+  const setUser = useAuthStore((state) => state.setUser);
 
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -51,34 +52,20 @@ export default function LoginPage() {
         purpose: "LOGIN",
       });
 
-      // 🔍 DEBUG LOG
-      console.log("Login Response:", res);
-
-      // #region agent log
-      fetch("http://127.0.0.1:7242/ingest/0119ffd1-4c35-47dc-b064-ec4d389574d6", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          runId: "pre-fix",
-          hypothesisId: "C",
-          location: "src/components/auth/LoginForm.jsx:handleLogin",
-          message: "loginApi response shape (no secrets)",
-          data: {
-            resType: typeof res,
-            resKeys: res && typeof res === "object" ? Object.keys(res) : null,
-            hasTokenDirect: !!(res && typeof res === "object" && (res.accessToken || res.token)),
-            hasTokenNested: !!(res && typeof res === "object" && res.data && (res.data.accessToken || res.data.token)),
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
-
-      const token = res?.data?.accessToken || res?.data?.token;
+      const payload = res?.data ?? res ?? {};
+      const token = payload?.accessToken || payload?.token;
+      const refreshToken = payload?.refreshToken;
+      const user = payload?.user || null;
 
       if (token) {
         // ✅ Update Global Store (React State) -> Updates Header Immediately
         setToken(token);
+        if (refreshToken) {
+          localStorage.setItem("refreshToken", refreshToken);
+        }
+        if (user) {
+          setUser(user);
+        }
 
         toast.dismiss(toastId);
         toast.success("Login successful");

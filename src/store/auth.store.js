@@ -14,9 +14,41 @@ import {
   registerApi,
   resetPasswordApi,
   getMeApi,
+  refreshSessionApi,
 } from "@/services/auth.service";
 
 const getAuthPayload = (res) => res?.data ?? res ?? {};
+const normalizeToken = (token) =>
+  typeof token === "string" ? token.trim() : "";
+
+const getStoredRefreshToken = () => {
+  if (typeof window === "undefined") return "";
+  return normalizeToken(localStorage.getItem("refreshToken"));
+};
+
+const persistTokens = ({ accessToken, refreshToken }) => {
+  if (typeof window === "undefined") return;
+  const cleanAccessToken = normalizeToken(accessToken);
+  const cleanRefreshToken = normalizeToken(refreshToken);
+
+  if (cleanAccessToken) {
+    localStorage.setItem("token", cleanAccessToken);
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
+    document.cookie = `token=${cleanAccessToken}; path=/; max-age=604800; SameSite=Lax${secure}`;
+  }
+
+  if (cleanRefreshToken) {
+    localStorage.setItem("refreshToken", cleanRefreshToken);
+  }
+};
+
+const clearPersistedToken = () => {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem("token");
+  localStorage.removeItem("refreshToken");
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `token=; path=/; max-age=0; SameSite=Lax${secure}`;
+};
 
 export const useAuthStore = create(
   persist(
@@ -39,17 +71,24 @@ export const useAuthStore = create(
 
       /* ================= INIT AUTH ================= */
       initAuth: () => {
+        if (typeof window === "undefined") return;
         const token = localStorage.getItem("token");
         if (token) {
-          set({ token });
+          set({ token: normalizeToken(token) });
         }
       },
 
       /* ================= MANUAL SETTERS ================= */
       setToken: (token) => {
-        localStorage.setItem("token", token);
-        document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax`;
-        set({ token });
+        const cleanToken = normalizeToken(token);
+        if (!cleanToken) {
+          clearPersistedToken();
+          set({ token: null });
+          return;
+        }
+
+        persistTokens({ accessToken: cleanToken });
+        set({ token: cleanToken });
       },
 
       setUser: (user) => set({ user }),
@@ -77,6 +116,79 @@ export const useAuthStore = create(
             loading: false,
           });
           return null;
+        }
+      },
+
+      restoreSession: async () => {
+        try {
+          const { token } = get();
+          const refreshToken = getStoredRefreshToken();
+          if (!token && !refreshToken) {
+            return false;
+          }
+
+          set({ loading: true, error: null });
+
+          if (token) {
+            try {
+              const meRes = await getMeApi();
+              const mePayload = getAuthPayload(meRes);
+              const user = mePayload?.user || mePayload || null;
+
+              set({
+                token: normalizeToken(token),
+                user,
+                loading: false,
+                error: null,
+              });
+              return true;
+            } catch (meError) {
+              const status = meError?.response?.status;
+              if (status && status !== 401) {
+                throw meError;
+              }
+            }
+          }
+
+          const refreshRes = await refreshSessionApi(
+            refreshToken ? { refreshToken } : undefined
+          );
+          const refreshPayload = getAuthPayload(refreshRes);
+          const refreshedToken = normalizeToken(
+            refreshPayload?.accessToken || refreshPayload?.token
+          );
+          const rotatedRefreshToken = normalizeToken(refreshPayload?.refreshToken);
+
+          if (!refreshedToken) {
+            throw new Error("Access token missing in refresh response");
+          }
+
+          persistTokens({
+            accessToken: refreshedToken,
+            refreshToken: rotatedRefreshToken || refreshToken,
+          });
+
+          const meRes = await getMeApi();
+          const mePayload = getAuthPayload(meRes);
+          const user = mePayload?.user || mePayload || null;
+
+          set({
+            token: refreshedToken,
+            user,
+            loading: false,
+            error: null,
+          });
+
+          return true;
+        } catch (err) {
+          clearPersistedToken();
+          set({
+            user: null,
+            token: null,
+            loading: false,
+            error: null,
+          });
+          return false;
         }
       },
 
@@ -172,11 +284,13 @@ export const useAuthStore = create(
               return false;
             }
 
-            localStorage.setItem("token", accessToken);
-            document.cookie = `token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
+            persistTokens({
+              accessToken,
+              refreshToken: payload?.refreshToken,
+            });
 
             set({
-              token: accessToken,
+              token: normalizeToken(accessToken),
               user,
               verificationToken: null,
               expiresIn: null,
@@ -221,11 +335,13 @@ export const useAuthStore = create(
             return false;
           }
 
-          localStorage.setItem("token", accessToken);
-          document.cookie = `token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
+          persistTokens({
+            accessToken,
+            refreshToken: payload?.refreshToken,
+          });
 
           set({
-            token: accessToken,
+            token: normalizeToken(accessToken),
             user,
             loading: false,
           });
@@ -259,19 +375,17 @@ export const useAuthStore = create(
           console.log("API RESPONSE:", res);
 
           const accessToken = res?.data?.accessToken;
+          const refreshToken = res?.data?.refreshToken;
           const user = res?.data?.user;
 
           if (accessToken) {
+            persistTokens({ accessToken, refreshToken });
             set({
-              token: accessToken,
+              token: normalizeToken(accessToken),
               user: user,
               isAuthenticated: true,
               loading: false,
             });
-
-            localStorage.setItem("token", accessToken);
-            // ✅ Also set cookie so middleware can read it
-            document.cookie = `token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
 
             return true;
           }
@@ -325,9 +439,7 @@ export const useAuthStore = create(
 
       /* ================= LOGOUT ================= */
       logout: () => {
-        localStorage.removeItem("token");
-        // ✅ Clear cookie so middleware stops allowing access
-        document.cookie = "token=; path=/; max-age=0; SameSite=Lax";
+        clearPersistedToken();
 
         set({
           user: null,

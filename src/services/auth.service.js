@@ -49,3 +49,14 @@ export const updateMeApi = async (payload) => {
   const response = await api.patch("/auth/me", payload);
   return response.data;
 };
+
+/* ================= REFRESH ACCESS TOKEN ================= */
+export const refreshSessionApi = async (payload) => {
+  const refreshToken = payload?.refreshToken;
+  const headers = refreshToken
+    ? { Authorization: `Refresh ${refreshToken}` }
+    : undefined;
+
+  const response = await api.post("/auth/refresh", {}, { headers });
+  return response.data;
+};

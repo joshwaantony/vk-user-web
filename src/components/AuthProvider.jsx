@@ -15,17 +15,25 @@ export default function AuthProvider({ children }) {
 
   const token = useAuthStore((state) => state.token);
   const initAuth = useAuthStore((state) => state.initAuth);
+  const restoreSession = useAuthStore((state) => state.restoreSession);
 
   const [mounted, setMounted] = useState(false);
+  const [isInitializingSession, setIsInitializingSession] = useState(true);
 
   // Wait until client mounts
   useEffect(() => {
-    setMounted(true);
-    initAuth();
-  }, [initAuth]);
+    const initializeSession = async () => {
+      setMounted(true);
+      initAuth();
+      await restoreSession();
+      setIsInitializingSession(false);
+    };
+
+    initializeSession();
+  }, [initAuth, restoreSession]);
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || isInitializingSession) return;
 
     const isLoggedIn = !!token;
 
@@ -34,9 +42,9 @@ export default function AuthProvider({ children }) {
       router.replace("/course");
     }
 
-  }, [token, pathname, mounted, router]);
+  }, [token, pathname, mounted, isInitializingSession, router]);
 
-  if (!mounted) return null;
+  if (!mounted || isInitializingSession) return null;
 
   return children;
 }
