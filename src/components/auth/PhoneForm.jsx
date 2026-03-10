@@ -19,10 +19,14 @@ export default function PhoneForm({
     sendOtp,
     loading,
   } = useAuthStore();
+  const localPhone = String(phone || "")
+    .replace(/^\+91/, "")
+    .replace(/\D/g, "")
+    .slice(0, 10);
 
   // ✅ VALIDATION
   const validate = () => {
-    if (!/^\d{10}$/.test(phone || "")) {
+    if (!/^\d{10}$/.test(localPhone)) {
       toast.error("Enter a valid 10-digit phone number");
       return false;
     }
@@ -48,29 +52,33 @@ export default function PhoneForm({
   //     toast.error("Failed to send OTP");
   //   }
   // };
-const handleSendOtp = async () => {
-  if (!validate()) return;
+  const handleSendOtp = async () => {
+    if (!validate()) return;
 
-  const toastId = toast.loading("Sending OTP...");
+    const toastId = toast.loading("Sending OTP...");
 
-  const result = await sendOtp({
-    phone: `+91${phone}`,
-    purpose,
-  });
+    const result = await sendOtp({
+      phone: `+91${localPhone}`,
+      purpose,
+    });
 
-  toast.dismiss(toastId);
+    toast.dismiss(toastId);
 
-  if (result.success) {
-    toast.success("OTP sent successfully");
-    router.push(nextRoute);
+    if (result.success) {
+      toast.success("OTP sent successfully");
+      router.push(nextRoute);
+    } else if (result.status === 409) {
+      toast.error("Phone number already registered. Please login.");
+    } else {
+      toast.error(result.message); // show backend message
+    }
+  };
 
-  } else if (result.status === 409) {
-    toast.error("Phone number already registered. Please login.");
-
-  } else {
-    toast.error(result.message); // ✅ show backend message
-  }
-};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (loading) return;
+    await handleSendOtp();
+  };
 
 
 
@@ -90,7 +98,10 @@ const handleSendOtp = async () => {
           {subtitle}
         </p>
 
-        <div className="mt-8 bg-white rounded-[28px] px-8 py-10 shadow-[0_20px_40px_rgba(15,23,42,0.08)]">
+        <form
+          onSubmit={handleSubmit}
+          className="mt-8 bg-white rounded-[28px] px-8 py-10 shadow-[0_20px_40px_rgba(15,23,42,0.08)]"
+        >
 
           <div className="text-left mb-6">
             <label className="block text-sm font-semibold text-[#0F172A] mb-2">
@@ -111,22 +122,25 @@ const handleSendOtp = async () => {
                 type="tel"
                 inputMode="numeric"
                 maxLength={10}
-                value={phone || ""}
+                value={localPhone}
                 onChange={(e) =>
                   setPhone(
-                    e.target.value.replace(/\D/g, "")
+                    e.target.value
+                      .replace(/\D/g, "")
+                      .slice(0, 10)
                   )
                 }
                 placeholder="Enter 10-digit number"
                 className="flex-1 h-full px-4 bg-transparent
                            text-[#0F172A] placeholder:text-[#94A3B8]
                            outline-none"
+                enterKeyHint="send"
               />
             </div>
           </div>
 
           <button
-            onClick={handleSendOtp}
+            type="submit"
             disabled={loading}
             className="w-full h-14 rounded-xl bg-[#2457E6]
                        text-white font-semibold text-lg
@@ -137,7 +151,7 @@ const handleSendOtp = async () => {
           >
             {loading ? "Sending..." : "Send OTP"}
           </button>
-        </div>
+        </form>
       </div>
     </main>
   );

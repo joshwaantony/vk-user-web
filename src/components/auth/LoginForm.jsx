@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 import { loginApi } from "@/services/auth.service";
 import { useAuthFlowStore } from "@/store/authFlow.store";
 import { useAuthStore } from "@/store/auth.store";
-import Link from "next/link";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import toast from "react-hot-toast";
 
@@ -86,6 +85,12 @@ export default function LoginPage() {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (loading) return;
+    await handleLogin();
+  };
+
   
   // 🔹 OTP LOGIN
   // const handleOtpLogin = () => {
@@ -157,7 +162,10 @@ const handleOtpLogin = () => {
           Sign in to your account
         </p>
 
-        <div className="mt-8 bg-white rounded-[28px] px-8 py-10 shadow-[0_20px_40px_rgba(15,23,42,0.08)]">
+        <form
+          onSubmit={handleSubmit}
+          className="mt-8 bg-white rounded-[28px] px-8 py-10 shadow-[0_20px_40px_rgba(15,23,42,0.08)]"
+        >
 
           {/* Phone */}
           <div className="text-left mb-6">
@@ -215,6 +223,7 @@ const handleOtpLogin = () => {
           {/* Links */}
           <div className="flex justify-between text-sm mb-6">
             <button
+              type="button"
               onClick={handleOtpLogin}
               className="text-[#2457E6] font-medium"
             >
@@ -222,6 +231,7 @@ const handleOtpLogin = () => {
             </button>
 
             <button
+              type="button"
               onClick={handleForgotPassword}
               className="text-[#2457E6] font-medium"
             >
@@ -231,7 +241,7 @@ const handleOtpLogin = () => {
 
           {/* Login Button */}
           <button
-            onClick={handleLogin}
+            type="submit"
             disabled={loading}
             className="w-full h-14 rounded-xl bg-[#2457E6] text-white font-semibold text-lg
                        shadow-[0_10px_20px_rgba(36,87,230,0.35)]
@@ -247,6 +257,7 @@ const handleOtpLogin = () => {
           </div>
 
           <button
+            type="button"
             className="w-full h-14 rounded-xl border text-[#334155] border-[#CBD5E1]
              flex items-center justify-center gap-3
              font-semibold hover:bg-[#F8FAFC]"
@@ -259,7 +270,7 @@ const handleOtpLogin = () => {
             Sign in with Google
           </button>
 
-        </div>
+        </form>
 
         <p className="mt-8 text-[#64748B] mb-10">
           Don&apos;t have an account?{" "}

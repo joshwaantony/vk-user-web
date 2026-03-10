@@ -47,6 +47,12 @@ export default function ResetPasswordPage() {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (loading || password !== confirm) return;
+    await handleSave();
+  };
+
   return (
     <main className="min-h-screen bg-[#EEF4FF] flex flex-col items-center justify-center px-4">
       <div className="mb-6">
@@ -60,7 +66,8 @@ export default function ResetPasswordPage() {
         Set your new password
       </p>
 
-      <div
+      <form
+        onSubmit={handleSubmit}
         className="mt-10 w-full max-w-[380px] bg-white rounded-[28px]
                    px-8 py-10
                    shadow-[0_30px_80px_rgba(36,87,230,0.18)]"
@@ -122,7 +129,7 @@ export default function ResetPasswordPage() {
         </div>
 
         <button
-          onClick={handleSave}
+          type="submit"
           disabled={loading || password !== confirm}
           className="w-full h-12 rounded-xl bg-[#1E40D8]
                      text-white font-semibold
@@ -133,7 +140,7 @@ export default function ResetPasswordPage() {
         >
           {loading ? "Saving..." : "Save"}
         </button>
-      </div>
+      </form>
     </main>
   );
 }
