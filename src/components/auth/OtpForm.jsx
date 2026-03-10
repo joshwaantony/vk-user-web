@@ -98,6 +98,12 @@ export default function OtpVerifyPage() {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (loading || timeLeft === 0) return;
+    await handleVerify();
+  };
+
   const handleResendOtp = async () => {
     if (!phone || !purpose) return;
 
@@ -112,7 +118,10 @@ export default function OtpVerifyPage() {
   };
 
   return (
-    <div className="w-full max-w-[380px] bg-white rounded-2xl px-8 py-10 shadow-[0_25px_60px_rgba(36,87,230,0.15)] text-center mt-4">
+    <form
+      onSubmit={handleSubmit}
+      className="w-full max-w-[380px] bg-white rounded-2xl px-8 py-10 shadow-[0_25px_60px_rgba(36,87,230,0.15)] text-center mt-4"
+    >
       <p className="text-sm font-semibold text-[#0F172A] mb-4">
         Enter OTP
       </p>
@@ -139,6 +148,7 @@ export default function OtpVerifyPage() {
         </p>
       ) : (
         <button
+          type="button"
           onClick={handleResendOtp}
           disabled={loading}
           className={`text-sm text-[#1E40D8] font-semibold mb-4 transition-all duration-200 hover:-translate-y-0.5 hover:text-[#1637b8] hover:underline disabled:opacity-60 disabled:hover:translate-y-0 ${showResendAttention ? "animate-pulse scale-105" : ""}`}
@@ -150,12 +160,12 @@ export default function OtpVerifyPage() {
       {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
       <button
-        onClick={handleVerify}
+        type="submit"
         disabled={loading || timeLeft === 0}
         className="w-full h-12 rounded-xl bg-[#1E40D8] disabled:opacity-60 text-white font-semibold text-base transition"
       >
         {loading ? "Verifying..." : "Verify"}
       </button>
-    </div>
+    </form>
   );
 }
