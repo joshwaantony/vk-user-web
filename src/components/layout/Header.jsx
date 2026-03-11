@@ -46,6 +46,28 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+
+  const clearClientData = () => {
+  if (typeof window === "undefined") return;
+
+  // Clear localStorage
+  localStorage.clear();
+
+  // Clear sessionStorage
+  sessionStorage.clear();
+
+  // Clear cookies
+  const cookies = document.cookie.split(";");
+
+  cookies.forEach((cookie) => {
+    const eqPos = cookie.indexOf("=");
+    const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+
+    document.cookie =
+      name +
+      "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax";
+  });
+};
   const navLink = (path) =>
     pathname === path
       ? "text-[#1C4ED8] font-semibold"
@@ -59,14 +81,30 @@ export default function Header() {
       await logoutApi();
     } catch (error) {
       console.error("Logout API failed:", error);
-    } finally {
-      logout();
-      setShowLogoutModal(false);
-      setOpen(false);
-      setIsLoggingOut(false);
-      router.replace("/home");
-      router.refresh();
-    }
+    } 
+    // finally {
+    //   logout();
+    //   setShowLogoutModal(false);
+    //   setOpen(false);
+    //   setIsLoggingOut(false);
+    //   router.replace("/home");
+    //   router.refresh();
+    // }
+
+    finally {
+  // clear Zustand state
+  logout();
+
+  // clear browser data
+  clearClientData();
+
+  setShowLogoutModal(false);
+  setOpen(false);
+  setIsLoggingOut(false);
+
+  router.replace("/home");
+  router.refresh();
+}
   };
 
   if (!mounted) {
@@ -243,8 +281,8 @@ export default function Header() {
             onClick={() => setShowLogoutModal(false)}
           />
 
-          <div className="relative w-[94%] max-w-[460px] rounded-2xl overflow-hidden shadow-2xl">
-            <div className="bg-[#00B975] px-6 py-7 text-white flex items-center gap-3">
+          <div className="relative w-[94%] max-w-[520px] rounded-2xl overflow-hidden shadow-2xl">
+            <div className="bg-[#c44303] px-6 py-6 text-white flex flex-col justify-center items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
                 <FiLogOut size={22} />
               </div>
@@ -253,8 +291,8 @@ export default function Header() {
               </h2>
             </div>
 
-            <div className="bg-[#F3F4F6] px-6 py-7">
-              <p className="text-lg leading-snug text-[#334155]">
+            <div className="bg-[#F3F4F6] px-6 py-8">
+              <p className="text-lg text-center leading-snug text-[#334155]">
                 Are you sure you want to logout? You will need to sign in again to access your courses.
               </p>
 
@@ -270,7 +308,7 @@ export default function Header() {
               <button
                 onClick={confirmLogout}
                 disabled={isLoggingOut}
-                className="py-2 rounded-2xl bg-[#f04444d8] text-white text-[18px] font-semibold hover:bg-[#DC2626] transition"
+                className="py-2 rounded-2xl bg-[#b93e00] text-white text-[18px] font-semibold hover:bg-[#DC2626] transition"
               >
                 {isLoggingOut ? "Logging out..." : "Logout"}
               </button>

@@ -125,8 +125,9 @@ export default function ProfilePage() {
   if (!token) return null;
 
   return (
-    <div className="min-h-screen bg-[#f3f5f7] px-4 sm:px-6 lg:px-26 py-8 lg:py-12">
-      {/* Header */}
+    <div className="min-h-screen  bg-[#f3f5f7]  py-8 lg:py-12">
+     <div className="max-w-7xl mx-auto px-4 sm:px-6">
+       {/* Header */}
       <div className="mb-8 lg:mb-12">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
           My Profile
@@ -323,6 +324,7 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+     </div>
     </div>
   );
 }

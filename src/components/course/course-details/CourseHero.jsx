@@ -11,6 +11,13 @@ export default function CourseHero({ course }) {
 
   if (!course) return null;
 
+
+  const formatDuration = (seconds) => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+};
   const handleBack = () => {
     // If user has history, go back
     if (window.history.length > 1) {
@@ -64,7 +71,7 @@ export default function CourseHero({ course }) {
               <FiUsers /> {course.students} students
             </span>
             <span className="flex items-center gap-1">
-              <FiClock /> {course.duration}
+              <FiClock /> {formatDuration(course.duration)}
             </span>
             <span className="flex items-center gap-1">
               <FiPlay /> {course.lessons} lessons
