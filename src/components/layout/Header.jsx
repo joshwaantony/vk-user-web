@@ -282,21 +282,21 @@ export default function Header() {
           />
 
           <div className="relative w-[94%] max-w-[520px] rounded-2xl overflow-hidden shadow-2xl">
-            <div className="bg-[#c44303] px-6 py-6 text-white flex flex-col justify-center items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                <FiLogOut size={22} />
+            <div className="bg-[#FFFFFF] px-6 py-10 text-white flex flex-col justify-center items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-[#FFE8E8] flex items-center justify-center">
+                <FiLogOut size={22} className="text-[#EF4444]" />
               </div>
-              <h2 className="text-3xl leading-none font-semibold">
+              <h2 className="text-3xl text-black leading-none font-semibold pt-4">
                 Confirm Logout
               </h2>
             </div>
 
-            <div className="bg-[#F3F4F6] px-6 py-8">
+            <div className="bg-[#FFFFFF] px-6 ">
               <p className="text-lg text-center leading-snug text-[#334155]">
                 Are you sure you want to logout? You will need to sign in again to access your courses.
               </p>
 
-              <div className="mt-7 grid grid-cols-2 gap-4">
+              <div className="mt-7 grid grid-cols-2 gap-4 pb-10">
               <button
                 onClick={() => setShowLogoutModal(false)}
                 disabled={isLoggingOut}
@@ -308,7 +308,7 @@ export default function Header() {
               <button
                 onClick={confirmLogout}
                 disabled={isLoggingOut}
-                className="py-2 rounded-2xl bg-[#b93e00] text-white text-[18px] font-semibold hover:bg-[#DC2626] transition"
+                className="py-2 rounded-2xl bg-[#ED4040] text-white text-[18px] font-semibold hover:bg-[#DC2626] transition"
               >
                 {isLoggingOut ? "Logging out..." : "Logout"}
               </button>
