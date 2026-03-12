@@ -250,13 +250,13 @@ const handleOtpLogin = () => {
             {loading ? "Signing In..." : "Sign In"}
           </button>
 
-          <div className="flex items-center my-8">
+          {/* <div className="flex items-center my-8">
             <div className="flex-1 h-px bg-[#E2E8F0]" />
             <span className="mx-4 text-sm text-[#94A3B8]">OR</span>
             <div className="flex-1 h-px bg-[#E2E8F0]" />
-          </div>
+          </div> */}
 
-          <button
+          {/* <button
             type="button"
             className="w-full h-14 rounded-xl border text-[#334155] border-[#CBD5E1]
              flex items-center justify-center gap-3
@@ -268,7 +268,7 @@ const handleOtpLogin = () => {
               className="w-5 h-5"
             />
             Sign in with Google
-          </button>
+          </button> */}
 
         </form>
 
