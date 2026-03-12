@@ -2,8 +2,6 @@
 
 
 
-
-
 "use client";
 
 import { useState } from "react";
@@ -45,24 +43,26 @@ export default function CourseContent() {
   );
 
   return (
-    <div className="bg-white border rounded-2xl p-6">
-      <h2 className="text-xl text-black font-semibold mb-1">
+    <div className="bg-white border rounded-2xl p-4 sm:p-6">
+      <h2 className="text-lg sm:text-xl text-black font-semibold mb-1">
         Course Content
       </h2>
 
-      <p className="text-sm text-gray-500 mb-6">
-        {sortedSections.length} sections •{" "}
-        {course.totalLessons} lessons
+      <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
+        {sortedSections.length} sections • {course.totalLessons} lessons
       </p>
 
       {sortedSections.map((section, index) => {
         const previousSection = index > 0 ? sortedSections[index - 1] : null;
+
         const previousSectionCompleted = previousSection
           ? previousSection.isCompleted ||
             (Number(previousSection.completedLessons || 0) >=
               Number(previousSection.totalLessons || 0))
           : true;
+
         const sectionUnlockedByApi = section.isUnlocked !== false;
+
         const isSectionUnlocked = isEnrolled
           ? index === 0
             ? sectionUnlockedByApi
@@ -76,40 +76,36 @@ export default function CourseContent() {
         const sortedLessons = [...(section.lessons || [])].sort(
           (a, b) => a.order - b.order
         );
+
         const completedLessons = sortedLessons.filter(
           (lesson) => lesson.isCompleted
         ).length;
+
         const sectionPercent =
           sortedLessons.length > 0
             ? Math.round(
-                (completedLessons / sortedLessons.length) *
-                  100
+                (completedLessons / sortedLessons.length) * 100
               )
             : 0;
 
         return (
-          <div
-            key={section.id}
-            className="border rounded-xl mb-4"
-          >
+          <div key={section.id} className="border rounded-xl mb-3 sm:mb-4">
             {/* SECTION HEADER */}
-            <div className="flex justify-between items-center p-4">
-              <div>
-                <p className="font-semibold text-[#495565] text-sm">
+            <div className="flex justify-between items-center p-3 sm:p-4 gap-3">
+              <div className="min-w-0">
+                <p className="font-semibold text-[#495565] text-xs sm:text-sm truncate">
                   Section {index + 1}: {section.title}
                 </p>
-                <p className="text-xs text-gray-500">
+
+                <p className="text-[11px] sm:text-xs text-gray-500">
                   {sortedLessons.length} lessons
                 </p>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4">
 
-                {/* ✅ Show circle ONLY if enrolled */}
                 {course.isEnrolled && (
-                  <CircleProgress
-                    percentage={sectionPercent}
-                  />
+                  <CircleProgress percentage={sectionPercent} />
                 )}
 
                 <button
@@ -120,7 +116,7 @@ export default function CourseContent() {
                     }
                     toast.error(unlockMessage);
                   }}
-                  className={`w-8 h-8 flex items-center justify-center rounded-full transition ${
+                  className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full transition ${
                     isSectionUnlocked
                       ? "bg-[#F1F4F9] hover:bg-[#E7EBF3]"
                       : "bg-[#EF4444] text-white ring-2 ring-[#FCA5A5] hover:bg-[#DC2626]"
@@ -149,9 +145,7 @@ export default function CourseContent() {
                     lessonId={lesson.id}
                     courseId={course.id || course._id}
                     title={lesson.title}
-                    time={`${Math.round(
-                      lesson.duration / 60
-                    )} min`}
+                    time={`${Math.round(lesson.duration / 60)} min`}
                     locked={lesson.locked}
                     isCompleted={lesson.isCompleted}
                     isEnrolled={isEnrolled}
@@ -159,13 +153,8 @@ export default function CourseContent() {
                     isFirstSection={index === 0}
                     thumbnail={lesson.thumbnail}
                     onAccessDenied={async (message) => {
-                      toast.error(
-                        message ||
-                          unlockMessage
-                      );
-                      await refreshCourseById(
-                        course.id || course._id
-                      );
+                      toast.error(message || unlockMessage);
+                      await refreshCourseById(course.id || course._id);
                     }}
                   />
                 ))}
@@ -181,8 +170,9 @@ export default function CourseContent() {
 /* ================= CIRCLE PROGRESS ================= */
 
 function CircleProgress({ percentage }) {
-  const radius = 28;
+  const radius = 26;
   const stroke = 5;
+
   const normalizedRadius = radius - stroke / 2;
   const circumference = normalizedRadius * 2 * Math.PI;
 
@@ -190,7 +180,7 @@ function CircleProgress({ percentage }) {
     circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="relative w-14 h-14">
+    <div className="relative w-12 h-12 sm:w-14 sm:h-14">
       <svg height={radius * 2} width={radius * 2}>
         <circle
           stroke="#E5E7EB"
@@ -200,6 +190,7 @@ function CircleProgress({ percentage }) {
           cx={radius}
           cy={radius}
         />
+
         <circle
           stroke={percentage === 100 ? "#22C55E" : "#2563EB"}
           fill="transparent"
@@ -218,7 +209,7 @@ function CircleProgress({ percentage }) {
         />
       </svg>
 
-      <div className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-[#1E293B]">
+      <div className="absolute inset-0 flex items-center justify-center text-xs sm:text-sm font-semibold text-[#1E293B]">
         {percentage}%
       </div>
     </div>
@@ -241,6 +232,7 @@ function Lesson({
   onAccessDenied,
 }) {
   const router = useRouter();
+
   const canWatchLesson =
     !locked && (!isEnrolled || isSectionUnlocked);
 
@@ -258,10 +250,9 @@ function Lesson({
       await watchLesson(lessonId);
 
       const url = courseId
-        ? `/lessons/${lessonId}/watch?courseId=${encodeURIComponent(
-            courseId
-          )}`
+        ? `/lessons/${lessonId}/watch?courseId=${encodeURIComponent(courseId)}`
         : `/lessons/${lessonId}/watch`;
+
       router.push(url);
     } catch (error) {
       const status = error?.response?.status;
@@ -272,39 +263,38 @@ function Lesson({
         return;
       }
 
-      toast.error(
-        message || "Unable to open this lesson right now"
-      );
+      toast.error(message || "Unable to open this lesson right now");
     }
   };
 
   return (
     <div
-      className={`flex justify-between items-center p-4 transition ${
+      className={`flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 p-3 sm:p-4 transition ${
         isCompleted
           ? "bg-emerald-50/70 border-l-4 border-emerald-500"
           : "hover:bg-gray-50"
       }`}
     >
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-3 sm:gap-4 items-center">
         <Image
           src={thumbnail || "/thumb-line.avif"}
           alt={title}
           width={48}
           height={48}
-          className="rounded-lg object-cover"
+          className="rounded-lg object-cover w-10 h-10 sm:w-12 sm:h-12"
         />
 
-        <div>
-          <p className="text-sm font-medium text-[#1E293B] flex items-center gap-2">
+        <div className="min-w-0">
+          <p className="text-xs sm:text-sm font-medium text-[#1E293B] flex items-center gap-2">
             {isCompleted && (
-              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 text-white">
-                <FiCheck size={12} />
+              <span className="inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-500 text-white">
+                <FiCheck size={11} />
               </span>
             )}
-            <span>{title}</span>
+            <span className="truncate">{title}</span>
           </p>
-          <p className="text-xs text-gray-500">
+
+          <p className="text-[11px] sm:text-xs text-gray-500">
             {isCompleted && "Completed"}
             {isCompleted && locked && " • "}
             {locked && "Locked lesson"}
@@ -312,22 +302,19 @@ function Lesson({
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <span className="flex items-center gap-1 text-xs text-gray-500">
+      <div className="flex items-center justify-between sm:justify-end gap-3">
+        <span className="flex items-center gap-1 text-[11px] sm:text-xs text-gray-500">
           <FiClock /> {time}
         </span>
 
         <div className="relative group">
           <button
             onClick={handleWatch}
-            className={`w-8 h-8 flex items-center justify-center rounded-full text-white transition-all duration-300 transform group-hover:-translate-y-0.5 group-hover:scale-110 ${
+            className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full text-white transition-all duration-300 transform group-hover:-translate-y-0.5 group-hover:scale-110 ${
               !canWatchLesson
                 ? "bg-[#EF4444] ring-2 ring-[#FCA5A5] hover:bg-[#DC2626]"
                 : "bg-[#1F3FD7] hover:bg-[#1630A8]"
             }`}
-            aria-label={
-              canWatchLesson ? "Watch lesson" : "Locked lesson"
-            }
           >
             {!canWatchLesson ? (
               <FiLock size={14} />
