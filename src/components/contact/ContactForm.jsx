@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useState } from "react";
@@ -10,20 +8,21 @@ import { FiChevronDown } from "react-icons/fi";
 
 export default function ContactForm() {
   const { submitContact, loading } = useContactStore();
+  const subjects = [
+    { label: "General Inquiry", value: "General Inquiry" },
+    { label: "Support", value: "Support" },
+    { label: "Admissions", value: "Admissions" },
+  ];
+  const defaultSubject = subjects[0].value;
 
   const [form, setForm] = useState({
     fullName: "",
     email: "",
-    subject: "",
+    subject: defaultSubject,
     message: "",
   });
-const subjects = [
-  { label: "General Inquiry", value: "General Inquiry" },
-  { label: "Support", value: "Support" },
-  { label: "Admissions", value: "Admissions" },
-];
 
-const [isSubjectOpen, setIsSubjectOpen] = useState(false);
+  const [isSubjectOpen, setIsSubjectOpen] = useState(false);
   const [count, setCount] = useState(0);
 
   const handleChange = (e) => {
@@ -50,7 +49,7 @@ const [isSubjectOpen, setIsSubjectOpen] = useState(false);
       setForm({
         fullName: "",
         email: "",
-        subject: "",
+        subject: defaultSubject,
         message: "",
       });
 
@@ -63,7 +62,6 @@ const [isSubjectOpen, setIsSubjectOpen] = useState(false);
   return (
     <section className="bg-white py-14 sm:py-20 px-4">
       <div className="max-w-7xl mx-auto grid gap-12 lg:grid-cols-2">
-
         {/* ================= LEFT FORM ================= */}
         <div className="w-full">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-black mb-3">
@@ -71,11 +69,11 @@ const [isSubjectOpen, setIsSubjectOpen] = useState(false);
           </h2>
 
           <p className="text-[#475569] mb-10 max-w-md text-sm sm:text-base">
-            Have questions? We'd love to hear from you! Fill out the form below and we'll respond as soon as possible.
+            Have questions? We'd love to hear from you! Fill out the form below
+            and we'll respond as soon as possible.
           </p>
 
           <form className="space-y-6" onSubmit={handleSubmit}>
-
             {/* Full Name */}
             <div>
               <label className="block text-sm font-semibold text-black mb-2">
@@ -130,45 +128,16 @@ const [isSubjectOpen, setIsSubjectOpen] = useState(false);
               />
             </div>
 
-            {/* Subject */}
-            {/* <div>
+            <div className="relative">
               <label className="block text-sm font-semibold text-black mb-2">
                 Subject
               </label>
-              <select
-                name="subject"
-                value={form.subject}
-                onChange={handleChange}
+
+              {/* Selected Value */}
+              <button
+                type="button"
+                onClick={() => setIsSubjectOpen(!isSubjectOpen)}
                 className="
-                  w-full
-                  border border-[#C5CDD7]
-                  rounded-xl
-                  px-4 py-3.5
-                  text-black
-                  text-sm sm:text-base
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-[#1E40E6]
-                "
-                required
-              >
-                <option value="">Select a subject</option>
-                <option value="General Inquiry">General Inquiry</option>
-                <option value="Support">Support</option>
-                <option value="Admissions">Admissions</option>
-              </select>
-            </div> */}
-
-            <div className="relative">
-  <label className="block text-sm font-semibold text-black mb-2">
-    Subject
-  </label>
-
-  {/* Selected Value */}
-<button
-  type="button"
-  onClick={() => setIsSubjectOpen(!isSubjectOpen)}
-  className="
     w-full
     border border-[#C5CDD7]
     rounded-xl
@@ -181,37 +150,39 @@ const [isSubjectOpen, setIsSubjectOpen] = useState(false);
     bg-white
     flex items-center justify-between
   "
->
-  <span className={`${form.subject ? "text-black" : "text-[#9CA3AF]"}`}>
-    {form.subject || "Select a subject"}
-  </span>
+              >
+                <span
+                  className={`${form.subject ? "text-black" : "text-[#9CA3AF]"}`}
+                >
+                  {form.subject || "Select a subject"}
+                </span>
 
-  <FiChevronDown
-    className={`transition-transform duration-200 ${
-      isSubjectOpen ? "rotate-180" : ""
-    }`}
-    size={18}
-  />
-</button>
+                <FiChevronDown
+                  className={`transition-transform duration-200 ${
+                    isSubjectOpen ? "rotate-180" : ""
+                  }`}
+                  size={18}
+                />
+              </button>
 
-  {/* Dropdown */}
-  {isSubjectOpen && (
-    <div className="absolute z-20 mt-2 w-full bg-white border border-[#E2E8F0] rounded-xl shadow-lg p-2">
-      {subjects.map((option) => {
-        const isActive = form.subject === option.value;
+              {/* Dropdown */}
+              {isSubjectOpen && (
+                <div className="absolute z-20 mt-2 w-full bg-white border border-[#E2E8F0] rounded-xl shadow-lg p-2">
+                  {subjects.map((option) => {
+                    const isActive = form.subject === option.value;
 
-        return (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => {
-              setForm((prev) => ({
-                ...prev,
-                subject: option.value,
-              }));
-              setIsSubjectOpen(false);
-            }}
-            className={`
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          setForm((prev) => ({
+                            ...prev,
+                            subject: option.value,
+                          }));
+                          setIsSubjectOpen(false);
+                        }}
+                        className={`
               w-full text-left px-3 py-2.5 rounded-lg text-sm transition
               ${
                 isActive
@@ -219,14 +190,14 @@ const [isSubjectOpen, setIsSubjectOpen] = useState(false);
                   : "text-[#0F172A] hover:bg-[#F1F5F9]"
               }
             `}
-          >
-            {option.label}
-          </button>
-        );
-      })}
-    </div>
-  )}
-</div>
+                      >
+                        {option.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
             {/* Message */}
             <div>
@@ -278,7 +249,6 @@ const [isSubjectOpen, setIsSubjectOpen] = useState(false);
             >
               {loading ? "Sending..." : "Send Message"}
             </button>
-
           </form>
         </div>
 
@@ -286,7 +256,6 @@ const [isSubjectOpen, setIsSubjectOpen] = useState(false);
         <div className="w-full">
           <ContactInfo />
         </div>
-
       </div>
     </section>
   );

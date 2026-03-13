@@ -15,9 +15,9 @@ export default function CompletedCourses({ data = [] }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
       {/* Heading */}
-      <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-5 sm:mb-6">
+      {/* <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-5 sm:mb-6">
         Completed Courses
-      </h2>
+      </h2> */}
 
       {/* Empty State */}
       {data.length === 0 && (
