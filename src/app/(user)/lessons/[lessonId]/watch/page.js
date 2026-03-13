@@ -63,16 +63,21 @@ export default function LessonWatchPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#EEF5FF]">
-      <LessonContent
-        lesson={lesson}
-        lessonId={lessonId}
-        fallbackCourseId={fallbackCourseId}
-      />
-      <LessonSidebar
-        lesson={lesson}
-        fallbackCourseId={fallbackCourseId}
-      />
-    </div>
+  <div className="min-h-screen flex flex-col lg:flex-row bg-[#EEF5FF]">
+
+  <div className="px-10 flex-1">
+    <LessonContent
+      lesson={lesson}
+      lessonId={lessonId}
+      fallbackCourseId={fallbackCourseId}
+    />
+  </div>
+
+  <LessonSidebar
+    lesson={lesson}
+    fallbackCourseId={fallbackCourseId}
+  />
+
+</div>
   );
 }
