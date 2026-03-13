@@ -15,11 +15,11 @@ import { useAuthStore } from "@/store/auth.store";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { register, loading, error } = useAuthStore();
+  const { register, loading } = useAuthStore();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const [form, setForm] = useState({
     name: "",
@@ -38,16 +38,15 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     });
   };
 
-  // 🔐 VALIDATION
   const validate = () => {
     if (!form.name || !form.email || !form.address) {
       toast.error("All fields are required");
       return false;
     }
-     if (!emailRegex.test(form.email)) {
-    toast.error("Please enter a valid email address");
-    return false;
-  }
+    if (!emailRegex.test(form.email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
     if (form.password.length < 8) {
       toast.error("Password must be at least 8 characters");
       return false;
@@ -63,57 +62,25 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return true;
   };
 
-//   const handleSignup = async () => {
-//     if (!validate()) return;
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
 
+    const success = await register({
+      name: form.name,
+      email: form.email,
+      address: form.address,
+      password: form.password,
+    });
 
-//     const success = await register({
-//       name: form.name,
-//       email: form.email,
-//       address: form.address,
-//       password: form.password,
-//     });
+    if (success) {
+      toast.success("Account created successfully");
 
-
-//  if (success) {
-//   toast.success("Account created successfully");
-//   router.replace("/course");
-// } else {
-//   // ✅ show backend validation message
-//   if (Array.isArray(error)) {
-//     error.forEach((e) => toast.error(e.message));
-//   } else {
-//     toast.error(error || "Registration failed");
-//   }
-// }
-
-//   };
-
-
-
-const handleSignup = async () => {
-  console.log("Signup clicked");   // 👈 add this
-
-  if (!validate()) return;
-
-  console.log("Validation passed");
-
-  const success = await register({
-    name: form.name,
-    email: form.email,
-    address: form.address,
-    password: form.password,
-  });
-
-  console.log("Register result:", success);
-  if (success) {
-  toast.success("Account created successfully");
-
-  setTimeout(() => {
-    router.push("/course");
-  }, 500);
-}
-};
+      setTimeout(() => {
+        router.push("/course");
+      }, 500);
+    }
+  };
   return (
     <main className="min-h-screen bg-[#EEF4FF] flex flex-col items-center justify-center px-4">
       {/* Logo */}
@@ -130,9 +97,12 @@ const handleSignup = async () => {
       </p>
 
       {/* Card */}
-      <div className="mt-10 w-full max-w-[760px] bg-white rounded-[28px]
+      <form
+        onSubmit={handleSignup}
+        className="mt-10 w-full max-w-[760px] bg-white rounded-[28px]
                       px-10 py-10
-                      shadow-[0_30px_80px_rgba(36,87,230,0.18)]">
+                      shadow-[0_30px_80px_rgba(36,87,230,0.18)]"
+      >
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -248,7 +218,7 @@ const handleSignup = async () => {
 
         {/* Sign Up Button */}
         <button
-          onClick={handleSignup}
+          type="submit"
           disabled={loading}
           className="w-full mt-8 h-12 rounded-xl bg-[#1E40D8]
                      text-white font-semibold"
@@ -262,9 +232,7 @@ const handleSignup = async () => {
             Sign In
           </Link>
         </p>
-      </div>
+      </form>
     </main>
   );
 }
-
-

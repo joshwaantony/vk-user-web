@@ -152,7 +152,7 @@ const handleOtpLogin = () => {
 
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <img src="/logo.svg" alt="Logo" />
+          <img src="/logo.svg" alt="Logo" className="h-20 w-20" />
         </div>
 
         <h1 className="text-3xl font-extrabold text-[#0F172A]">

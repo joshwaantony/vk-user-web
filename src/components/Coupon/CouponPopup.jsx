@@ -78,6 +78,7 @@ export default function CouponPopup({ onClose, courseId }) {
       String(c?.id || c?._id || "") ===
       String(courseId || "")
   );
+  const hasPendingCoupon = Boolean(coupon.trim()) && !couponData;
 
   /* Disable scroll */
   useEffect(() => {
@@ -146,6 +147,14 @@ export default function CouponPopup({ onClose, courseId }) {
         error?.response?.data?.message || "Invalid coupon"
       );
     }
+  };
+
+  const handleCouponChange = (e) => {
+    const nextCoupon = e.target.value;
+    if (couponData) {
+      clearCoupon();
+    }
+    setCoupon(nextCoupon);
   };
 
   /* PAYMENT */
@@ -360,27 +369,30 @@ export default function CouponPopup({ onClose, courseId }) {
                 <input
                   type="text"
                   value={coupon}
-                  onChange={(e) => setCoupon(e.target.value)}
+                  onChange={handleCouponChange}
                   className="text-black mt-2 w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
 
                 <div className="flex gap-2 mt-3">
-                  <button
-                    onClick={handleApplyCoupon}
-                    disabled={couponLoading}
-                    className="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm"
-                  >
-                    {couponLoading
-                      ? "Applying..."
-                      : "Apply"}
-                  </button>
+                  {hasPendingCoupon && (
+                    <button
+                      onClick={handleApplyCoupon}
+                      disabled={couponLoading}
+                      className="flex-1 bg-[#00B870] text-white py-2 rounded-lg text-sm"
+                    >
+                      {couponLoading ? "Applying..." : "Apply"}
+                    </button>
+                  )}
 
                   {couponData && (
                     <button
-                      onClick={clearCoupon}
-                      className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg text-sm"
+                      onClick={() => {
+                        clearCoupon();
+                        setCoupon("");
+                      }}
+                      className="flex-1 bg-[#ED4040] text-white py-2 rounded-lg text-sm"
                     >
-                      Remove
+                      Cancel
                     </button>
                   )}
                 </div>
@@ -388,8 +400,8 @@ export default function CouponPopup({ onClose, courseId }) {
 
               <button
                 onClick={handleSkip}
-                disabled={loading || razorLoading}
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60"
+                disabled={loading || razorLoading || hasPendingCoupon}
+                className="w-full bg-[#00B870] hover:bg-[#00A665] text-white font-medium py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60"
               >
                 {loading || razorLoading
                   ? "Processing..."
