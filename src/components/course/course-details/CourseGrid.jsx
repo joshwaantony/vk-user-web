@@ -14,6 +14,7 @@ export default function  CourseGrid() {
     usePopularCourseStore();
 
   const [limit, setLimit] = useState(6); 
+  const skeletonCount = courses.length || limit;
 
   useEffect(() => {
     fetchPopularCourses(limit);
@@ -24,8 +25,8 @@ export default function  CourseGrid() {
   };
 
   if (loading) {
-  return (
-    <div
+    return (
+      <div
         className="
           mt-12
           px-4
@@ -40,13 +41,12 @@ export default function  CourseGrid() {
           lg:gap-8
         "
       >
-    
-      {Array.from({ length: 6 }).map((_, index) => (
-        <AllCourseCardSkeleton key={index} />
-      ))}
-    </div>
-  );
-}
+        {Array.from({ length: skeletonCount }).map((_, index) => (
+          <AllCourseCardSkeleton key={index} />
+        ))}
+      </div>
+    );
+  }
 
 
   return (
