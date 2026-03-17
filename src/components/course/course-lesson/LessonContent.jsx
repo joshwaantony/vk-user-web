@@ -69,6 +69,10 @@ export default function LessonContent({
   const refreshCourseTimerRef = useRef(null);
 
   const [videoLoading, setVideoLoading] = useState(true);
+  const [qualityOptions, setQualityOptions] = useState([
+    { label: "Auto", value: "auto" },
+  ]);
+  const [selectedQuality, setSelectedQuality] = useState("auto");
 
   const lessonId =
     lesson?.id || lesson?._id || lesson?.lessonId || lessonIdProp;
@@ -240,6 +244,8 @@ export default function LessonContent({
 
     const video = videoRef.current;
     setVideoLoading(true);
+    setQualityOptions([{ label: "Auto", value: "auto" }]);
+    setSelectedQuality("auto");
 
     if (Hls.isSupported()) {
       const hls = new Hls({
@@ -251,7 +257,25 @@ export default function LessonContent({
       hls.attachMedia(video);
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        const levels = hls.levels
+          .map((level, index) => ({
+            label: level.height ? `${level.height}p` : `${index + 1}`,
+            value: String(index),
+            height: level.height || 0,
+          }))
+          .sort((a, b) => b.height - a.height);
+
+        setQualityOptions([
+          { label: "Auto", value: "auto" },
+          ...levels.map(({ label, value }) => ({ label, value })),
+        ]);
         setVideoLoading(false);
+      });
+
+      hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
+        setSelectedQuality(
+          data.level >= 0 ? String(data.level) : "auto"
+        );
       });
 
       hlsRef.current = hls;
@@ -272,6 +296,20 @@ export default function LessonContent({
       }
     };
   }, [lesson?.playbackUrl]);
+
+  const handleQualityChange = (event) => {
+    const nextValue = event.target.value;
+    setSelectedQuality(nextValue);
+
+    if (!hlsRef.current) return;
+
+    if (nextValue === "auto") {
+      hlsRef.current.currentLevel = -1;
+      return;
+    }
+
+    hlsRef.current.currentLevel = Number(nextValue);
+  };
 
   /* ================= AUTO SAVE ================= */
   useEffect(() => {
@@ -550,6 +588,26 @@ export default function LessonContent({
             <PromoLoader />
           </div>
         )}
+
+        <div className="absolute top-4 right-4 z-10">
+          <select
+            value={selectedQuality}
+            onChange={handleQualityChange}
+            disabled={qualityOptions.length <= 1}
+            className="min-w-[96px] rounded-lg border border-white/20 bg-black/60 px-3 py-2 text-sm text-white outline-none backdrop-blur disabled:cursor-not-allowed disabled:opacity-60"
+            aria-label="Select video quality"
+          >
+            {qualityOptions.map((option) => (
+              <option
+                key={option.value}
+                value={option.value}
+                className="text-black"
+              >
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <video
           ref={videoRef}
