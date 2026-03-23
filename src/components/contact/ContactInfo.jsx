@@ -12,7 +12,7 @@ export default function ContactInfo() {
         icon={<HiOutlineMail />}
         title="Email Us"
         desc="Our team is here to help you"
-        link="support@vk.com"
+        link=" vkeasylearningmodel@gmail.com"
       />
 
       <InfoCard
