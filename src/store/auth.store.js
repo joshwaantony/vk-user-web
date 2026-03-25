@@ -20,6 +20,10 @@ import {
 const getAuthPayload = (res) => res?.data ?? res ?? {};
 const normalizeToken = (token) =>
   typeof token === "string" ? token.trim() : "";
+const getApiErrorMessage = (err, fallback) =>
+  err?.response?.data?.errors?.[0]?.message ||
+  err?.response?.data?.message ||
+  fallback;
 
 const getStoredRefreshToken = () => {
   if (typeof window === "undefined") return "";
@@ -397,21 +401,22 @@ export const useAuthStore = create(
               loading: false,
             });
 
-            return true;
+            return { success: true };
           }
 
           set({ loading: false });
-          return false;
+          return { success: false, message: "Registration failed" };
 
         } catch (err) {
           console.log("REGISTER ERROR:", err);
+          const message = getApiErrorMessage(err, "Registration failed");
 
           set({
-            error: err?.response?.data?.message || "Registration failed",
+            error: message,
             loading: false,
           });
 
-          return false;
+          return { success: false, message };
         }
       },
 

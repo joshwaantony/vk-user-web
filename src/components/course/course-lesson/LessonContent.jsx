@@ -5,6 +5,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Hls from "hls.js";
+import { motion } from "framer-motion";
 import useCourseStore from "@/store/CourseStore";
 import { watchLesson } from "@/services/lesson.service";
 import {
@@ -561,10 +562,20 @@ export default function LessonContent({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#EEF5FF]">
+    <motion.div
+      className="flex-1 flex flex-col bg-[#EEF5FF]"
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+    >
 
       {/* ================= TOP BAR ================= */}
-      <div className="h-16 flex items-center px-4 sm:px-6 border-b bg-[#EEF5FF]">
+      <motion.div
+        className="h-16 flex items-center px-4 sm:px-6 border-b bg-[#EEF5FF]"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.05 }}
+      >
         <div
           onClick={() => router.back()}
           className="flex items-center gap-2 text-sm text-black font-semibold cursor-pointer hover:text-gray-500 transition"
@@ -579,10 +590,15 @@ export default function LessonContent({
             {lesson?.title}
           </span>
         </div>
-      </div>
+      </motion.div>
 
       {/* ================= VIDEO PLAYER ================= */}
-      <div className="relative bg-black">
+      <motion.div
+        className="relative bg-black"
+        initial={{ opacity: 0, scale: 0.985 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.55, delay: 0.1 }}
+      >
         {videoLoading && (
           <div className="absolute inset-0 flex items-center justify-center text-white bg-[#F3F8FF]">
             <PromoLoader />
@@ -621,10 +637,15 @@ export default function LessonContent({
         >
           <FiMaximize size={18} />
         </button> */}
-      </div>
+      </motion.div>
 
       {/* ================= LESSON DETAILS ================= */}
-      <div className="px-4 sm:px-8 py-6 border-t">
+      <motion.div
+        className="px-4 sm:px-8 py-6 border-t"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.16 }}
+      >
 
         <div className="flex items-start sm:items-center justify-between mb-2 gap-2">
           <h2 className="text-lg sm:text-xl text-black font-semibold">
@@ -648,7 +669,7 @@ export default function LessonContent({
         {/* ================= ACTION BUTTONS (UNCHANGED UI) ================= */}
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
 
-          <button
+          <motion.button
             type="button"
             onClick={() => navigateToLesson(previousLesson)}
             disabled={!previousLesson}
@@ -657,14 +678,15 @@ export default function LessonContent({
                 ? "bg-[#1E293B] text-white hover:bg-[#111827]"
                 : "bg-[#1E293B] text-gray-400 cursor-not-allowed"
             }`}
+            whileTap={previousLesson ? { scale: 0.97 } : undefined}
           >
             <FiArrowLeft />
             Previous Lesson
-          </button>
+          </motion.button>
 
      
 
-          <button
+          <motion.button
             type="button"
             onClick={() => navigateToLesson(nextLesson)}
             disabled={!nextLesson}
@@ -673,23 +695,34 @@ export default function LessonContent({
                 ? "bg-[#2563EB] text-white hover:bg-[#1E4ED8]"
                 : "bg-[#93C5FD] text-white cursor-not-allowed"
             }`}
+            whileTap={nextLesson ? { scale: 0.97 } : undefined}
           >
             Next Lesson
             <FiArrowRight />
-          </button>
+          </motion.button>
 
         </div>
-      </div>
+      </motion.div>
 
       {learningPoints.length > 0 && (
-        <div className="px-4 sm:px-8 pb-6">
+        <motion.div
+          className="px-4 sm:px-8 pb-6"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.22 }}
+        >
           <WhatYouWillLearn points={learningPoints} />
-        </div>
+        </motion.div>
       )}
 
       {/* ================= INSTRUCTOR ================= */}
       {course?.faculty?.length > 0 && (
-        <div className="px-4 sm:px-8 pb-20">
+        <motion.div
+          className="px-4 sm:px-8 pb-20"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.28 }}
+        >
           <div className="relative overflow-hidden rounded-2xl border border-[#D7E3F5] bg-gradient-to-r from-[#F7FAFF] via-[#EDF3FF] to-[#E3EDFF] p-5 sm:p-6">
             <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-[#1F3FD7]/10 blur-2xl" />
             <div className="absolute -bottom-8 -left-8 w-28 h-28 rounded-full bg-[#60A5FA]/15 blur-2xl" />
@@ -718,8 +751,8 @@ export default function LessonContent({
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }

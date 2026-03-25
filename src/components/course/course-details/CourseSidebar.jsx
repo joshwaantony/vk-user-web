@@ -17,6 +17,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { useProgressStore } from "@/store/progress.store";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import CouponPopup from "@/components/Coupon/CouponPopup";
 import toast from "react-hot-toast";
 
@@ -136,7 +137,13 @@ export default function CourseSidebar({ course }) {
         <div className="space-y-8 lg:sticky lg:top-[120px]">
 
           {/* PRICE CARD */}
-          <div className="group bg-[#1F3FD7] text-white rounded-2xl p-8 text-center">
+          <motion.div
+            className="group bg-[#1F3FD7] text-white rounded-2xl p-8 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -4 }}
+          >
             {!isEnrolled && (
               <>
                 <p className="text-sm opacity-80">Course Price</p>
@@ -171,10 +178,15 @@ export default function CourseSidebar({ course }) {
               <FiPlayCircle />
               {getButtonText()}
             </button>
-          </div>
+          </motion.div>
 
           {/* PROGRESS CARD */}
-          <div className="bg-white border rounded-2xl p-8">
+          <motion.div
+            className="bg-white border rounded-2xl p-8"
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          >
             <h4 className="font-semibold text-black mb-5">
               Your Progress
             </h4>
@@ -189,9 +201,11 @@ export default function CourseSidebar({ course }) {
             </div>
 
             <div className="h-2 bg-gray-200 rounded-full mb-4">
-              <div
+              <motion.div
                 className="h-2 bg-[#1F3FD7] rounded-full transition-all duration-300"
-                style={{ width: `${safePercent}%` }}
+                initial={{ width: 0 }}
+                animate={{ width: `${safePercent}%` }}
+                transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
               />
             </div>
 
@@ -227,7 +241,7 @@ export default function CourseSidebar({ course }) {
               </li>
 
             </ul>
-          </div>
+          </motion.div>
 
         </div>
       </aside>

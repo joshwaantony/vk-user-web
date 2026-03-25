@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import {
   FiChevronDown,
@@ -250,9 +251,19 @@ export default function LessonSidebar({ lesson, fallbackCourseId }) {
   };
 
   return (
-    <div className="w-full lg:w-[360px] bg-white text-black min-h-screen">
+    <motion.div
+      className="w-full lg:w-[360px] bg-white text-black min-h-screen"
+      initial={{ opacity: 0, x: 18 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+    >
       {/* ================= PROGRESS ================= */}
-      <div className="p-4 sm:p-6 border-b border-[#EDEDED]">
+      <motion.div
+        className="p-4 sm:p-6 border-b border-[#EDEDED]"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.06 }}
+      >
         <h3 className="font-semibold text-lg mb-2">Your Progress</h3>
 
         <div className="flex items-center justify-between gap-3 mb-3">
@@ -261,16 +272,18 @@ export default function LessonSidebar({ lesson, fallbackCourseId }) {
         </div>
 
         <div className="w-full h-2 bg-gray-200 rounded-full mb-2">
-          <div
+          <motion.div
             className="h-2 bg-blue-600 rounded-full"
-            style={{ width: `${safePercent}%` }}
+            initial={{ width: 0 }}
+            animate={{ width: `${safePercent}%` }}
+            transition={{ duration: 0.65, delay: 0.12, ease: "easeOut" }}
           />
         </div>
 
         <p className="text-xs text-gray-500">
           {completedLessons} of {totalLessons} lessons completed
         </p>
-      </div>
+      </motion.div>
 
       {/* ================= SECTIONS ================= */}
       {sortedSections.map((section, index) => {
@@ -292,7 +305,13 @@ export default function LessonSidebar({ lesson, fallbackCourseId }) {
           openSections[sectionId] ?? (index === 0 && isSectionUnlocked);
 
         return (
-          <div key={sectionId} className="p-4 sm:p-6 border-b border-[#EDEDED]">
+          <motion.div
+            key={sectionId}
+            className="p-4 sm:p-6 border-b border-[#EDEDED]"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.08 + index * 0.04 }}
+          >
             {/* SECTION HEADER */}
             <button
               onClick={() => {
@@ -322,8 +341,15 @@ export default function LessonSidebar({ lesson, fallbackCourseId }) {
             </button>
 
             {/* LESSON LIST */}
-            {isOpen && (
-              <div className="space-y-3">
+            <AnimatePresence initial={false}>
+              {isOpen && (
+                <motion.div
+                  className="space-y-3"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                >
                 {[...(section.lessons || [])]
                   .sort((a, b) => a.order - b.order)
                   .map((lesson, lessonIndex) => {
@@ -333,13 +359,16 @@ export default function LessonSidebar({ lesson, fallbackCourseId }) {
                       !lesson.locked && (!isEnrolled || isSectionUnlocked);
 
                     return (
-                      <div
+                      <motion.div
                         key={lessonId}
                         className={`flex justify-between items-start gap-3 py-3 border-t border-[#EDEDED] transition ${
                           lesson.isCompleted
                             ? "bg-emerald-50/60 border-l-4 border-emerald-500 pl-2 rounded-sm"
                             : ""
                         }`}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.22, delay: lessonIndex * 0.03 }}
                       >
                         {/* LEFT */}
                         <div className="flex gap-3">
@@ -394,8 +423,8 @@ export default function LessonSidebar({ lesson, fallbackCourseId }) {
                             {String(lesson.duration % 60).padStart(2, "0")}
                           </span>
 
-                          <div className="relative group">
-                            <button
+                          <motion.div className="relative group" whileHover={{ y: -2 }}>
+                            <motion.button
                               type="button"
                               onClick={() => {
                                 if (!canWatchLesson) {
@@ -414,29 +443,31 @@ export default function LessonSidebar({ lesson, fallbackCourseId }) {
                                   ? "Watch lesson"
                                   : "Locked lesson"
                               }
+                              whileTap={canWatchLesson ? { scale: 0.96 } : undefined}
                             >
                               {canWatchLesson ? (
                                 <FiPlay size={14} />
                               ) : (
                                 <FiLock size={14} />
                               )}
-                            </button>
+                            </motion.button>
 
                             <span className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-[#111827] px-2 py-1 text-[11px] text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                               {canWatchLesson
                                 ? "Watch lesson"
                                 : "Locked lesson"}
                             </span>
-                          </div>
+                          </motion.div>
                         </div>
-                      </div>
+                      </motion.div>
                     );
                   })}
-              </div>
-            )}
-          </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         );
       })}
-    </div>
+    </motion.div>
   );
 }

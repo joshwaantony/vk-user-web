@@ -6,6 +6,7 @@
 
 import { useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 
 import LessonContent from "@/components/course/course-lesson/LessonContent";
 import LessonSidebar from "@/components/course/course-lesson/LessonSidebar";
@@ -63,21 +64,37 @@ export default function LessonWatchPage() {
   }
 
   return (
-  <div className="min-h-screen flex flex-col lg:flex-row bg-[#EEF5FF]">
+  <motion.div
+    className="min-h-screen flex flex-col lg:flex-row bg-[#EEF5FF]"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.45 }}
+  >
 
-  <div className="px-10 flex-1">
+  <motion.div
+    className="px-10 flex-1"
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.55, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+  >
     <LessonContent
       lesson={lesson}
       lessonId={lessonId}
       fallbackCourseId={fallbackCourseId}
     />
-  </div>
+  </motion.div>
 
-  <LessonSidebar
-    lesson={lesson}
-    fallbackCourseId={fallbackCourseId}
-  />
+  <motion.div
+    initial={{ opacity: 0, x: 20 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.55, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
+  >
+    <LessonSidebar
+      lesson={lesson}
+      fallbackCourseId={fallbackCourseId}
+    />
+  </motion.div>
 
-</div>
+  </motion.div>
   );
 }
