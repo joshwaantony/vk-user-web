@@ -10,11 +10,17 @@ import CourseCard from "./CourseCard";
 import AllCourseCardSkeleton from "@/components/loader/AllCourseCardSkeleton";
 
 export default function  CourseGrid() {
-  const { courses, loading, fetchPopularCourses } =
+  const {
+    courses,
+    loading,
+    popularCoursesTotal,
+    fetchPopularCourses,
+  } =
     usePopularCourseStore();
 
   const [limit, setLimit] = useState(6); 
   const skeletonCount = courses.length || limit;
+  const showLoadMoreButton = popularCoursesTotal > limit;
 
   useEffect(() => {
     fetchPopularCourses(limit);
@@ -74,27 +80,28 @@ export default function  CourseGrid() {
 ))}
       </div>
 
-      {/* 👇 Load More Button */}
-      <div className="w-full flex justify-center mt-12 ">
-        <button
-          onClick={handleLoadMore}
-          className="
-            border
-            border-[#1E40E6]
-            text-[#1E40E6]
-            font-semibold
-            text-base sm:text-lg
-            px-6 sm:px-8 md:px-10
-            py-3 mb-6
-            rounded-xl
-            hover:bg-[#1E40E6]
-            hover:text-white
-            transition
-          "
-        >
-          View All Courses
-        </button>
-      </div>
+      {showLoadMoreButton && (
+        <div className="w-full flex justify-center mt-12 ">
+          <button
+            onClick={handleLoadMore}
+            className="
+              border
+              border-[#1E40E6]
+              text-[#1E40E6]
+              font-semibold
+              text-base sm:text-lg
+              px-6 sm:px-8 md:px-10
+              py-3 mb-6
+              rounded-xl
+              hover:bg-[#1E40E6]
+              hover:text-white
+              transition
+            "
+          >
+            View All Courses
+          </button>
+        </div>
+      )}
     </>
   );
 }

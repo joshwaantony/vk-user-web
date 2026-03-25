@@ -7,6 +7,22 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import CouponPopup from "@/components/Coupon/CouponPopup";
 
+function formatCourseDuration(minutes) {
+  const totalMinutes = Number(minutes) || 0;
+  const hours = Math.floor(totalMinutes / 60);
+  const remainingMinutes = totalMinutes % 60;
+
+  if (hours > 0 && remainingMinutes > 0) {
+    return `${hours} hr ${remainingMinutes} min`;
+  }
+
+  if (hours > 0) {
+    return `${hours} hr`;
+  }
+
+  return `${remainingMinutes} min`;
+}
+
 export default function CourseCard({ course }) {
   
   if (!course) return null;
@@ -90,7 +106,7 @@ export default function CourseCard({ course }) {
           <div className="flex items-center justify-between text-sm text-[#475569]">
             <div className="flex items-center gap-2">
               <FaClock className="text-[#64748B]" />
-              <span>{course?.duration} mins</span>
+              <span>{formatCourseDuration(course?.duration)}</span>
             </div>
 
             <span className="font-semibold text-[#1C3FD1]">

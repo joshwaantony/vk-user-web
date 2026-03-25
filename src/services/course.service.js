@@ -46,11 +46,29 @@ export const getAllCourses = async () => {
    GET POPULAR COURSES
 ---------------------------------- */
 export const getPopularCourses = async (limit = 6) => {
-  return getCourses({
+  const query = new URLSearchParams({
+    q: "",
+    categoryId: "",
+    level: "",
+    minPrice: "0",
+    maxPrice: "10000",
     sortBy: SORT_BY.POPULAR,
-    page: 1,
-    limit,
+    page: "1",
+    limit: String(limit),
   });
+
+  const res = await api.get(`/courses?${query.toString()}`);
+  const data = res.data?.data ?? {};
+
+  return {
+    courses: data.courses || [],
+    total:
+      data.total ??
+      data.totalCourses ??
+      data.count ??
+      data.totalCount ??
+      0,
+  };
 };
 
 /* ----------------------------------

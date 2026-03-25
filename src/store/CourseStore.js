@@ -15,6 +15,7 @@ const useCourseStore = create((set, get) => ({
      STATE
   ===================== */
   courses: [],
+  popularCoursesTotal: 0,
   course: null,
   filters: {
     q: "",
@@ -91,10 +92,11 @@ const useCourseStore = create((set, get) => ({
     try {
       set({ loading: true, error: null });
 
-      const courses = await getPopularCourses(limit);
+      const { courses, total } = await getPopularCourses(limit);
 
       set({
         courses,
+        popularCoursesTotal: total,
         loading: false,
       });
     } catch (err) {
