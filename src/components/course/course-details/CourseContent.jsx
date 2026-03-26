@@ -5,6 +5,7 @@
 "use client";
 
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   FiClock,
   FiChevronDown,
@@ -43,14 +44,29 @@ export default function CourseContent() {
   );
 
   return (
-    <div className="bg-white border rounded-2xl p-4 sm:p-6">
-      <h2 className="text-lg sm:text-xl text-black font-semibold mb-1">
+    <motion.div
+      className="bg-white border rounded-2xl p-4 sm:p-6"
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <motion.h2
+        className="text-lg sm:text-xl text-black font-semibold mb-1"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.05 }}
+      >
         Course Content
-      </h2>
+      </motion.h2>
 
-      <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
+      <motion.p
+        className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
         {sortedSections.length} sections • {course.totalLessons} lessons
-      </p>
+      </motion.p>
 
       {sortedSections.map((section, index) => {
         const previousSection = index > 0 ? sortedSections[index - 1] : null;
@@ -89,7 +105,13 @@ export default function CourseContent() {
             : 0;
 
         return (
-          <div key={section.id} className="border rounded-xl mb-3 sm:mb-4">
+          <motion.div
+            key={section.id}
+            className="border rounded-xl mb-3 sm:mb-4"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: index * 0.06 }}
+          >
             {/* SECTION HEADER */}
             <div className="flex justify-between items-center p-3 sm:p-4 gap-3">
               <div className="min-w-0">
@@ -137,8 +159,15 @@ export default function CourseContent() {
             </div>
 
             {/* LESSONS */}
-            {isOpen && (
-              <div className="border-t divide-y">
+            <AnimatePresence initial={false}>
+              {isOpen && (
+                <motion.div
+                  className="border-t divide-y"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.28, ease: "easeInOut" }}
+                >
                 {sortedLessons.map((lesson) => (
                   <Lesson
                     key={lesson.id}
@@ -158,12 +187,13 @@ export default function CourseContent() {
                     }}
                   />
                 ))}
-              </div>
-            )}
-          </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         );
       })}
-    </div>
+    </motion.div>
   );
 }
 
@@ -180,7 +210,12 @@ function CircleProgress({ percentage }) {
     circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="relative w-12 h-12 sm:w-14 sm:h-14">
+    <motion.div
+      className="relative w-12 h-12 sm:w-14 sm:h-14"
+      initial={{ opacity: 0, scale: 0.92 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.35 }}
+    >
       <svg height={radius * 2} width={radius * 2}>
         <circle
           stroke="#E5E7EB"
@@ -191,7 +226,7 @@ function CircleProgress({ percentage }) {
           cy={radius}
         />
 
-        <circle
+        <motion.circle
           stroke={percentage === 100 ? "#22C55E" : "#2563EB"}
           fill="transparent"
           strokeWidth={stroke}
@@ -206,13 +241,16 @@ function CircleProgress({ percentage }) {
             transformOrigin: "50% 50%",
           }}
           className="transition-all duration-500"
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
         />
       </svg>
 
       <div className="absolute inset-0 flex items-center justify-center text-xs sm:text-sm font-semibold text-[#1E293B]">
         {percentage}%
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -268,12 +306,15 @@ function Lesson({
   };
 
   return (
-    <div
+    <motion.div
       className={`flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 p-3 sm:p-4 transition ${
         isCompleted
           ? "bg-emerald-50/70 border-l-4 border-emerald-500"
           : "hover:bg-gray-50"
       }`}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.28 }}
     >
       <div className="flex gap-3 sm:gap-4 items-center">
         <Image
@@ -307,27 +348,28 @@ function Lesson({
           <FiClock /> {time}
         </span>
 
-        <div className="relative group">
-          <button
+        <motion.div className="relative group" whileHover={{ y: -2 }}>
+          <motion.button
             onClick={handleWatch}
             className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full text-white transition-all duration-300 transform group-hover:-translate-y-0.5 group-hover:scale-110 ${
               !canWatchLesson
                 ? "bg-[#EF4444] ring-2 ring-[#FCA5A5] hover:bg-[#DC2626]"
                 : "bg-[#1F3FD7] hover:bg-[#1630A8]"
             }`}
+            whileTap={{ scale: 0.96 }}
           >
             {!canWatchLesson ? (
               <FiLock size={14} />
             ) : (
               <FiPlay size={14} />
             )}
-          </button>
+          </motion.button>
 
           <span className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-[#111827] px-2 py-1 text-[11px] text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
             {canWatchLesson ? "Watch lesson" : "Locked lesson"}
           </span>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }

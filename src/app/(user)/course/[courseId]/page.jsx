@@ -6,6 +6,7 @@
 
 import { useEffect } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import useCourseStore from "@/store/CourseStore";
 
 import CourseHero from "@/components/course/course-details/CourseHero";
@@ -99,25 +100,39 @@ export default function CourseDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#EEF5FF]">
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className="
           max-w-7xl mx-auto px-4 py-8
           grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8
         "
       >
         {/* LEFT CONTENT */}
-        <div className="min-h-[800px] overflow-y-auto space-y-8 pr-2">
+        <motion.div
+          initial={{ opacity: 0, x: -24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+          className="min-h-[800px] overflow-y-auto space-y-8 pr-2"
+        >
           <CourseHero course={course} />
           <WhatYouWillLearn points={course.learningOutcomes || []} />
           <CourseContent
             sections={course.sections || []}
             totalLessons={course.totalLessons}
           />
-        </div>
+        </motion.div>
 
         {/* RIGHT SIDEBAR */}
-        <CourseSidebar course={course} />
-      </div>
+        <motion.div
+          initial={{ opacity: 0, x: 24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <CourseSidebar course={course} />
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

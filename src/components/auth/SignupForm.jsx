@@ -66,20 +66,23 @@ export default function SignupPage() {
     e.preventDefault();
     if (!validate()) return;
 
-    const success = await register({
+    const result = await register({
       name: form.name,
       email: form.email,
       address: form.address,
       password: form.password,
     });
 
-    if (success) {
+    if (result?.success) {
       toast.success("Account created successfully");
 
       setTimeout(() => {
         router.push("/course");
       }, 500);
+      return;
     }
+
+    toast.error(result?.message || "Registration failed");
   };
   return (
     <main className="min-h-screen bg-[#EEF4FF] flex flex-col items-center justify-center px-4">
