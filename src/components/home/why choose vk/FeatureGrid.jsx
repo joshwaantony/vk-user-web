@@ -50,7 +50,7 @@ const features = [
     description:
       "Monitor your learning journey with detailed analytics and personalized progress reports.",
     icon: HiOutlineChartBar,
-    highlight: true, // highlighted card in screenshot
+    
   },
   {
     title: "Mobile Learning",

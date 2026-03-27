@@ -212,9 +212,19 @@ export default function SignupPage() {
             />
             <p className="text-sm text-black">
               I agree to the{" "}
-              <span className="text-[#2457E6] font-medium">Terms of service</span>{" "}
+              <Link
+                href="/terms-and-conditions"
+                className="text-[#2457E6] font-medium"
+              >
+                Terms of service
+              </Link>{" "}
               and{" "}
-              <span className="text-[#2457E6] font-medium">Privacy Policy</span>
+              <Link
+                href="/privacy-policy"
+                className="text-[#2457E6] font-medium"
+              >
+                Privacy Policy
+              </Link>
             </p>
           </div>
         </div>
