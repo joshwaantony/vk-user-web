@@ -10,6 +10,7 @@
   "dependencies": {
     "@videojs/http-streaming": "^3.17.4",
     "axios": "^1.13.2",
+    "framer-motion": "^12.38.0",
     "hls.js": "^1.6.15",
     "next": "^16.1.6",
     "react": "19.2.3",
