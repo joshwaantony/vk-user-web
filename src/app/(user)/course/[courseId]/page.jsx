@@ -39,7 +39,7 @@ export default function CourseDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-10">
+      <div className="p-10 bg-[#EEF5FF]">
         <div className="min-h-screen bg-[#EEF5FF] animate-pulse">
           <div
             className="
@@ -95,7 +95,39 @@ export default function CourseDetailPage() {
   }
 
   if (!course) {
-    return <p className="p-10">Course not found</p>;
+    return (
+      <div className="min-h-screen bg-[#EEF5FF] px-4 py-10 flex items-center justify-center">
+        <div className="w-full max-w-lg rounded-3xl bg-white border border-blue-100 shadow-[0_24px_60px_rgba(37,99,235,0.12)] p-8 text-center">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#E0EAFF] text-[#2457E6] text-2xl font-bold">
+            !
+          </div>
+
+          <h2 className="text-2xl font-bold text-[#0F172A]">
+            Course not found
+          </h2>
+          <p className="mt-3 text-sm sm:text-base text-[#64748B] leading-7">
+            This course may have been removed, renamed, or the link may be invalid.
+          </p>
+
+          <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              type="button"
+              onClick={() => router.push("/course")}
+              className="px-5 py-3 rounded-xl bg-[#2457E6] text-white font-semibold hover:bg-[#1E4ED8] transition"
+            >
+              Browse Courses
+            </button>
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="px-5 py-3 rounded-xl border border-[#CBD5E1] text-[#334155] font-semibold hover:bg-[#F8FAFC] transition"
+            >
+              Go Back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
