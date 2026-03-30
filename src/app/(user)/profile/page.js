@@ -5,6 +5,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import toast from "react-hot-toast";
 import {
   FiUser,
   FiCalendar,
@@ -27,6 +28,16 @@ const formatDate = (value) => {
     month: "long",
     year: "numeric",
   });
+};
+
+const getProfileSaveErrorMessage = (err) => {
+  const apiError = err?.response?.data;
+
+  if (Array.isArray(apiError?.errors) && apiError.errors.length > 0) {
+    return apiError.errors[0]?.message || apiError.message;
+  }
+
+  return apiError?.message || "Failed to update profile";
 };
 
 export default function ProfilePage() {
@@ -111,12 +122,16 @@ export default function ProfilePage() {
         await fetchMe();
       }
 
-      setSaveSuccess("Profile updated successfully.");
+      const successMessage =
+        res?.message || res?.data?.message || "Profile updated successfully.";
+
+      setSaveSuccess(successMessage);
+      toast.success(successMessage);
       setIsEditing(false);
     } catch (err) {
-      setSaveError(
-        err?.response?.data?.message || "Failed to update profile"
-      );
+      const errorMessage = getProfileSaveErrorMessage(err);
+      setSaveError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSaving(false);
     }
