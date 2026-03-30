@@ -109,7 +109,7 @@ export default function Header() {
 
   if (!mounted) {
     return (
-      <header className="sticky top-0 z-50 w-full border-b bg-white py-4">
+      <header className="sticky top-0 z-50 w-full  bg-white py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
           <Link href="/">
             <img src="/logo.svg" alt="Logo" className="h-12 sm:h-14" />
