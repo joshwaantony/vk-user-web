@@ -7,20 +7,24 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import CouponPopup from "@/components/Coupon/CouponPopup";
 
-function formatCourseDuration(minutes) {
-  const totalMinutes = Number(minutes) || 0;
-  const hours = Math.floor(totalMinutes / 60);
-  const remainingMinutes = totalMinutes % 60;
-
-  if (hours > 0 && remainingMinutes > 0) {
-    return `${hours} hr ${remainingMinutes} min`;
-  }
+function formatCourseDuration(seconds) {
+  const totalSeconds = Number(seconds) || 0;
+  const hours = Math.floor(totalSeconds / 3600);
+  const remainingSecondsAfterHours = totalSeconds % 3600;
+  const minutes = Math.floor(remainingSecondsAfterHours / 60);
+  const remainingSeconds = remainingSecondsAfterHours % 60;
 
   if (hours > 0) {
-    return `${hours} hr`;
+    return minutes > 0 ? `${hours} hr ${minutes} min` : `${hours} hr`;
   }
 
-  return `${remainingMinutes} min`;
+  if (minutes > 0) {
+    return remainingSeconds > 0
+      ? `${minutes} min ${remainingSeconds} sec`
+      : `${minutes} min`;
+  }
+
+  return `${remainingSeconds} sec`;
 }
 
 export default function CourseCard({ course }) {

@@ -110,10 +110,10 @@ export default function CourseCard({ course }) {
             mt-4
           "
         >
-          <span className="flex items-center gap-2">
+          {/* <span className="flex items-center gap-2">
             <FiClock className="text-gray-400" size={14} />
             {course.duration}
-          </span>
+          </span> */}
 
           <span className="text-[11px] sm:text-xs">
             Last accessed {course.lastAccessed}

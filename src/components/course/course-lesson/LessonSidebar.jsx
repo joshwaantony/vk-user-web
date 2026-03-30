@@ -215,18 +215,22 @@ export default function LessonSidebar({ lesson, fallbackCourseId }) {
 
   if ((loading || shouldWaitForCourse) && sections.length === 0) {
     return (
-      <div className="w-full lg:w-[360px] bg-white p-6">
-        <p className="text-sm text-gray-500">Loading course...</p>
+      <div className="w-full lg:w-[360px] px-3 sm:px-4 lg:px-0">
+        <div className="bg-white text-black min-h-screen rounded-2xl lg:rounded-none px-6 ">
+          <p className="text-sm text-gray-500">Loading course...</p>
+        </div>
       </div>
     );
   }
 
   if (sections.length === 0) {
     return (
-      <div className="w-full lg:w-[360px] bg-white p-6">
-        <p className="text-sm text-gray-500">
-          Course content is unavailable right now.
-        </p>
+      <div className="w-full lg:w-[360px] px-3 sm:px-4 lg:px-0">
+        <div className="bg-white text-black min-h-screen rounded-2xl lg:rounded-none p-6">
+          <p className="text-sm text-gray-500">
+            Course content is unavailable right now.
+          </p>
+        </div>
       </div>
     );
   }
@@ -252,14 +256,15 @@ export default function LessonSidebar({ lesson, fallbackCourseId }) {
 
   return (
     <motion.div
-      className="w-full lg:w-[360px] bg-white text-black min-h-screen"
+      className="w-full lg:w-[360px] px-4 sm:px-[70px] lg:px-0"
       initial={{ opacity: 0, x: 18 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
+      <div className="bg-white text-black min-h-screen rounded-2xl lg:rounded-none overflow-hidden">
       {/* ================= PROGRESS ================= */}
       <motion.div
-        className="p-4 sm:p-6 border-b border-[#EDEDED]"
+        className="p-4  sm:p-6 border-b border-[#EDEDED]"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.06 }}
@@ -468,6 +473,7 @@ export default function LessonSidebar({ lesson, fallbackCourseId }) {
           </motion.div>
         );
       })}
+      </div>
     </motion.div>
   );
 }
