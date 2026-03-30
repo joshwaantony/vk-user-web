@@ -1,7 +1,6 @@
 
 
-
-
+import Image from "next/image";
 import FeatureBadges from "./FeatureBadges";
 
 export default function HeroSection() {
@@ -22,13 +21,19 @@ export default function HeroSection() {
       <div
         className="
           absolute inset-0
-          bg-cover bg-center
           hidden sm:block
         "
-        style={{
-          backgroundImage: "url('/course/hero.png')",
-        }}
-      />
+      >
+        <Image
+          src="/course/hero.png"
+          alt=""
+          fill
+          loading="lazy"
+          className="object-cover object-center"
+          sizes="100vw"
+          priority={false}
+        />
+      </div>
 
       {/* Overlay (for both) */}
       <div className="absolute inset-0 bg-[#0B1B3A]/40" />
