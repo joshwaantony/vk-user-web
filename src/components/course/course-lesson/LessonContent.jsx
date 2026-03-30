@@ -706,7 +706,7 @@ export default function LessonContent({
 
       {learningPoints.length > 0 && (
         <motion.div
-          className="px-4 sm:px-8 pb-6"
+          className=" sm:px-8 pb-6"
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.22 }}
@@ -718,7 +718,7 @@ export default function LessonContent({
       {/* ================= INSTRUCTOR ================= */}
       {course?.faculty?.length > 0 && (
         <motion.div
-          className="px-4 sm:px-8 pb-20"
+          className=" sm:px-8 pb-20"
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.28 }}

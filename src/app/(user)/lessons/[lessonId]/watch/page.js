@@ -72,7 +72,7 @@ export default function LessonWatchPage() {
   >
 
   <motion.div
-    className="px-10 flex-1"
+    className="px-4 sm:px-10 flex-1"
     initial={{ opacity: 0, x: -20 }}
     animate={{ opacity: 1, x: 0 }}
     transition={{ duration: 0.55, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
