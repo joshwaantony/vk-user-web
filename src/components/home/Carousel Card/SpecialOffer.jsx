@@ -1,6 +1,4 @@
- 
 "use client"
-import usePromoStore from "@/store/usePromoStore";
 
 export default function SpecialOffer() {
 
@@ -39,7 +37,7 @@ export default function SpecialOffer() {
             leading-tight
           "
         >
-          Up to <span className="text-[#059669]">50% Off</span>
+          Learn Smarter with <span className="text-[#059669]">Exclusive Savings</span>
         </h2>
 
         {/* Description */}
@@ -53,7 +51,7 @@ export default function SpecialOffer() {
             mx-auto
           "
         >
-          Limited time offer on our most popular courses
+          Unlock special pricing on expert-led courses designed to help you grow faster in tax, accounting, and finance.
         </p>
 
       </div>
