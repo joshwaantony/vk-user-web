@@ -24,12 +24,21 @@ export default function AllCourseCard({ course }) {
   const [showPopup, setShowPopup] = useState(false);
 
 
-  const formatDuration = (seconds) => {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
+  const formatDuration = (minutes) => {
+    const totalMinutes = Number(minutes) || 0;
+    const hours = Math.floor(totalMinutes / 60);
+    const remainingMinutes = totalMinutes % 60;
 
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
-};
+    if (hours > 0 && remainingMinutes > 0) {
+      return `${hours} hr ${remainingMinutes} min`;
+    }
+
+    if (hours > 0) {
+      return `${hours} hr`;
+    }
+
+    return `${remainingMinutes} min`;
+  };
   /* ---------------- BUTTON CLICK ---------------- */
   const handleButtonClick = (e) => {
     e.stopPropagation();
@@ -112,7 +121,8 @@ export default function AllCourseCard({ course }) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <FiClock />
-<span>{formatDuration(course.duration)}</span>            </div>
+              <span>{formatDuration(course.duration)}</span>
+            </div>
 
             <span className="text-blue-600 font-semibold">
               ₹{course.price}
