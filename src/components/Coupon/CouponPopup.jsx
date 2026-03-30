@@ -26,6 +26,11 @@ const generateIdempotencyKey = () => {
   return `idem_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 };
 
+const getRazorpayContact = (phone) => {
+  if (!phone) return "";
+  return String(phone).replace(/[^\d+]/g, "");
+};
+
 const setPendingPayment = (orderId, courseId) => {
   if (typeof window === "undefined") return;
 
@@ -268,6 +273,7 @@ export default function CouponPopup({ onClose, courseId }) {
         prefill: {
           name: user?.name || "",
           email: user?.email || "",
+          contact: getRazorpayContact(user?.phone),
         },
 
         theme: { color: "#16a34a" },
