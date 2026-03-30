@@ -1,6 +1,5 @@
 
-
-
+import Image from "next/image";
 import ContactCards from "./ContactCards";
 
 export default function ContactHero() {
@@ -20,13 +19,18 @@ export default function ContactHero() {
       "
     >
       {/* BACKGROUND IMAGE (>=651px) */}
-      <div
-        className="absolute inset-0 bg-cover bg-center hidden min-[651px]:block brightness-75"
-        style={{
-          backgroundImage: "url('/contact.png')",
-          backgroundPosition: "center 20%",
-        }}
-      />
+      <div className="absolute inset-0 hidden min-[651px]:block brightness-75">
+        <Image
+          src="/contact.png"
+          alt=""
+          fill
+          loading="lazy"
+          className="object-cover"
+          style={{ objectPosition: "center 20%" }}
+          sizes="100vw"
+          priority={false}
+        />
+      </div>
 
       {/* DARK GRADIENT OVERLAY */}
       <div
