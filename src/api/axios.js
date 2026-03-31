@@ -1,5 +1,6 @@
 
 import axios from "axios";
+import { forceSessionLogout } from "@/lib/session";
 
 const API_ORIGIN =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -79,6 +80,13 @@ const extractAccessToken = (payload) =>
     payload?.accessToken || payload?.token || payload?.data?.accessToken
   );
 
+const getResponseMessage = (error) =>
+  normalizeToken(error?.response?.data?.message).toLowerCase();
+
+const isExplicitSessionExpiry = (error) =>
+  error?.response?.status === 401 &&
+  getResponseMessage(error).includes("session expired");
+
 const shouldSkipRefresh = (url = "") =>
   url.includes(REFRESH_ENDPOINT) ||
   REFRESH_BYPASS_ROUTES.some((route) => url.includes(route));
@@ -128,6 +136,13 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const url = originalRequest?.url || "";
     if (!originalRequest) return Promise.reject(error);
+
+    if (isExplicitSessionExpiry(error)) {
+      processQueue(error, null);
+      clearStoredToken();
+      forceSessionLogout();
+      return Promise.reject(error);
+    }
 
     /* ---------------------------------------------
        TOKEN EXPIRED → TRY REFRESH
@@ -181,6 +196,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         clearStoredToken();
+        forceSessionLogout();
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

@@ -11,6 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { FiLogOut, FiMenu, FiUser } from "react-icons/fi";
 import { useAuthStore } from "@/store/auth.store";
 import { logoutApi } from "@/services/auth.service";
+import { clearSessionData } from "@/lib/session";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -45,29 +46,6 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-
-  const clearClientData = () => {
-  if (typeof window === "undefined") return;
-
-  // Clear localStorage
-  localStorage.clear();
-
-  // Clear sessionStorage
-  sessionStorage.clear();
-
-  // Clear cookies
-  const cookies = document.cookie.split(";");
-
-  cookies.forEach((cookie) => {
-    const eqPos = cookie.indexOf("=");
-    const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
-
-    document.cookie =
-      name +
-      "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax";
-  });
-};
   const navLink = (path) =>
     pathname === path
       ? "text-[#1C4ED8] font-semibold"
@@ -92,19 +70,14 @@ export default function Header() {
     // }
 
     finally {
-  // clear Zustand state
-  logout();
-
-  // clear browser data
-  clearClientData();
-
-  setShowLogoutModal(false);
-  setOpen(false);
-  setIsLoggingOut(false);
-
-  router.replace("/home");
-  router.refresh();
-}
+      logout();
+      clearSessionData();
+      setShowLogoutModal(false);
+      setOpen(false);
+      setIsLoggingOut(false);
+      router.replace("/home");
+      router.refresh();
+    }
   };
 
   if (!mounted) {
