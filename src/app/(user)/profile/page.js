@@ -17,6 +17,7 @@ import {
 } from "react-icons/fi";
 import { useAuthStore } from "@/store/auth.store";
 import { updateMeApi } from "@/services/auth.service";
+import PromoLoader from "@/components/loader/PromoLoader";
 
 const formatDate = (value) => {
   if (!value) return "-";
@@ -70,6 +71,7 @@ export default function ProfilePage() {
       router.replace("/login?redirect=/profile");
       return;
     }
+
     fetchMe();
   }, [token, router, fetchMe]);
 
@@ -137,7 +139,21 @@ export default function ProfilePage() {
     }
   };
 
-  if (!token) return null;
+  if (!token) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
+       <PromoLoader/>
+      </div>
+    );
+  }
+
+  if (loading && !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
+        Loading profile...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen  bg-[#f3f5f7]  py-8 lg:py-12">
