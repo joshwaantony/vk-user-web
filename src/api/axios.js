@@ -35,44 +35,30 @@ const getStoredAccessToken = () => {
   return normalizeToken(localStorage.getItem("token"));
 };
 
-const getStoredRefreshToken = () => {
-  if (typeof window === "undefined") return "";
-  return normalizeToken(localStorage.getItem("refreshToken"));
-};
-
 const setStoredToken = (token) => {
   if (typeof window === "undefined") return;
   const cleanToken = normalizeToken(token);
   if (!cleanToken) return;
 
   localStorage.setItem("token", cleanToken);
-  const secure = window.location.protocol === "https:" ? "; Secure" : "";
-  document.cookie = `token=${cleanToken}; path=/; max-age=604800; SameSite=Lax${secure}`;
 };
 
 const clearStoredToken = () => {
   if (typeof window === "undefined") return;
   localStorage.removeItem("token");
   localStorage.removeItem("refreshToken");
-  const secure = window.location.protocol === "https:" ? "; Secure" : "";
-  document.cookie = `token=; path=/; max-age=0; SameSite=Lax${secure}`;
 };
 
 const extractTokens = (payload) => {
   const data = payload?.data ?? payload ?? {};
   return {
     accessToken: normalizeToken(data?.accessToken || data?.token),
-    refreshToken: normalizeToken(data?.refreshToken),
   };
 };
 
-const hasAnySessionToken = () =>
-  Boolean(getStoredAccessToken() || getStoredRefreshToken());
-
-const persistRefreshedTokens = ({ accessToken, refreshToken }) => {
+const persistRefreshedTokens = ({ accessToken }) => {
   if (typeof window === "undefined") return;
   if (accessToken) setStoredToken(accessToken);
-  if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
 };
 
 const extractAccessToken = (payload) =>
@@ -150,8 +136,7 @@ api.interceptors.response.use(
     if (
       status === 401 &&
       !originalRequest._retry &&
-      !shouldSkipRefresh(url) &&
-      hasAnySessionToken()
+      !shouldSkipRefresh(url)
     ) {
       originalRequest._retry = true;
 
@@ -171,23 +156,18 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshToken = getStoredRefreshToken();
-        const headers = { "X-Skip-Auth-Refresh": "true" };
-        if (refreshToken) {
-          headers.Authorization = `Refresh ${refreshToken}`;
-        }
-
-        const res = await api.post(REFRESH_ENDPOINT, {}, { headers });
+        const res = await api.post(
+          REFRESH_ENDPOINT,
+          {},
+          { headers: { "X-Skip-Auth-Refresh": "true" } }
+        );
         const tokens = extractTokens(res?.data);
         const cleanToken = tokens.accessToken || extractAccessToken(res?.data);
         if (!cleanToken) {
           throw new Error("No token returned from refresh");
         }
 
-        persistRefreshedTokens({
-          accessToken: cleanToken,
-          refreshToken: tokens.refreshToken,
-        });
+        persistRefreshedTokens({ accessToken: cleanToken });
         processQueue(null, cleanToken);
 
         originalRequest.headers = originalRequest.headers || {};
