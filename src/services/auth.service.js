@@ -51,13 +51,8 @@ export const updateMeApi = async (payload) => {
 };
 
 /* ================= REFRESH ACCESS TOKEN ================= */
-export const refreshSessionApi = async (payload) => {
-  const refreshToken = payload?.refreshToken;
-  const headers = refreshToken
-    ? { Authorization: `Refresh ${refreshToken}` }
-    : undefined;
-
-  const response = await api.post("/auth/refresh", {}, { headers });
+export const refreshSessionApi = async () => {
+  const response = await api.post("/auth/refresh", {});
   return response.data;
 };
 

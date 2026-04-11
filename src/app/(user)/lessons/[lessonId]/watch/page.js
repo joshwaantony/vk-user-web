@@ -5,18 +5,21 @@
 "use client";
 
 import { useEffect } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 import LessonContent from "@/components/course/course-lesson/LessonContent";
 import LessonSidebar from "@/components/course/course-lesson/LessonSidebar";
 import useLessonStore from "@/store/useLessonStore";
 import PromoLoader from "@/components/loader/PromoLoader";
+import { useAuthStore } from "@/store/auth.store";
 
 export default function LessonWatchPage() {
+  const router = useRouter();
   const { lessonId } = useParams();
   const searchParams = useSearchParams();
   const fallbackCourseId = searchParams.get("courseId");
+  const token = useAuthStore((state) => state.token);
 
   const { lesson, loading, error, fetchLesson } = useLessonStore();
   const hasLessonData = Boolean(
@@ -33,10 +36,32 @@ export default function LessonWatchPage() {
   );
 
   useEffect(() => {
+    if (!token || !lessonId) return;
+
     if (lessonId) {
       fetchLesson(lessonId);
     }
-  }, [lessonId, fetchLesson]);
+  }, [token, lessonId, fetchLesson]);
+
+  useEffect(() => {
+    if (token || !lessonId) return;
+
+    const redirectTarget = fallbackCourseId
+      ? `/lessons/${lessonId}/watch?courseId=${encodeURIComponent(
+          fallbackCourseId
+        )}`
+      : `/lessons/${lessonId}/watch`;
+
+    router.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`);
+  }, [token, router, lessonId, fallbackCourseId]);
+
+  if (!token) {
+    return (
+      <div className="min-h-screen bg-[#EEF5FF] flex items-center justify-center text-sm text-gray-500">
+        <PromoLoader/>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

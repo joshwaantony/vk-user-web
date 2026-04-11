@@ -53,15 +53,11 @@ export default function LoginPage() {
 
       const payload = res?.data ?? res ?? {};
       const token = payload?.accessToken || payload?.token;
-      const refreshToken = payload?.refreshToken;
       const user = payload?.user || null;
 
       if (token) {
         // ✅ Update Global Store (React State) -> Updates Header Immediately
         setToken(token);
-        if (refreshToken) {
-          localStorage.setItem("refreshToken", refreshToken);
-        }
         if (user) {
           setUser(user);
         }
