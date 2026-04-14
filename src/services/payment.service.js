@@ -6,6 +6,28 @@ const getErrorMessage = (error, fallback) =>
   error?.message ||
   fallback;
 
+const extractPendingOrderPayload = (payload) => {
+  const data = payload?.data ?? payload ?? {};
+  const order =
+    data?.order ||
+    payload?.order ||
+    (data?.id || data?.orderId ? data : null);
+  const alreadyPending =
+    payload?.alreadyPending === true ||
+    data?.alreadyPending === true;
+
+  if (!alreadyPending || !order) return null;
+
+  return {
+    alreadyPending: true,
+    message:
+      payload?.message ||
+      "Your payment session is already in progress. Continuing checkout...",
+    order,
+    data,
+  };
+};
+
 /* =====================================================
    CREATE ORDER API
 ===================================================== */
@@ -34,6 +56,13 @@ export const createOrderAPI = async (
     // Support both: { data: { order, pricing } } and { data: { ...orderFields } }
     return res.data?.data;
   } catch (error) {
+    const pendingOrderPayload = extractPendingOrderPayload(
+      error?.response?.data
+    );
+    if (pendingOrderPayload) {
+      return pendingOrderPayload;
+    }
+
     console.error("Create Order Error:", error?.response?.data || error);
     throw new Error(getErrorMessage(error, "Unable to create order"));
   }
