@@ -249,7 +249,8 @@ export default function CourseSidebar({ course }) {
       {/* COUPON POPUP */}
       {showPopup && isLoggedIn && !isEnrolled && (
         <CouponPopup
-          courseId={course.id}
+          courseId={course.id || course._id}
+          course={course}
           onClose={() => setShowPopup(false)}
         />
       )}

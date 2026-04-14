@@ -9,7 +9,6 @@ import { IoClose } from "react-icons/io5";
 import { HiArrowRight } from "react-icons/hi";
 import { usePaymentStore } from "@/store/payment.store";
 import { useAuthStore } from "@/store/auth.store";
-import useCourseStore from "@/store/CourseStore";
 import { useCouponStore } from "@/store/coupon.store";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -59,7 +58,7 @@ const clearPendingPayment = () => {
   localStorage.removeItem(PENDING_PAYMENT_KEY);
 };
 
-export default function CouponPopup({ onClose, courseId }) {
+export default function CouponPopup({ onClose, courseId, course }) {
   const [coupon, setCoupon] = useState("");
   const [processingEnrollment, setProcessingEnrollment] = useState(false);
   const [razorLoading, setRazorLoading] = useState(false);
@@ -69,7 +68,6 @@ export default function CouponPopup({ onClose, courseId }) {
   const { createOrder, verifyClient, verifyOrder, loading } =
     usePaymentStore();
   const { token, user } = useAuthStore();
-  const { courses } = useCourseStore();
 
   const {
     validateCoupon,
@@ -77,13 +75,13 @@ export default function CouponPopup({ onClose, courseId }) {
     loading: couponLoading,
     clearCoupon,
   } = useCouponStore();
-
-  const selectedCourse = courses.find(
-    (c) =>
-      String(c?.id || c?._id || "") ===
-      String(courseId || "")
-  );
+  const currentCourse = course || null;
   const hasPendingCoupon = Boolean(coupon.trim()) && !couponData;
+  const displayPrice =
+    couponData?.finalAmount ??
+    couponData?.finalPrice ??
+    currentCourse?.price ??
+    null;
 
   /* Disable scroll */
   useEffect(() => {
@@ -171,14 +169,6 @@ export default function CouponPopup({ onClose, courseId }) {
     try {
       setRazorLoading(true);
 
-      const finalAmount = Number(
-        couponData?.finalAmount ??
-          couponData?.finalPrice ??
-          selectedCourse?.price ??
-          0
-      );
-      const isFreeCheckout = finalAmount <= 0;
-
       const createOrderKey = generateIdempotencyKey();
 
       const createOrderResponse = await createOrder(
@@ -192,13 +182,31 @@ export default function CouponPopup({ onClose, courseId }) {
         createOrderResponse?.order ||
         createOrderResponse?.data?.order ||
         createOrderResponse;
+      const isPendingCheckout = createOrderResponse?.alreadyPending === true;
 
       const orderId = order?.id || order?.orderId;
+      const pricing =
+        createOrderResponse?.pricing ||
+        createOrderResponse?.data?.pricing ||
+        order?.pricing ||
+        null;
+      const payableAmount = Number(
+        order?.amount ??
+        order?.finalAmount ??
+        pricing?.finalAmount ??
+        NaN
+      );
+      const isFreeEnrollment =
+        createOrderResponse?.freeEnrollment === true ||
+        createOrderResponse?.data?.freeEnrollment === true;
       const alreadyEnrolled =
         createOrderResponse?.enrolled === true ||
         createOrderResponse?.data?.enrolled === true ||
         order?.enrolled === true ||
         order?.status === "COMPLETED";
+      const isFreeCheckout =
+        isFreeEnrollment ||
+        (Number.isFinite(payableAmount) && payableAmount <= 0);
 
       if (isFreeCheckout || alreadyEnrolled) {
         try {
@@ -226,6 +234,10 @@ export default function CouponPopup({ onClose, courseId }) {
       }
 
       if (!orderId) throw new Error("Order ID missing");
+
+      if (isPendingCheckout) {
+        toast("Your payment session is already in progress. Continuing checkout...");
+      }
 
       setPendingPayment(orderId, courseId);
 
@@ -278,6 +290,16 @@ export default function CouponPopup({ onClose, courseId }) {
 
         theme: { color: "#16a34a" },
       };
+
+      if (
+        typeof window === "undefined" ||
+        typeof window.Razorpay !== "function"
+      ) {
+        clearPendingPayment();
+        setRazorLoading(false);
+        toast.error("Payment service is still loading. Please try again.");
+        return;
+      }
 
       const razorpay = new window.Razorpay(options);
 
@@ -333,10 +355,8 @@ export default function CouponPopup({ onClose, courseId }) {
                   Course Price:
                 </span>
                 <span className="text-lg font-bold text-gray-900">
-                  {selectedCourse
-                    ? couponData
-                      ? `₹${couponData.finalAmount ?? couponData.finalPrice}`
-                      : `₹${selectedCourse.price}`
+                  {displayPrice != null
+                    ? `₹${displayPrice}`
                     : "Loading..."}
                 </span>
               </div>
@@ -346,7 +366,7 @@ export default function CouponPopup({ onClose, courseId }) {
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Base Price</span>
                     <span className="font-medium text-gray-900">
-                      ₹{couponData.basePrice ?? selectedCourse?.price ?? 0}
+                      ₹{couponData.basePrice ?? currentCourse?.price ?? 0}
                     </span>
                   </div>
 

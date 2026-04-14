@@ -152,6 +152,7 @@ export default function AllCourseCard({ course }) {
       {showPopup && isLoggedIn && !isEnrolled && (
         <CouponPopup
           courseId={course.id}
+          course={course}
           onClose={() => setShowPopup(false)}
         />
       )}

@@ -96,7 +96,7 @@ export default function Header() {
     <>
       {/* ================= HEADER ================= */}
       <header
-        className={`sticky top-0 z-50 w-full border-b bg-white transition-all duration-300 ${
+        className={`sticky top-0 z-50 w-full  bg-white transition-all duration-300 ${
           shrink ? "py-2" : "py-4"
         }`}
       >

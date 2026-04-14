@@ -27,12 +27,12 @@ Acceptance checks:
 
 ### 2. Replace client-owned auth with server-owned session protection
 
-- [ ] Stop relying on `localStorage` as the source of truth for access tokens in [`src/api/axios.js`](/Users/apple/Downloads/vk-user-web/src/api/axios.js) and [`src/store/auth.store.js`](/Users/apple/Downloads/vk-user-web/src/store/auth.store.js).
-- [ ] Remove the JavaScript-written `token` cookie pattern from auth/session code.
-- [ ] Update [`middleware.js`](/Users/apple/Downloads/vk-user-web/middleware.js) to validate a server-owned session cookie, not just the existence of a client-set token string.
-- [ ] Align frontend auth flow with secure `httpOnly` cookie session handling.
-- [ ] Review logout flow to make sure session is invalidated both client-side and server-side.
-- [ ] Needs backend alignment: confirm cookie names, expiry, refresh behavior, and middleware validation contract.
+- [x] Stop relying on `localStorage` as the source of truth for access tokens in [`src/api/axios.js`](/Users/apple/Downloads/vk-user-web/src/api/axios.js) and [`src/store/auth.store.js`](/Users/apple/Downloads/vk-user-web/src/store/auth.store.js).
+- [x] Remove the JavaScript-written `token` cookie pattern from auth/session code.
+- [x] Update [`middleware.js`](/Users/apple/Downloads/vk-user-web/middleware.js) to validate a server-owned session cookie, not just the existence of a client-set token string.
+- [x] Align frontend auth flow with secure `httpOnly` cookie session handling.
+- [x] Review logout flow to make sure session is invalidated both client-side and server-side.
+- [x] Needs backend alignment: confirm cookie names, expiry, refresh behavior, and middleware validation contract.
 
 Acceptance checks:
 
@@ -237,7 +237,7 @@ Acceptance checks:
 ## Suggested Execution Order
 
 - [x] Task 1: Remove root auth blank screen
-- [ ] Task 2: Replace client-owned auth/session model
+- [x] Task 2: Replace client-owned auth/session model
 - [ ] Task 3: Fix redirect recovery
 - [ ] Task 4: Fix checkout reliability
 - [ ] Task 5: Normalize auth API response handling
