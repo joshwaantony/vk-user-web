@@ -45,7 +45,7 @@ export default function CourseContent() {
 
   return (
     <motion.div
-      className="bg-white border rounded-2xl p-4 sm:p-6"
+      className="bg-white  rounded-2xl p-4 sm:p-6"
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
@@ -107,7 +107,7 @@ export default function CourseContent() {
         return (
           <motion.div
             key={section.id}
-            className="border rounded-xl mb-3 sm:mb-4"
+            className="border border-[#EDEDED] rounded-xl mb-3 sm:mb-4"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: index * 0.06 }}
@@ -162,7 +162,7 @@ export default function CourseContent() {
             <AnimatePresence initial={false}>
               {isOpen && (
                 <motion.div
-                  className="border-t divide-y"
+                  className="border-t border-[#EDEDED] divide-y"
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}

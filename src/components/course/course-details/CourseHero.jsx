@@ -39,7 +39,7 @@ export default function CourseHero({ course }) {
 
       {/* ✅ STICKY BACK BAR */}
       <motion.div
-        className="sticky top-0 z-40 bg-white border-b"
+        className="sticky top-0 z-40 bg-white "
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, delay: 0.08 }}
@@ -57,7 +57,7 @@ export default function CourseHero({ course }) {
 
       {/* HERO CARD */}
       <motion.div
-        className="bg-white rounded-2xl overflow-hidden border"
+        className="bg-white rounded-2xl overflow-hidden "
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.55, delay: 0.12 }}

@@ -30,14 +30,14 @@ export default function HeroSection() {
           <CarouselPagination
         total={promos.length}
         current={activeIndex + 1}
-      />
+      /> 
     </div>
     <div className="bg-white ">
             <PopularCoursesHeader />
-            <CourseGrid />
-                   
-
-
+            <CourseGrid />   
+                    
+  
+ 
 
 
     </div>

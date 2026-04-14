@@ -182,7 +182,7 @@ export default function CourseSidebar({ course }) {
 
           {/* PROGRESS CARD */}
           <motion.div
-            className="bg-white border rounded-2xl p-8"
+            className="bg-white  rounded-2xl p-8"
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}

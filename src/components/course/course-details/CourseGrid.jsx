@@ -9,7 +9,7 @@ import usePopularCourseStore from "@/store/CourseStore";
 import CourseCard from "./CourseCard";
 import AllCourseCardSkeleton from "@/components/loader/AllCourseCardSkeleton";
 
-export default function  CourseGrid() {
+export default function CourseGrid() {
   const {
     courses,
     loading,
