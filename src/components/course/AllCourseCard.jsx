@@ -70,7 +70,7 @@ export default function AllCourseCard({ course }) {
       {/* ================= COURSE CARD ================= */}
       <div
         onClick={() => router.push(`/course/${course.id}`)}
-        className="cursor-pointer bg-white rounded-2xl border shadow-sm hover:shadow-md transition overflow-hidden"
+        className="cursor-pointer bg-white rounded-2xl  shadow-sm hover:shadow-md transition overflow-hidden"
       >
         {/* Thumbnail */}
         <img
@@ -105,7 +105,7 @@ export default function AllCourseCard({ course }) {
     onError={(e) => {
       e.currentTarget.src = "/avatar.png";
     }}
-    className="w-9 h-9 rounded-full object-cover border"
+    className="w-9 h-9 rounded-full object-cover "
   />
 
   <div className="flex flex-col leading-tight">
@@ -119,7 +119,7 @@ export default function AllCourseCard({ course }) {
 </div>
 
 
-          <hr />
+          <hr className="text-[#EDEDED]" />
 
           {/* Duration & Price */}
           <div className="flex items-center justify-between">

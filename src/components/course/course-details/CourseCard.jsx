@@ -90,7 +90,7 @@ export default function CourseCard({ course }) {
                 onError={(e) => {
                   e.currentTarget.src = "/avatar.png";
                 }}
-                className="w-10 h-10 rounded-full object-cover border"
+                className="w-10 h-10 rounded-full object-cover "
               />
 
               <div className="flex flex-col">

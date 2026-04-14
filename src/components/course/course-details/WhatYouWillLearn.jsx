@@ -5,7 +5,7 @@
 
 export default function WhatYouWillLearn({ points = [] }) {
   return (
-    <div className="bg-white border rounded-2xl p-8">
+    <div className="bg-white  rounded-2xl p-8">
       <h2 className="text-xl text-black font-semibold mb-6">
         What you’ll learn
       </h2>

@@ -2,7 +2,7 @@
 
 export default function AllCourseCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl border shadow-sm overflow-hidden animate-pulse">
+    <div className="bg-white rounded-2xl border border-[#EDEDED] shadow-sm overflow-hidden animate-pulse">
       <div className="w-full h-48 bg-gray-300" />
 
       <div className="p-5 flex flex-col gap-4">
@@ -27,7 +27,7 @@ export default function AllCourseCardSkeleton() {
           </div>
         </div>
 
-        <hr />
+        <hr className="text-[#EDEDED]" />
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
