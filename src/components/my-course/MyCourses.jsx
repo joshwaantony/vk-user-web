@@ -69,7 +69,7 @@ export default function MyCourses() {
       </div>
 
       {/* ================= TABS ================= */}
-      <div className="flex gap-6 sm:gap-8 border-b mb-6 sm:mb-8 overflow-x-auto">
+      <div className="flex gap-6 sm:gap-8 border-b border-[#EDEDED] mb-6 sm:mb-8 overflow-x-auto">
         <button
           onClick={() => setTab("progress")}
           className={`pb-3 text-sm sm:text-base font-medium whitespace-nowrap ${
