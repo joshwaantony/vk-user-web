@@ -201,7 +201,7 @@ export default function ProfilePage() {
                 {/* {user?.role || "-"} */}
               </p>
 
-              <div className="border-t my-5"></div>
+              <div className="border-t border-[#EDEDED] my-5"></div>
 
               <div className="flex justify-center gap-10 sm:gap-16">
                 <div>
@@ -308,7 +308,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="border-t my-8"></div>
+          <div className="border-t border-[#EDEDED] my-8"></div>
 
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">

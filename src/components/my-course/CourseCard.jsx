@@ -28,7 +28,7 @@ export default function CourseCard({ course }) {
       onClick={handleGoToCourse}
       className="
         cursor-pointer
-        bg-white rounded-2xl border overflow-hidden
+        bg-white rounded-2xl border border-[#EDEDED] overflow-hidden
         transition-all duration-300 ease-out
         hover:-translate-y-1
         hover:scale-[1.02]
