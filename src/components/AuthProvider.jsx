@@ -20,11 +20,16 @@ export default function AuthProvider({ children }) {
   useEffect(() => {
     const initializeSession = async () => {
       initAuth();
-      await restoreSession();
+      const sessionState = await restoreSession();
+
+      if (sessionState?.shouldLogout) {
+        router.replace("/home");
+        router.refresh();
+      }
     };
 
     initializeSession();
-  }, [initAuth, restoreSession]);
+  }, [initAuth, restoreSession, router]);
 
   useEffect(() => {
     const isLoggedIn = !!token;
