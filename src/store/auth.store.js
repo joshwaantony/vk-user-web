@@ -127,7 +127,10 @@ export const useAuthStore = create(
                 loading: false,
                 error: null,
               });
-              return true;
+              return {
+                restored: true,
+                shouldLogout: false,
+              };
             } catch (meError) {
               const status = meError?.response?.status;
               if (status && status !== 401) {
@@ -159,8 +162,13 @@ export const useAuthStore = create(
             error: null,
           });
 
-          return true;
+          return {
+            restored: true,
+            shouldLogout: false,
+          };
         } catch (err) {
+          const hadPersistedSession = !!normalizeToken(get().token);
+
           clearPersistedToken();
           set({
             user: null,
@@ -168,7 +176,10 @@ export const useAuthStore = create(
             loading: false,
             error: null,
           });
-          return false;
+          return {
+            restored: false,
+            shouldLogout: hadPersistedSession,
+          };
         }
       },
 
