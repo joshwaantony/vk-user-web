@@ -41,6 +41,39 @@ const resolveId = (value) => {
   return null;
 };
 
+const escapeSvgText = (value = "") =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const getLessonFallbackThumbnail = (title = "Lesson") => {
+  const safeTitle = escapeSvgText(title.trim() || "Lesson");
+  const label = safeTitle.slice(0, 18);
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" fill="none">
+      <defs>
+        <linearGradient id="lessonGradient" x1="8" y1="8" x2="88" y2="88" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#1D4ED8" />
+          <stop offset="1" stop-color="#0F172A" />
+        </linearGradient>
+      </defs>
+      <rect width="96" height="96" rx="24" fill="url(#lessonGradient)" />
+      <rect x="8" y="8" width="80" height="80" rx="20" fill="white" fill-opacity="0.08" stroke="white" stroke-opacity="0.15" />
+      <circle cx="30" cy="30" r="10" fill="white" fill-opacity="0.18" />
+      <path d="M45 25.5C45 24.1193 46.1193 23 47.5 23H66.5C67.8807 23 69 24.1193 69 25.5C69 26.8807 67.8807 28 66.5 28H47.5C46.1193 28 45 26.8807 45 25.5Z" fill="white" fill-opacity="0.9"/>
+      <path d="M45 35.5C45 34.1193 46.1193 33 47.5 33H60.5C61.8807 33 63 34.1193 63 35.5C63 36.8807 61.8807 38 60.5 38H47.5C46.1193 38 45 36.8807 45 35.5Z" fill="white" fill-opacity="0.65"/>
+      <path d="M24 58C24 54.6863 26.6863 52 30 52H66C69.3137 52 72 54.6863 72 58V66C72 69.3137 69.3137 72 66 72H30C26.6863 72 24 69.3137 24 66V58Z" fill="white" fill-opacity="0.12"/>
+      <path d="M39 57.5C39 55.567 41.1494 54.406 42.7692 55.4698L53.8462 62.7442C55.3102 63.7056 55.3102 65.8544 53.8462 66.8158L42.7692 74.0902C41.1494 75.154 39 73.993 39 72.06V57.5Z" fill="white"/>
+      <text x="48" y="86" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="white" fill-opacity="0.95">${label}</text>
+    </svg>
+  `;
+
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+};
+
 export default function LessonSidebar({ lesson, fallbackCourseId }) {
   const router = useRouter();
   const unlockMessage = "Complete previous section to unlock";
@@ -380,7 +413,10 @@ export default function LessonSidebar({ lesson, fallbackCourseId }) {
                           {/* IMPROVED THUMBNAIL */}
                           <div className="relative flex-shrink-0 group/image">
                             <Image
-                              src={lesson.thumbnail || "/thumb-line.avif"}
+                              src={
+                                lesson.thumbnail ||
+                                getLessonFallbackThumbnail(lesson.title)
+                              }
                               alt={lesson.title}
                               width={48}
                               height={48}
