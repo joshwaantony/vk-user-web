@@ -195,7 +195,7 @@ export default function CourseContent() {
             <AnimatePresence initial={false}>
               {isOpen && (
                 <motion.div
-                  className="border-t border-[#EDEDED] divide-y"
+                  className="border-t border-[#EDEDED] divide-y divide-[#EDEDED]"
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
