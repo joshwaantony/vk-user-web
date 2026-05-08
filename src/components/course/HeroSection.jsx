@@ -5,7 +5,7 @@ import FeatureBadges from "./FeatureBadges";
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-[480px] sm:min-h-[520px] lg:min-h-[560px] text-white overflow-hidden">
+    <section className="relative overflow-hidden text-white min-h-[500px] sm:min-h-[520px] lg:min-h-[560px]">
 
       {/* MOBILE GRADIENT BACKGROUND */}
       <div className="
@@ -36,39 +36,44 @@ export default function HeroSection() {
       </div>
 
       {/* Overlay (for both) */}
-      <div className="absolute inset-0 bg-[#0B1B3A]/40" />
+      <div className="absolute inset-0 bg-[#08162F]/55 sm:bg-[#0B1B3A]/45" />
+      <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-white/10 to-transparent sm:hidden" />
+      <div className="absolute -left-16 top-24 h-36 w-36 rounded-full bg-[#EABF56]/15 blur-3xl sm:hidden" />
+      <div className="absolute -right-12 bottom-20 h-40 w-40 rounded-full bg-[#60A5FA]/15 blur-3xl sm:hidden" />
 
       {/* Content */}
       <div
         className="
           relative max-w-7xl mx-auto
           px-4 sm:px-6 lg:px-8
-          py-16 sm:py-20 lg:py-24
+          py-12 sm:py-20 lg:py-24
           grid grid-cols-1 lg:grid-cols-2
           items-center
         "
       >
         {/* LEFT CONTENT */}
-        <div className="max-w-xl text-center lg:text-left mx-auto lg:mx-0">
+        <div className="mx-auto max-w-xl text-center lg:mx-0 lg:text-left">
+          <div className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.24em] text-white/75 backdrop-blur-sm sm:hidden">
+            Learn from experts
+          </div>
           <h1
             className="
-              text-[28px] sm:text-[34px] lg:text-[46px]
-              font-bold leading-tight
+              mt-5 text-[34px] font-bold leading-[1.05]
+              sm:mt-0 sm:text-[34px] sm:leading-tight lg:text-[46px]
             "
           >
             Explore Courses for
-            <br />
-            <span className="text-[#EABF56]">
+            <span className="mt-2 block text-[#EABF56]">
               Tax, Accounting & Finance
             </span>
           </h1>
 
           <p
             className="
-              mt-4 sm:mt-6
+              mx-auto mt-5 max-w-md
               text-white/80
-              text-[14px] sm:text-[16px] lg:text-[17px]
-              leading-relaxed
+              text-[15px] leading-7
+              sm:mx-0 sm:mt-6 sm:text-[16px] lg:text-[17px]
             "
           >
             Boost your career with top-rated courses
@@ -77,7 +82,7 @@ export default function HeroSection() {
           </p>
 
           {/* Feature badges */}
-          <div className="mt-8 sm:mt-10 flex justify-center lg:justify-start">
+          <div className="mt-8 flex justify-center sm:mt-10 lg:justify-start">
             <FeatureBadges />
           </div>
         </div>

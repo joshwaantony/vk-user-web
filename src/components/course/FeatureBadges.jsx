@@ -25,33 +25,35 @@ export default function FeatureBadges() {
   ];
 
   return (
-    <div className="flex flex-wrap gap-4 sm:gap-6 justify-start">
+    <div className="grid w-full max-w-[340px] grid-cols-2 gap-3 sm:flex sm:max-w-none sm:flex-wrap sm:gap-6 sm:justify-start">
       {items.map((item, i) => (
         <div
           key={`${item.label}-${i}`}
-          className="relative group"
+          className={`relative group ${i === items.length - 1 ? "col-span-2 sm:col-span-1" : ""}`}
           onClick={() => setActive(active === i ? null : i)}
         >
           {/* Card */}
           <div
             className="
-              w-[120px] sm:w-[140px]
-              h-[110px] sm:h-[120px]
-              rounded-xl
-              bg-white/10
-              backdrop-blur
+              h-[124px] w-full rounded-2xl
+              border border-white/10 bg-white/10
+              px-4 backdrop-blur-md
               flex flex-col
               items-center
               justify-center
               text-center
-              gap-3
+              gap-3.5
               cursor-pointer
-              transition
+              transition duration-300
+              shadow-[0_18px_40px_rgba(3,10,27,0.18)]
               hover:bg-white/20
+              sm:h-[120px] sm:w-[140px] sm:px-3
             "
           >
-            {item.icon}
-            <p className="text-[13px] sm:text-sm text-white/90 whitespace-pre-line leading-snug">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/8">
+              {item.icon}
+            </div>
+            <p className="text-[13px] text-white/90 whitespace-pre-line leading-snug sm:text-sm">
               {item.label}
             </p>
           </div>
@@ -60,10 +62,10 @@ export default function FeatureBadges() {
           <div
             className={`
               absolute
-              -top-14
+              -top-16
               left-1/2
               -translate-x-1/2
-              w-[220px]
+              z-10 w-[220px]
               px-3
               py-2
               rounded-lg
