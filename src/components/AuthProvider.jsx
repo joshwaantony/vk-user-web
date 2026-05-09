@@ -8,12 +8,15 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
+import { getAuthRedirectFromLocation } from "@/lib/authRedirect";
+
+const AUTH_PAGES = ["/login", "/signup", "/phone/enter-phone", "/phone/verify"];
 
 export default function AuthProvider({ children }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const token = useAuthStore((state) => state.token);
+  const user = useAuthStore((state) => state.user);
   const initAuth = useAuthStore((state) => state.initAuth);
   const restoreSession = useAuthStore((state) => state.restoreSession);
 
@@ -32,12 +35,20 @@ export default function AuthProvider({ children }) {
   }, [initAuth, restoreSession, router]);
 
   useEffect(() => {
-    const isLoggedIn = !!token;
+    const isLoggedIn = !!user;
+    const isAuthPage = AUTH_PAGES.some((page) => pathname.startsWith(page));
 
-    if (isLoggedIn && (pathname === "/" || pathname === "/home")) {
+    if (!isLoggedIn) return;
+
+    if (pathname === "/" || pathname === "/home") {
       router.replace("/course");
+      return;
     }
-  }, [token, pathname, router]);
+
+    if (isAuthPage) {
+      router.replace(getAuthRedirectFromLocation("/course"));
+    }
+  }, [user, pathname, router]);
 
   return children;
 }

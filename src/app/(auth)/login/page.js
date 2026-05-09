@@ -5,18 +5,19 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import PromoLoader from "@/components/loader/PromoLoader";
+import { getAuthRedirectFromLocation } from "@/lib/authRedirect";
 
 function page() {
   const router = useRouter();
-  const token = useAuthStore((state) => state.token);
+  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
-    if (token) {
-      router.replace("/course");
+    if (user) {
+      router.replace(getAuthRedirectFromLocation());
     }
-  }, [token, router]);
+  }, [user, router]);
 
-  if (token) {
+  if (user) {
     return (
       <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
         <PromoLoader/>

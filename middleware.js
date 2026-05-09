@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 const PROTECTED_PREFIXES = ["/my-course", "/profile", "/lessons"];
-const AUTH_PAGES = ["/login", "/signup", "/phone/enter-phone", "/phone/verify"];
 
 export function middleware(req) {
   const { pathname, search } = req.nextUrl;
@@ -20,32 +19,13 @@ export function middleware(req) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isAuthenticated && isAuthPage) {
-    const redirectUrl = req.nextUrl.clone();
-    redirectUrl.pathname = "/course";
-    redirectUrl.search = "";
-    return NextResponse.redirect(redirectUrl);
-  }
-
-  if (isAuthenticated && (pathname === "/" || pathname === "/home")) {
-    const redirectUrl = req.nextUrl.clone();
-    redirectUrl.pathname = "/course";
-    redirectUrl.search = "";
-    return NextResponse.redirect(redirectUrl);
-  }
-
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/",
-    "/home",
     "/my-course/:path*",
     "/profile/:path*",
     "/lessons/:path*",
-    "/login",
-    "/signup",
-    "/phone/:path*",
   ],
 };
