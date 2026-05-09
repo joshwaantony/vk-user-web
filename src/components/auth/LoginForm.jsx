@@ -11,6 +11,7 @@ import { useAuthFlowStore } from "@/store/authFlow.store";
 import { useAuthStore } from "@/store/auth.store";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import toast from "react-hot-toast";
+import { getAuthRedirectFromLocation } from "@/lib/authRedirect";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -65,8 +66,7 @@ export default function LoginPage() {
         toast.dismiss(toastId);
         toast.success("Login successful");
 
-        // ✅ Smooth SPA Redirect (No Reload)
-        router.replace("/course");
+        router.replace(getAuthRedirectFromLocation());
 
       } else {
         throw new Error("Token missing in response");
@@ -87,7 +87,6 @@ export default function LoginPage() {
     await handleLogin();
   };
 
-  
   // 🔹 OTP LOGIN
   // const handleOtpLogin = () => {
   //   setFlow({
