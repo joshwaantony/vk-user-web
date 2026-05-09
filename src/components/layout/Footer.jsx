@@ -64,7 +64,10 @@ export default function Footer() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <SocialIcon>
+              <SocialIcon
+                href="https://www.facebook.com/profile.php?id=61579674126435"
+                label="Open VK Accountancy Facebook"
+              >
                 <FaFacebookF />
               </SocialIcon>
               <SocialIcon>
@@ -73,7 +76,10 @@ export default function Footer() {
               <SocialIcon>
                 <FaLinkedinIn />
               </SocialIcon>
-              <SocialIcon>
+              <SocialIcon
+                href="https://www.instagram.com/vkaccountancy?igsh=MTl1MmR6b2w5bXR2Zw=="
+                label="Open VK Accountancy Instagram"
+              >
                 <FaInstagram />
               </SocialIcon>
             </div>
@@ -127,7 +133,21 @@ function FooterColumn({ title, links }) {
   );
 }
 
-function SocialIcon({ children }) {
+function SocialIcon({ children, href, label = "Social link" }) {
+  if (href) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        aria-label={label}
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/10 text-sm text-white/80 transition hover:-translate-y-0.5 hover:bg-sky-500 hover:text-white"
+      >
+        {children}
+      </a>
+    );
+  }
+
   return (
     <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/10 text-sm text-white/80 transition hover:-translate-y-0.5 hover:bg-sky-500 hover:text-white">
       {children}
