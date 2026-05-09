@@ -1,12 +1,19 @@
 import LegalPageLayout, {
   LegalSection,
 } from "@/components/legal/LegalPageLayout";
+import { createMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Contact Us | VK Learning",
+export const metadata = createMetadata({
+  title: "Contact Us",
   description:
     "Legal and payment contact information for V K Accountancy Easy Learning Model Private Limited.",
-};
+  path: "/contact-us",
+  keywords: [
+    "vk accountancy contact details",
+    "merchant details",
+    "legal contact information",
+  ],
+});
 
 export default function ContactUsPolicyPage() {
   return (
