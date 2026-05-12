@@ -9,8 +9,7 @@ import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { getAuthRedirectFromLocation } from "@/lib/authRedirect";
-
-const AUTH_PAGES = ["/login", "/signup", "/phone/enter-phone", "/phone/verify"];
+import { AUTH_PAGES } from "@/constants/routes";
 
 export default function AuthProvider({ children }) {
   const router = useRouter();

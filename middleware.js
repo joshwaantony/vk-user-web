@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-
-const PROTECTED_PREFIXES = ["/my-course", "/profile", "/lessons"];
+import { PROTECTED_PREFIXES } from "./src/constants/routes";
 
 export function middleware(req) {
   const { pathname, search } = req.nextUrl;
@@ -10,8 +9,6 @@ export function middleware(req) {
   const isProtected = PROTECTED_PREFIXES.some((prefix) =>
     pathname.startsWith(prefix)
   );
-  const isAuthPage = AUTH_PAGES.some((page) => pathname.startsWith(page));
-
   if (!isAuthenticated && isProtected) {
     const loginUrl = req.nextUrl.clone();
     loginUrl.pathname = "/login";
