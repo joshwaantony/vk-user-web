@@ -252,29 +252,54 @@ export const useAuthStore = create(
           });
 
           const payload = getAuthPayload(res);
-          const verificationToken = payload?.verificationToken;
 
+          /* ── FORGOT_PASSWORD ── */
           if (purpose === "FORGOT_PASSWORD") {
+            const verificationToken = payload?.verificationToken;
             set({
               passwordResetToken: verificationToken,
               expiresIn: null,
               loading: false,
             });
-            return true;
+            return { outcome: "reset-password" };
           }
 
+          /* ── REGISTER (unified phone flow) ──
+           * Backend returns accessToken  → existing user, log them in.
+           * Backend returns verificationToken → new user, proceed to signup.
+           */
           if (purpose === "REGISTER") {
+            const accessToken =
+              payload?.accessToken || payload?.token;
+
+            if (accessToken) {
+              // Existing account — treat as successful login
+              const user = payload?.user || null;
+              persistTokens({ accessToken });
+              set({
+                token: normalizeToken(accessToken),
+                user,
+                verificationToken: null,
+                expiresIn: null,
+                loading: false,
+              });
+              return { outcome: "login" };
+            }
+
+            // New account — store verificationToken for /auth/register
+            const verificationToken = payload?.verificationToken;
             set({
-              verificationToken: verificationToken,
+              verificationToken,
               expiresIn: null,
               loading: false,
             });
-            return true;
+            return { outcome: "signup" };
           }
+
+          /* ── Legacy LOGIN purpose (kept for backwards compat) ── */
           if (purpose === "LOGIN") {
             const accessToken =
-              payload?.accessToken ||
-              payload?.token;
+              payload?.accessToken || payload?.token;
             const user = payload?.user || null;
 
             if (!accessToken) {
@@ -282,13 +307,10 @@ export const useAuthStore = create(
                 error: "Token missing in OTP login response",
                 loading: false,
               });
-              return false;
+              return { outcome: "error" };
             }
 
-            persistTokens({
-              accessToken,
-            });
-
+            persistTokens({ accessToken });
             set({
               token: normalizeToken(accessToken),
               user,
@@ -296,19 +318,18 @@ export const useAuthStore = create(
               expiresIn: null,
               loading: false,
             });
-            return true;
+            return { outcome: "login" };
           }
 
-
           set({ loading: false });
-          return true;
+          return { outcome: "unknown" };
 
         } catch (err) {
           set({
             error: err?.response?.data?.message || "Invalid OTP",
             loading: false,
           });
-          return false;
+          return { outcome: "error" };
         }
       },
 

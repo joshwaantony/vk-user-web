@@ -85,16 +85,22 @@ export default function OtpVerifyPage() {
       return;
     }
 
-    const success = await verifyOtp(otpValue);
-    if (!success) return;
-    toast.success("OTP verified successfully");
+    const result = await verifyOtp(otpValue);
 
-    if (purpose === "FORGOT_PASSWORD") {
-      router.replace("/reset-password");
-    } else if (purpose === "REGISTER") {
-      router.replace("/signup");
-    } else {
+    if (result.outcome === "login") {
+      // Existing user — logged in via OTP
+      toast.success("Welcome back!");
       router.replace("/course");
+    } else if (result.outcome === "signup") {
+      // New user — proceed to registration form
+      toast.success("OTP verified. Complete your registration.");
+      router.replace("/signup");
+    } else if (result.outcome === "reset-password") {
+      toast.success("OTP verified.");
+      router.replace("/reset-password");
+    } else {
+      // outcome === "error" or unknown — error already set in store
+      toast.error("OTP verification failed. Please try again.");
     }
   };
 
