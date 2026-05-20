@@ -67,10 +67,8 @@ export default function PhoneForm({
     if (result.success) {
       toast.success("OTP sent successfully");
       router.push(nextRoute);
-    } else if (result.status === 409) {
-      toast.error("Phone number already registered. Please login.");
     } else {
-      toast.error(result.message); // show backend message
+      toast.error(result.message || "Failed to send OTP");
     }
   };
 
