@@ -34,7 +34,6 @@ export default function TermsAndConditionsPage() {
       ]}
       primaryAction={{ href: "/contact", label: "Contact VK Support" }}
       secondaryAction={{ href: "/privacy-policy", label: "Read Privacy Policy" }}
-      footerNote="This page is adapted to match VK Learning's legal policy structure and design language."
     >
       <LegalSection title="Who These Terms Apply To">
         <p>
