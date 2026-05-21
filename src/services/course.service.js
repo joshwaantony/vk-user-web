@@ -16,19 +16,31 @@ const SORT_BY = {
    GET COURSES (FILTER + SEARCH)
 ---------------------------------- */
 export const getCourses = async (params = {}) => {
-  const query = new URLSearchParams({
-    q: params.q ?? "",
-    categoryId: params.categoryId ?? "",
-    level: params.level ?? "",
-    minPrice: String(params.minPrice ?? 0),
-    maxPrice: String(params.maxPrice ?? 10000),
-    sortBy: params.sortBy || SORT_BY.POPULAR,
-    page: String(params.page ?? 1),
-    limit: String(params.limit ?? 9),
-  });
+  const sortBy = params.sortBy || SORT_BY.POPULAR;
+  const isPopular = sortBy === SORT_BY.POPULAR;
 
-  const res = await api.get(`/courses?${query.toString()}`);
-  return res.data?.data?.courses || [];
+  if (isPopular) {
+    const query = new URLSearchParams({
+      page: String(params.page ?? 1),
+      limit: String(params.limit ?? 9),
+    });
+    const res = await api.get(`/courses/popular?${query.toString()}`);
+    return res.data?.data?.courses || [];
+  } else {
+    const queryParams = {
+      q: params.q ?? "",
+      categoryId: params.categoryId ?? "",
+      level: params.level ?? "",
+      minPrice: String(params.minPrice ?? 0),
+      maxPrice: String(params.maxPrice ?? 10000),
+      sortBy: sortBy,
+      page: String(params.page ?? 1),
+      limit: String(params.limit ?? 9),
+    };
+    const query = new URLSearchParams(queryParams);
+    const res = await api.get(`/courses?${query.toString()}`);
+    return res.data?.data?.courses || [];
+  }
 };
 
 /* ----------------------------------
@@ -47,17 +59,11 @@ export const getAllCourses = async () => {
 ---------------------------------- */
 export const getPopularCourses = async (limit = 6) => {
   const query = new URLSearchParams({
-    q: "",
-    categoryId: "",
-    level: "",
-    minPrice: "0",
-    maxPrice: "10000",
-    sortBy: SORT_BY.POPULAR,
     page: "1",
     limit: String(limit),
   });
 
-  const res = await api.get(`/courses?${query.toString()}`);
+  const res = await api.get(`/courses/popular?${query.toString()}`);
   const data = res.data?.data ?? {};
 
   return {

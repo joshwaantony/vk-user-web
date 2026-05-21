@@ -1,3 +1,4 @@
+
 import { NextResponse } from "next/server";
 import { PROTECTED_PREFIXES } from "./src/constants/routes";
 
