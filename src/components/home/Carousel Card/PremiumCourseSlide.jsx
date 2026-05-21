@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 import usePromoStore from "@/store/usePromoStore";
 import { useRouter } from "next/navigation";
 import {
-  HiOutlineClock,
   HiChevronLeft,
   HiChevronRight,
   HiX,
@@ -17,6 +16,8 @@ import PromoLoader from "@/components/loader/PromoLoader";
 import Hls from "hls.js";
 
 export default function PremiumCourseSlide() {
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
   const {
     promos,
     activeIndex,
@@ -28,17 +29,48 @@ export default function PremiumCourseSlide() {
     videoUrl,
     clearVideo,
   } = usePromoStore();
-const router = useRouter();
+  const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [videoLoading, setVideoLoading] = useState(false);
 
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
   const handleStartLearning = () => {
-  if (promo?.courseId) {
-    router.push(`/course/${promo.courseId}`);
-  }
-};
+    if (promo?.courseId) {
+      router.push(`/course/${promo.courseId}`);
+    }
+  };
+
+  const handleTouchStart = (event) => {
+    touchStartX.current = event.touches[0].clientX;
+    touchEndX.current = event.touches[0].clientX;
+  };
+
+  const handleTouchMove = (event) => {
+    touchEndX.current = event.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (
+      touchStartX.current === null ||
+      touchEndX.current === null
+    ) {
+      return;
+    }
+
+    const swipeDistance =
+      touchStartX.current - touchEndX.current;
+    const minSwipeDistance = 50;
+
+    if (swipeDistance > minSwipeDistance) {
+      nextPromo();
+    } else if (swipeDistance < -minSwipeDistance) {
+      prevPromo();
+    }
+
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
 
   /* ================= FETCH PROMOS ================= */
   useEffect(() => {
@@ -74,7 +106,7 @@ const router = useRouter();
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         setVideoLoading(false);
-        video.play().catch(() => { });
+        video.play().catch(() => {});
       });
 
       hlsRef.current = hls;
@@ -82,7 +114,7 @@ const router = useRouter();
       video.src = videoUrl;
       video.addEventListener("loadedmetadata", () => {
         setVideoLoading(false);
-        video.play().catch(() => { });
+        video.play().catch(() => {});
       });
     }
 
@@ -143,6 +175,9 @@ const router = useRouter();
       <div
         style={bgStyle}
         className="relative w-full overflow-hidden px-4 sm:px-6 md:px-10 lg:px-16 py-12 sm:py-14 md:py-16 lg:py-20 transition-[background] duration-700 ease-in-out"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
@@ -177,7 +212,6 @@ const router = useRouter();
                   </button>
                 </div>
 
-            
               </div>
             </div>
           </div>
@@ -206,27 +240,15 @@ const router = useRouter();
             <p className="text-gray-600 max-w-xl mx-auto lg:mx-0 mb-8 text-sm sm:text-base md:text-lg">
               {promo.description}
             </p>
-
-
-                        
-         {/* CTA */}
-<div className="flex justify-center lg:justify-start">
-  <button
-    onClick={handleStartLearning}
-    className="
-      bg-gray-900 text-white
-      px-6 sm:px-8 md:px-10
-      py-3 sm:py-4
-      rounded-xl font-semibold
-      flex items-center gap-3
-      hover:scale-105 hover:bg-black
-      transition
-    "
-  >
-    Start Learning
-    <HiChevronRight />
-  </button>
-</div>
+            <div className="flex justify-center lg:justify-start">
+              <button
+                onClick={handleStartLearning}
+                className="bg-gray-900 text-white px-6 sm:px-8 md:px-10 py-3 sm:py-4 rounded-xl font-semibold flex items-center gap-3 hover:scale-105 hover:bg-black transition"
+              >
+                Start Learning
+                <HiChevronRight />
+              </button>
+            </div>
 
           </div>
         </div>

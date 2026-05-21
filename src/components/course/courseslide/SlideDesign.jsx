@@ -17,6 +17,8 @@ import Hls from "hls.js";
 
 export default function SlideDesign() {
   const router = useRouter();
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
 
   const {
     promos,
@@ -110,6 +112,37 @@ export default function SlideDesign() {
     }
   };
 
+  const handleTouchStart = (event) => {
+    touchStartX.current = event.touches[0].clientX;
+    touchEndX.current = event.touches[0].clientX;
+  };
+
+  const handleTouchMove = (event) => {
+    touchEndX.current = event.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (
+      touchStartX.current === null ||
+      touchEndX.current === null
+    ) {
+      return;
+    }
+
+    const swipeDistance =
+      touchStartX.current - touchEndX.current;
+    const minSwipeDistance = 50;
+
+    if (swipeDistance > minSwipeDistance) {
+      nextPromo();
+    } else if (swipeDistance < -minSwipeDistance) {
+      prevPromo();
+    }
+
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
   /* ================= CLOSE HANDLER ================= */
   const handleClose = () => {
     if (videoRef.current) {
@@ -143,6 +176,9 @@ export default function SlideDesign() {
       <section
         className="w-full rounded-3xl relative transition-all duration-700 ease-in-out"
         style={{ background: bgStyle }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <div className="max-w-[1400px] mx-auto px-6 sm:px-8 py-10 sm:py-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
