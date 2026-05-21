@@ -31,10 +31,6 @@ export default function Footer() {
           label: "Cancellation & Refund Policy",
           href: "/cancellation-and-refund-policy",
         },
-        {
-          label: "Contact Us",
-          href: "/contact-us",
-        },
       ],
     },
   ];

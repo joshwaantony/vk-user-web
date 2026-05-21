@@ -32,8 +32,7 @@ export default function CancellationAndRefundPolicyPage() {
         "No refund for non-usage or change of mind",
       ]}
       primaryAction={{ href: "/contact", label: "Contact VK Support" }}
-      secondaryAction={{ href: "/contact-us", label: "View Legal Contact" }}
-      footerNote="This page is adapted to VK Learning's no-cancellation and no-refund policy requirements."
+      secondaryAction={{ href: "/privacy-policy", label: "Read Privacy Policy" }}
     >
       <LegalSection title="Policy Summary">
         <p>

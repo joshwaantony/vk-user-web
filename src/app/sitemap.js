@@ -29,12 +29,6 @@ export default function sitemap() {
       priority: 0.7,
     },
     {
-      url: absoluteUrl("/contact-us"),
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.4,
-    },
-    {
       url: absoluteUrl("/privacy-policy"),
       lastModified: now,
       changeFrequency: "yearly",
