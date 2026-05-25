@@ -76,7 +76,7 @@ const getLessonFallbackThumbnail = (title = "Lesson") => {
 
 export default function LessonSidebar({ lesson, fallbackCourseId }) {
   const router = useRouter();
-  const unlockMessage = "Complete previous section to unlock";
+  const unlockMessage = "Complete the previous lesson to unlock this one";
   const { course, loading, fetchCourseById } = useCourseStore();
   const {
     courseProgress,
@@ -208,6 +208,16 @@ export default function LessonSidebar({ lesson, fallbackCourseId }) {
     () => [...sections].sort((a, b) => (a?.order || 0) - (b?.order || 0)),
     [sections],
   );
+  const orderedLessons = useMemo(
+    () =>
+      sortedSections.flatMap((section) =>
+        [...(section?.lessons || [])].sort(
+          (a, b) => (a?.order || 0) - (b?.order || 0),
+        ),
+      ),
+    [sortedSections],
+  );
+  const activeLessonId = resolveId(lesson);
 
   useEffect(() => {
     debugLesson("Incoming lesson payload", {
@@ -393,8 +403,30 @@ export default function LessonSidebar({ lesson, fallbackCourseId }) {
                   .map((lesson, lessonIndex) => {
                     const lessonId =
                       lesson.id || lesson._id || `${sectionId}-${lessonIndex}`;
+                    const normalizedLessonId = resolveId(lesson);
+                    const flatLessonIndex = orderedLessons.findIndex(
+                      (item) => resolveId(item) === normalizedLessonId,
+                    );
+                    const previousLesson =
+                      flatLessonIndex > 0
+                        ? orderedLessons[flatLessonIndex - 1]
+                        : null;
+                    const previousLessonId = resolveId(previousLesson);
+                    const previousLessonCompleted = previousLesson
+                      ? previousLessonId === activeLessonId
+                        ? Boolean(
+                            lessonProgress?.isCompleted ||
+                              previousLesson?.isCompleted,
+                          )
+                        : Boolean(previousLesson?.isCompleted)
+                      : true;
                     const canWatchLesson =
-                      !lesson.locked && (!isEnrolled || isSectionUnlocked);
+                      !lesson.locked &&
+                      (!isEnrolled || isSectionUnlocked) &&
+                      (flatLessonIndex <= 0 ||
+                        lesson.isCompleted ||
+                        normalizedLessonId === activeLessonId ||
+                        previousLessonCompleted);
 
                     return (
                       <motion.div
