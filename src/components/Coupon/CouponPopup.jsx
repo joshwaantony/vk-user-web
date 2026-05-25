@@ -248,6 +248,7 @@ export default function CouponPopup({ onClose, courseId, course }) {
         order_id: orderId,
         name: "VK Academy",
         description: "Course Purchase",
+        image: "/logo.svg",
 
         handler: async function (response) {
           try {

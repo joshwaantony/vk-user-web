@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/auth.store";
@@ -17,8 +18,9 @@ export default function PhoneForm({
     phone,
     setPhone,
     sendOtp,
-    loading,
   } = useAuthStore();
+  const [otpIssueState, setOtpIssueState] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const localPhone = String(phone || "")
     .replace(/^\+91/, "")
     .replace(/\D/g, "")
@@ -56,6 +58,8 @@ export default function PhoneForm({
     if (!validate()) return;
 
     const toastId = toast.loading("Sending OTP...");
+    setOtpIssueState(null);
+    setIsSubmitting(true);
 
     const result = await sendOtp({
       phone: `+91${localPhone}`,
@@ -63,10 +67,17 @@ export default function PhoneForm({
     });
 
     toast.dismiss(toastId);
+    setIsSubmitting(false);
 
-    if (result.success) {
-      toast.success("OTP sent successfully");
+    if (result.success && result.otpIssued !== false) {
+      toast.success(result.message || "OTP sent successfully");
       router.push(nextRoute);
+    } else if (result.success && purpose === "FORGOT_PASSWORD") {
+      setOtpIssueState({
+        type: "info",
+      });
+    } else if (result.success) {
+      toast.error(result.message || "Unable to send OTP right now");
     } else {
       toast.error(result.message || "Failed to send OTP");
     }
@@ -74,7 +85,7 @@ export default function PhoneForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading) return;
+    if (isSubmitting) return;
     await handleSendOtp();
   };
 
@@ -116,7 +127,7 @@ export default function PhoneForm({
                 +91
               </span>
 
-              <input
+            <input
                 type="tel"
                 inputMode="numeric"
                 maxLength={10}
@@ -139,7 +150,7 @@ export default function PhoneForm({
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={isSubmitting}
             className="w-full h-14 rounded-xl bg-[#2457E6]
                        text-white font-semibold text-lg
                        hover:bg-[#1E4ED8]
@@ -147,8 +158,41 @@ export default function PhoneForm({
                        disabled:cursor-not-allowed
                        transition"
           >
-            {loading ? "Sending..." : "Send OTP"}
+            {isSubmitting ? "Sending..." : "Send OTP"}
           </button>
+
+          {otpIssueState?.type === "info" && (
+            <div className="mt-5 rounded-2xl border border-[#D6E4FF] bg-[#F8FBFF] p-4 text-left">
+              <p className="text-sm font-semibold text-[#0F172A]">
+                We’re unable to send an OTP to this number right now.
+              </p>
+              <p className="mt-1 text-sm text-[#64748B]">
+                Please try again in a moment or sign up if you’re new here.
+              </p>
+
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  disabled={isSubmitting}
+                  className="flex-1 rounded-xl border border-[#CBD5E1] px-4 py-3 text-sm font-semibold text-[#334155] transition hover:bg-white disabled:opacity-60"
+                >
+                  Retry
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.location.href =
+                      "/phone/enter-phone?purpose=REGISTER";
+                  }}
+                  className="flex-1 rounded-xl bg-[#2457E6] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1E4ED8]"
+                >
+                  Register
+                </button>
+              </div>
+            </div>
+          )}
         </form>
       </div>
     </main>

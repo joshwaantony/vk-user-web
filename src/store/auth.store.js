@@ -197,6 +197,12 @@ export const useAuthStore = create(
           }
           const payload = getAuthPayload(res);
           const otpExpiry = Number(payload?.expiresIn);
+          const otpIssued = payload?.otpIssued !== false;
+          const responseMessage =
+            payload?.message ||
+            (otpIssued
+              ? "OTP sent successfully"
+              : "We couldn't send an OTP for this number.");
 
           set({
             phone,
@@ -215,6 +221,8 @@ export const useAuthStore = create(
           return {
             success: true,
             expiresIn: nextExpiresIn,
+            otpIssued,
+            message: responseMessage,
           };
 
         } catch (err) {
