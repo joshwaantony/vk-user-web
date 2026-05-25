@@ -3,10 +3,10 @@
 import Link from "next/link";
 import {
   FaFacebookF,
-  FaTwitter,
   FaLinkedinIn,
   FaInstagram,
 } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import { useAuthStore } from "@/store/auth.store";
 
 export default function Footer() {
@@ -66,8 +66,8 @@ export default function Footer() {
               >
                 <FaFacebookF />
               </SocialIcon>
-              <SocialIcon>
-                <FaTwitter />
+              <SocialIcon label="Open VK Accountancy on X">
+                <FaXTwitter />
               </SocialIcon>
               <SocialIcon>
                 <FaLinkedinIn />
