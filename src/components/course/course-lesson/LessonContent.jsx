@@ -45,7 +45,7 @@ export default function LessonContent({
   fallbackCourseId,
 }) {
   const router = useRouter();
-  const unlockMessage = "Complete previous section to unlock";
+  const unlockMessage = "Complete the current lesson to unlock the next one";
 
   // ✅ MUST BE INSIDE COMPONENT
   const { course, fetchCourseById, refreshCourseById } =
@@ -149,6 +149,10 @@ export default function LessonContent({
     currentLessonIndex < orderedLessons.length - 1
       ? orderedLessons[currentLessonIndex + 1]
       : null;
+  const currentLessonCompleted = Boolean(
+    lessonProgress?.isCompleted || lesson?.isCompleted
+  );
+  const canOpenNextLesson = Boolean(nextLesson && currentLessonCompleted);
   const learningPoints = useMemo(() => {
     if (
       Array.isArray(course?.learningOutcomes) &&
@@ -532,6 +536,13 @@ export default function LessonContent({
   const navigateToLesson = async (targetLesson) => {
     const targetLessonId = resolveId(targetLesson);
     if (!targetLessonId) return;
+    const isNextLessonTarget =
+      resolveId(nextLesson) === targetLessonId;
+
+    if (isNextLessonTarget && !currentLessonCompleted) {
+      toast.error(unlockMessage);
+      return;
+    }
 
     try {
       await watchLesson(targetLessonId);
@@ -577,7 +588,13 @@ export default function LessonContent({
         transition={{ duration: 0.4, delay: 0.05 }}
       >
         <div
-          onClick={() => router.back()}
+          onClick={() => {
+            if (resolvedCourseId) {
+              router.push(`/course/${resolvedCourseId}`);
+              return;
+            }
+            router.push("/course");
+          }}
           className="flex items-center gap-2 text-sm text-black font-semibold cursor-pointer hover:text-gray-500 transition"
         >
           <FiArrowLeft />
@@ -689,13 +706,13 @@ export default function LessonContent({
           <motion.button
             type="button"
             onClick={() => navigateToLesson(nextLesson)}
-            disabled={!nextLesson}
+            disabled={!canOpenNextLesson}
             className={`px-5 py-3 rounded-lg font-medium flex items-center gap-2 text-sm transition ${
-              nextLesson
+              canOpenNextLesson
                 ? "bg-[#2563EB] text-white hover:bg-[#1E4ED8]"
                 : "bg-[#93C5FD] text-white cursor-not-allowed"
             }`}
-            whileTap={nextLesson ? { scale: 0.97 } : undefined}
+            whileTap={canOpenNextLesson ? { scale: 0.97 } : undefined}
           >
             Next Lesson
             <FiArrowRight />
