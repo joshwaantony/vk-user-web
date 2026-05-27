@@ -120,7 +120,7 @@ export default function PrivacyPolicyPage() {
             href="mailto:support@vk.com"
             className="font-semibold text-slate-900 underline underline-offset-4"
           >
-            support@vk.com
+           info@vkaccountancy.com
           </a>
           .
         </p>
