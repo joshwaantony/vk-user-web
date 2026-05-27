@@ -5,84 +5,99 @@
 import { HiPhone, HiOutlineMail, HiLocationMarker } from "react-icons/hi";
 
 export default function ContactCards() {
+  const cards = [
+    {
+      title: "Call Us",
+      value: "+91 9447791106",
+      note: "Mon-Fri: 9AM-6PM",
+      href: "tel:+919447791106",
+      ariaLabel: "Call VK Accountancy",
+      icon: HiPhone,
+      noteClassName:
+        "whitespace-nowrap text-[12px] font-medium tracking-[0.01em] text-[#E7D9FF]",
+    },
+    {
+      title: "Email Us",
+      value: "info@vkaccountancy.com",
+      note: "Response within 24 hrs",
+      href: "mailto:info@vkaccountancy.com",
+      ariaLabel: "Email VK Accountancy",
+      icon: HiOutlineMail,
+      valueClassName: "whitespace-nowrap text-[11px] leading-5 sm:text-[12px]",
+      noteClassName:
+        "whitespace-nowrap text-[11px] font-medium tracking-[0.01em] text-[#E7D9FF]",
+    },
+    {
+      title: "Visit Us",
+      value: "Pazhaveedu",
+      note: "Ambalapuzha, Alappuzha- 688009",
+      href: "https://www.google.com/maps?q=Pazhaveedu%2C%20Alappuzha%2C%20Kerala",
+      ariaLabel: "Open VK Accountancy location in Google Maps",
+      icon: HiLocationMarker,
+      external: true,
+      noteClassName:
+        "whitespace-nowrap text-[11px] font-medium tracking-[0.01em] text-[#E7D9FF]",
+    },
+  ];
+
   return (
-    <div className="grid sm:grid-cols-3 gap-4">
-      
-      {/* CALL */}
-      <a
-        href="tel:+919447791106"
-        aria-label="Call VK Accountancy"
-        className="group flex min-h-[180px] flex-col rounded-xl bg-white/20 p-4 text-center text-white backdrop-blur transition hover:scale-[1.03]"
-      >
-        <div
-          className="
-            w-10 h-10 mx-auto mb-2 flex items-center justify-center rounded-full
-            bg-white/30 text-white
-            transition-all duration-300 ease-out
-            group-hover:bg-[#1C4ED8]
-            group-hover:text-white
-            group-hover:scale-110
-          "
-        >
-          <HiPhone />
-        </div>
-        <h4 className="font-semibold">Call Us</h4>
-        <p className="mt-1 text-sm text-blue-100">+91 9447791106</p>
-        <p className="mt-auto pt-3 text-xs text-blue-200">Mon–Fri: 9AM–6PM</p>
-      </a>
+    <div className="grid gap-4 sm:grid-cols-3 xl:max-w-[860px]">
+      {cards.map(
+        ({
+          title,
+          value,
+          note,
+          href,
+          ariaLabel,
+          icon: Icon,
+          external,
+          valueClassName = "",
+          noteClassName = "",
+        }) => (
+          <a
+            key={title}
+            href={href}
+            aria-label={ariaLabel}
+            target={external ? "_blank" : undefined}
+            rel={external ? "noreferrer" : undefined}
+            className="
+              group relative flex min-h-[230px] flex-col items-center overflow-hidden
+              rounded-[22px] border border-white/10 bg-[#b995d8]/35 px-5 py-7
+              text-center text-white backdrop-blur-md
+              shadow-[0_12px_36px_rgba(17,24,39,0.22)]
+              transition duration-300 ease-out
+              hover:-translate-y-1 hover:bg-[#c5a2df]/40 hover:shadow-[0_18px_40px_rgba(30,64,175,0.20)]
+            "
+          >
+            <div className="absolute inset-0 bg-gradient-to-b from-white/8 via-transparent to-black/10" />
+            <div className="absolute inset-x-6 top-0 h-px bg-white/30" />
 
-      {/* EMAIL */}
-      <a
-        href="mailto:info@vkaccountancy.com"
-        aria-label="Email VK Accountancy"
-        className="group flex min-h-[180px] flex-col rounded-xl bg-white/20 p-4 text-center text-white backdrop-blur transition hover:scale-[1.03]"
-      >
-        <div
-          className="
-            w-10 h-10 mx-auto mb-2 flex items-center justify-center rounded-full
-            bg-white/30 text-white
-            transition-all duration-300 ease-out
-            group-hover:bg-[#1C4ED8]
-            group-hover:text-white
-            group-hover:scale-110
-          "
-        >
-          <HiOutlineMail />
-        </div>
-        <h4 className="font-semibold">Email Us</h4>
-        <span className="mt-1 text-sm leading-6 text-blue-100 break-all hover:text-white">
-          info@vkaccountancy.com
-        </span>
-        <p className="mt-auto pt-3 text-xs text-blue-200">Response within 24 hrs</p>
-      </a>
+            <div
+              className="
+                relative mb-4 flex h-14 w-14 items-center justify-center rounded-full
+                bg-white/20 text-xl text-white transition duration-300
+                group-hover:scale-105 group-hover:bg-white/28
+              "
+            >
+              <Icon />
+            </div>
 
-      {/* VISIT */}
-      <a
-        href="https://www.google.com/maps?q=Pazhaveedu%2C%20Alappuzha%2C%20Kerala"
-        target="_blank"
-        rel="noreferrer"
-        aria-label="Open VK Accountancy location in Google Maps"
-        className="group flex min-h-[180px] flex-col rounded-xl bg-white/20 p-4 text-center text-white backdrop-blur transition hover:scale-[1.03]"
-      >
-        <div
-          className="
-            w-10 h-10 mx-auto mb-2 flex items-center justify-center rounded-full
-            bg-white/30 text-white
-            transition-all duration-300 ease-out
-            group-hover:bg-[#1C4ED8]
-            group-hover:text-white
-            group-hover:scale-110
-          "
-        >
-          <HiLocationMarker />
-        </div>
-        <h4 className="font-semibold">Visit Us</h4>
-        <p className="mt-1 text-sm text-blue-100">Pazhaveedu</p>
-        <p className="mt-auto pt-3 text-xs leading-5 text-blue-200">
-          Ambalapuzha, Alappuzha- 688009
-        </p>
-      </a>
-
+            <h4 className="relative text-[1.75rem] font-semibold tracking-tight">
+              {title}
+            </h4>
+            <div
+              className={`relative mt-2 text-base text-white/90 ${valueClassName}`}
+            >
+              {value}
+            </div>
+            <p
+              className={`relative mt-auto pt-5 text-sm leading-5 text-white/75 ${noteClassName}`}
+            >
+              {note}
+            </p>
+          </a>
+        )
+      )}
     </div>
   );
 }
