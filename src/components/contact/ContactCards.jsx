@@ -33,7 +33,7 @@ export default function ContactCards() {
 
       {/* EMAIL */}
       <a
-        href="mailto:vkeasylearningmodel@gmail.com"
+        href="mailto:info@vkaccountancy.com"
         aria-label="Email VK Accountancy"
         className="group flex min-h-[180px] flex-col rounded-xl bg-white/20 p-4 text-center text-white backdrop-blur transition hover:scale-[1.03]"
       >
@@ -51,7 +51,7 @@ export default function ContactCards() {
         </div>
         <h4 className="font-semibold">Email Us</h4>
         <span className="mt-1 text-sm leading-6 text-blue-100 break-all hover:text-white">
-          vkeasylearningmodel@gmail.com
+          info@vkaccountancy.com
         </span>
         <p className="mt-auto pt-3 text-xs text-blue-200">Response within 24 hrs</p>
       </a>
