@@ -27,6 +27,11 @@ export default function OtpVerifyPage() {
   const [showResendAttention, setShowResendAttention] = useState(false);
 
   const inputsRef = useRef([]);
+  const formattedPhone = phone
+    ? String(phone).startsWith("+91")
+      ? String(phone)
+      : `+91${String(phone)}`
+    : "";
 
   useEffect(() => {
     if (!expiresIn) return;
@@ -131,6 +136,17 @@ export default function OtpVerifyPage() {
       <p className="text-sm font-semibold text-[#0F172A] mb-4">
         Enter OTP
       </p>
+
+      {formattedPhone && (
+        <div className="mb-5 rounded-2xl border border-[#D6E4FF] bg-[#F8FBFF] px-4 py-3">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#64748B]">
+            Mobile Number
+          </p>
+          <p className="mt-1 text-sm font-semibold text-[#2457E6]">
+            {formattedPhone}
+          </p>
+        </div>
+      )}
 
       <div className="flex justify-center gap-4 mb-4">
         {otp.map((digit, i) => (
