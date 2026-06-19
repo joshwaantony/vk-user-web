@@ -98,12 +98,12 @@ export default function CourseHero({ course }) {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.45, delay: 0.28 }}
           >
-            <span className="flex items-center gap-1">
+            {/* <span className="flex items-center gap-1">
               <HiStar className="text-yellow-400" /> {course.rating}
-            </span>
-            <span className="flex items-center gap-1">
+            </span> */}
+            {/* <span className="flex items-center gap-1">
               <FiUsers /> {course.students} students
-            </span>
+            </span> */}
             <span className="flex items-center gap-1">
               <FiClock /> {formatDuration(course.duration)}
             </span>

@@ -88,13 +88,13 @@ export default function AllCourseCard({ course }) {
           </h3>
 
           {/* Rating */}
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          {/* <div className="flex items-center gap-2 text-sm text-gray-600">
             <HiStar className="text-yellow-500" />
             <span>4.5</span>
             <span>•</span>
             <FaUsers  className="text-gray-500" />
             <span>{course.totalStudents} students</span>
-          </div>
+          </div> */}
 
        
          {/* Faculty Section */}

@@ -74,16 +74,16 @@ export default function CourseCard({ course }) {
             </h3>
 
             {/* Rating */}
-            <div className="flex items-center gap-2 mt-3 text-sm text-[#475569]">
+            {/* <div className="flex items-center gap-2 mt-3 text-sm text-[#475569]">
               <FaStar className="text-[#F59E0B]" />
               <span>4.5</span>
               <span>·</span>
               <FaUsers className="text-[#64748B]" />
               <span>{course?.totalStudents} students</span>
-            </div>
+            </div> */}
 
             {/* Faculty */}
-            <div className="flex items-center gap-3 mt-4">
+            <div className="flex items-center gap-3 mt-8">
               <img
                 src={faculty?.imageUrl || "/avatar.png"}
                 alt={faculty?.name}
