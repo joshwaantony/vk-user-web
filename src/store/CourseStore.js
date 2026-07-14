@@ -27,7 +27,16 @@ const useCourseStore = create((set, get) => ({
     page: 1,
     limit: 9,
   },
+  pagination: {
+    page: 1,
+    limit: 9,
+    totalItems: 0,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  },
   loading: false,
+  loadingMore: false,
   error: null,
 
   /* =====================
@@ -43,6 +52,7 @@ const useCourseStore = create((set, get) => ({
         filters: {
           ...state.filters,
           ...params,
+          page: params.page ?? 1,
         },
       }));
 
@@ -50,10 +60,11 @@ const useCourseStore = create((set, get) => ({
         ...get().filters,
         ...params,
       };
-      const courses = await getCourses(nextFilters);
+      const { courses, pagination } = await getCourses(nextFilters);
 
       set({
         courses,
+        pagination,
         loading: false,
       });
     } catch (err) {
@@ -62,6 +73,43 @@ const useCourseStore = create((set, get) => ({
           err?.response?.data?.message ||
           "Failed to load courses",
         loading: false,
+      });
+    }
+  },
+
+  // 🔄 LOAD MORE COURSES (for Infinite Scroll)
+  loadMoreCourses: async () => {
+    const { pagination, filters, loadingMore, loading } = get();
+
+    // Don't load if already loading, or if there's no next page
+    if (loading || loadingMore || !pagination.hasNextPage) return;
+
+    try {
+      set({ loadingMore: true });
+
+      const nextPage = pagination.page + 1;
+      const nextFilters = {
+        ...filters,
+        page: nextPage,
+      };
+
+      const { courses: newCourses, pagination: newPagination } = await getCourses(nextFilters);
+
+      set((state) => ({
+        courses: [...state.courses, ...newCourses],
+        pagination: newPagination,
+        filters: {
+          ...state.filters,
+          page: nextPage,
+        },
+        loadingMore: false,
+      }));
+    } catch (err) {
+      set({
+        error:
+          err?.response?.data?.message ||
+          "Failed to load more courses",
+        loadingMore: false,
       });
     }
   },
