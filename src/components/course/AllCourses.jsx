@@ -10,10 +10,14 @@ import AllCourseCard from "./AllCourseCard";
 import AllCourseCardSkeleton from "../loader/AllCourseCardSkeleton";
 
 export default function AllCourses() {
-  const { courses, loading, error } = useCourseStore();
-
-  const [visibleCount, setVisibleCount] = useState(9);
-  const skeletonCount = courses.length || visibleCount;
+  const {
+    courses,
+    loading,
+    loadingMore,
+    error,
+    pagination,
+    loadMoreCourses,
+  } = useCourseStore();
 
   // 👇 Infinite Scroll Logic
   useEffect(() => {
@@ -23,24 +27,23 @@ export default function AllCourses() {
         document.body.offsetHeight - 200;
 
       if (bottom) {
-        setVisibleCount((prev) => prev + 6);
+        loadMoreCourses();
       }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [loadMoreCourses]);
 
   if (loading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-        {Array.from({ length: skeletonCount }).map((_, index) => (
+        {Array.from({ length: 9 }).map((_, index) => (
           <AllCourseCardSkeleton key={index} />
         ))}
       </div>
     );
   }
-
 
   if (error) {
     return (
@@ -53,12 +56,42 @@ export default function AllCourses() {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-        {courses.slice(0, visibleCount).map((course) => (
+        {courses.map((course) => (
           <AllCourseCard key={course.id} course={course} />
         ))}
+
+        {loadingMore && (
+          <>
+            <AllCourseCardSkeleton />
+            <AllCourseCardSkeleton />
+            <AllCourseCardSkeleton />
+          </>
+        )}
       </div>
 
-  
+      {!loadingMore && pagination.hasNextPage && (
+        <div className="flex justify-center mt-12">
+          <button
+            onClick={loadMoreCourses}
+            className="
+              px-8 py-3.5
+              bg-[#1C3FD1]
+              text-white
+              font-semibold
+              rounded-xl
+              shadow-lg shadow-[#1C3FD1]/20
+              transition duration-300
+              hover:bg-[#1532A8]
+              hover:shadow-[#1532A8]/30
+              hover:scale-[1.02]
+              active:scale-95
+              focus:outline-none
+            "
+          >
+            Load More Courses
+          </button>
+        </div>
+      )}
     </>
   );
 }

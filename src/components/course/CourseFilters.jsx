@@ -18,6 +18,7 @@ export default function CourseFilters() {
     fetchCourses,
     courses,
     loading,
+    pagination,
   } = useCourseStore();
 
   const sortOptions = [
@@ -195,7 +196,7 @@ export default function CourseFilters() {
         <p className="text-sm text-[#475569]">
           Showing{" "}
           <span className="font-semibold">
-            {loading ? "..." : courses.length}
+            {loading ? "..." : (pagination?.totalItems ?? courses.length)}
           </span>{" "}
           Results
         </p>

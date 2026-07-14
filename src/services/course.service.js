@@ -25,7 +25,17 @@ export const getCourses = async (params = {}) => {
       limit: String(params.limit ?? 9),
     });
     const res = await api.get(`/courses/popular?${query.toString()}`);
-    return res.data?.data?.courses || [];
+    return {
+      courses: res.data?.data?.courses || [],
+      pagination: res.data?.data?.pagination || {
+        page: 1,
+        limit: 9,
+        totalItems: 0,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      },
+    };
   } else {
     const queryParams = {
       q: params.q ?? "",
@@ -39,7 +49,17 @@ export const getCourses = async (params = {}) => {
     };
     const query = new URLSearchParams(queryParams);
     const res = await api.get(`/courses?${query.toString()}`);
-    return res.data?.data?.courses || [];
+    return {
+      courses: res.data?.data?.courses || [],
+      pagination: res.data?.data?.pagination || {
+        page: 1,
+        limit: 9,
+        totalItems: 0,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      },
+    };
   }
 };
 
@@ -47,11 +67,12 @@ export const getCourses = async (params = {}) => {
    GET ALL COURSES
 ---------------------------------- */
 export const getAllCourses = async () => {
-  return getCourses({
+  const res = await getCourses({
     sortBy: SORT_BY.POPULAR,
     page: 1,
     limit: 9,
   });
+  return res.courses;
 };
 
 /* ----------------------------------
