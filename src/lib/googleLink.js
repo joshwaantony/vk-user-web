@@ -1,4 +1,6 @@
 const GOOGLE_LINK_PENDING_KEY = "vk_google_link_pending";
+const GOOGLE_LINK_EMAIL_KEY = "vk_google_link_email";
+const GOOGLE_LINK_TOKEN_KEY = "vk_google_link_token";
 const GOOGLE_IDENTITY_SCRIPT_ID = "google-identity-services";
 const GOOGLE_IDENTITY_SCRIPT_SRC = "https://accounts.google.com/gsi/client";
 
@@ -7,19 +9,51 @@ let googleIdentityScriptPromise = null;
 export const getGoogleClientId = () =>
   process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 
-export const markGoogleLinkPending = () => {
+export const setGoogleLinkContext = ({
+  email = "",
+  pendingLinkToken = "",
+} = {}) => {
   if (typeof window === "undefined") return;
   sessionStorage.setItem(GOOGLE_LINK_PENDING_KEY, "1");
+  if (email) {
+    sessionStorage.setItem(GOOGLE_LINK_EMAIL_KEY, email);
+  } else {
+    sessionStorage.removeItem(GOOGLE_LINK_EMAIL_KEY);
+  }
+
+  if (pendingLinkToken) {
+    sessionStorage.setItem(GOOGLE_LINK_TOKEN_KEY, pendingLinkToken);
+  } else {
+    sessionStorage.removeItem(GOOGLE_LINK_TOKEN_KEY);
+  }
 };
 
-export const clearGoogleLinkPending = () => {
+export const clearGoogleLinkContext = () => {
   if (typeof window === "undefined") return;
   sessionStorage.removeItem(GOOGLE_LINK_PENDING_KEY);
+  sessionStorage.removeItem(GOOGLE_LINK_EMAIL_KEY);
+  sessionStorage.removeItem(GOOGLE_LINK_TOKEN_KEY);
 };
 
 export const hasGoogleLinkPending = () => {
   if (typeof window === "undefined") return false;
   return sessionStorage.getItem(GOOGLE_LINK_PENDING_KEY) === "1";
+};
+
+export const getGoogleLinkContext = () => {
+  if (typeof window === "undefined") return { pending: false };
+
+  return {
+    pending: hasGoogleLinkPending(),
+    email: sessionStorage.getItem(GOOGLE_LINK_EMAIL_KEY) || "",
+    pendingLinkToken: sessionStorage.getItem(GOOGLE_LINK_TOKEN_KEY) || "",
+  };
+};
+
+export const consumeGoogleLinkContext = () => {
+  const context = getGoogleLinkContext();
+  clearGoogleLinkContext();
+  return context;
 };
 
 export const loadGoogleIdentityScript = () => {

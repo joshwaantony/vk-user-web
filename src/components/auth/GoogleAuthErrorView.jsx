@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getGoogleErrorMessage, startGoogleLogin } from "@/lib/googleAuth";
+import { setGoogleLinkContext } from "@/lib/googleLink";
 
 export default function GoogleAuthErrorView() {
   const router = useRouter();
@@ -52,7 +53,14 @@ export default function GoogleAuthErrorView() {
       pendingLinkToken: Boolean(pendingLinkToken),
       email: email || null,
     });
-  }, [email, errorCode, pendingLinkToken]);
+
+    if (isAccountLinkRequired) {
+      setGoogleLinkContext({
+        email,
+        pendingLinkToken,
+      });
+    }
+  }, [email, errorCode, isAccountLinkRequired, pendingLinkToken]);
 
   return (
     <main className="min-h-screen bg-[#F3F8FF] flex items-center justify-center px-4 py-10">
@@ -67,9 +75,15 @@ export default function GoogleAuthErrorView() {
 
         <p className="mt-2 text-[#64748B]">
           {isAccountLinkRequired
-            ? "We found an existing account with this email. Sign in to confirm linking."
+            ? "We found an existing account. Please sign in first."
             : message}
         </p>
+
+        {isAccountLinkRequired && email ? (
+          <p className="mt-3 text-sm font-medium text-[#1D4ED8]">
+            Matched email: {email}
+          </p>
+        ) : null}
 
         <div className="mt-8 flex flex-col gap-3">
           <button
