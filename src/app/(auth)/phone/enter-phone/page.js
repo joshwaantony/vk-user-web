@@ -12,6 +12,15 @@ const getFlowCopy = (purposeParam) => {
     };
   }
 
+  if (normalizedPurpose === "LINK_PHONE") {
+    return {
+      purpose: "LINK_PHONE",
+      title: "Add phone number",
+      subtitle:
+        "We’ll send you a one-time verification code to confirm your number.",
+    };
+  }
+
   // All other entry points (login + register) are now unified under REGISTER.
   // The backend will return accessToken for existing accounts and
   // verificationToken for new ones. OtpForm handles the branching.
@@ -29,6 +38,10 @@ export default async function Page({ searchParams }) {
     resolvedSearchParams?.purpose
   );
   const nextRouteParams = new URLSearchParams();
+
+  if (resolvedSearchParams?.purpose === "LINK_PHONE") {
+    nextRouteParams.set("purpose", "LINK_PHONE");
+  }
 
   if (resolvedSearchParams?.pendingLinkToken) {
     nextRouteParams.set(
@@ -48,6 +61,7 @@ export default async function Page({ searchParams }) {
       title={title}
       subtitle={subtitle}
       purpose={purpose}
+      showGoogleButton={purpose === "REGISTER"}
       nextRoute={
         nextRouteQuery
           ? `/phone/verify?${nextRouteQuery}`

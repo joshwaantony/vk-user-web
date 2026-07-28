@@ -5,12 +5,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/auth.store";
+import { startGoogleLogin } from "@/lib/googleAuth";
 
 export default function PhoneForm({
   title,
   subtitle,
   purpose,
   nextRoute,
+  showGoogleButton = false,
 }) {
   const router = useRouter();
 
@@ -160,6 +162,31 @@ export default function PhoneForm({
           >
             {isSubmitting ? "Sending..." : "Send OTP"}
           </button>
+
+          {showGoogleButton && (
+            <>
+              <div className="flex items-center my-8">
+                <div className="flex-1 h-px bg-[#E2E8F0]" />
+                <span className="mx-4 text-sm text-[#94A3B8]">OR</span>
+                <div className="flex-1 h-px bg-[#E2E8F0]" />
+              </div>
+
+              <button
+                type="button"
+                onClick={startGoogleLogin}
+                className="w-full h-14 rounded-xl border text-[#334155] border-[#CBD5E1]
+             flex items-center justify-center gap-3
+             font-semibold hover:bg-[#F8FAFC]"
+              >
+                <img
+                  src="/google.svg"
+                  alt="Google"
+                  className="w-5 h-5"
+                />
+                Continue with Google
+              </button>
+            </>
+          )}
 
           {otpIssueState?.type === "info" && (
             <div className="mt-5 rounded-2xl border border-[#D6E4FF] bg-[#F8FBFF] p-4 text-left">

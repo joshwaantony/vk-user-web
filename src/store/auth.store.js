@@ -11,6 +11,8 @@ import {
   sendOtpApi,
   verifyOtpApi,
   sendForgotPasswordOtpApi,
+  sendMePhoneOtpApi,
+  verifyMePhoneOtpApi,
   registerApi,
   resetPasswordApi,
   getMeApi,
@@ -192,6 +194,8 @@ export const useAuthStore = create(
 
           if (purpose === "FORGOT_PASSWORD") {
             res = await sendForgotPasswordOtpApi({ phone, purpose });
+          } else if (purpose === "LINK_PHONE") {
+            res = await sendMePhoneOtpApi({ phone });
           } else {
             res = await sendOtpApi({ phone, purpose });
           }
@@ -253,11 +257,17 @@ export const useAuthStore = create(
 
           set({ loading: true, error: null });
 
-          const res = await verifyOtpApi({
-            phone,
-            otp,
-            purpose,
-          });
+          const res =
+            purpose === "LINK_PHONE"
+              ? await verifyMePhoneOtpApi({
+                  phone,
+                  otp,
+                })
+              : await verifyOtpApi({
+                  phone,
+                  otp,
+                  purpose,
+                });
 
           const payload = getAuthPayload(res);
 
@@ -329,14 +339,47 @@ export const useAuthStore = create(
             return { outcome: "login" };
           }
 
+          if (purpose === "LINK_PHONE") {
+            const currentUser = get().user || null;
+            const linkedUser = payload?.user || currentUser;
+
+            if (!payload?.phoneLinked && !linkedUser) {
+              set({
+                error: "Phone link response missing user data",
+                loading: false,
+              });
+              return { outcome: "error" };
+            }
+
+            set({
+              user: linkedUser,
+              verificationToken: null,
+              expiresIn: null,
+              loading: false,
+            });
+
+            return { outcome: "link-phone" };
+          }
+
           set({ loading: false });
           return { outcome: "unknown" };
 
         } catch (err) {
+          const code = err?.response?.data?.code;
           set({
             error: err?.response?.data?.message || "Invalid OTP",
             loading: false,
           });
+
+          if (code === "ACCOUNT_MERGE_REQUIRED") {
+            return {
+              outcome: "merge-required",
+              message:
+                err?.response?.data?.message ||
+                "This phone number already belongs to another account.",
+            };
+          }
+
           return { outcome: "error" };
         }
       },

@@ -14,7 +14,6 @@ const getErrorMessage = (err) =>
 export default function AddPhoneOtpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const setToken = useAuthStore((state) => state.setToken);
   const fetchMe = useAuthStore((state) => state.fetchMe);
 
   const phone = searchParams?.get("phone") || "";
@@ -42,12 +41,7 @@ export default function AddPhoneOtpForm() {
         otp: otp.trim(),
       });
 
-      const payload = res?.data ?? res ?? {};
-      const accessToken = payload?.accessToken || payload?.token;
-
-      if (accessToken) {
-        setToken(accessToken);
-      }
+      res?.data ?? res ?? {};
 
       try {
         await fetchMe();

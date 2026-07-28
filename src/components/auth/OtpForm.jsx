@@ -108,6 +108,9 @@ export default function OtpVerifyPage() {
       router.replace(
         hasGoogleLinkPending() ? "/profile/link-google" : "/course"
       );
+    } else if (result.outcome === "link-phone") {
+      toast.success("Phone number linked");
+      router.replace("/profile");
     } else if (result.outcome === "signup") {
       // New user — proceed to registration form
       toast.success("OTP verified. Complete your registration.");
@@ -115,6 +118,10 @@ export default function OtpVerifyPage() {
     } else if (result.outcome === "reset-password") {
       toast.success("OTP verified.");
       router.replace("/reset-password");
+    } else if (result.outcome === "merge-required") {
+      toast.error(
+        result.message || "This phone number already belongs to another account."
+      );
     } else {
       // outcome === "error" or unknown — error already set in store
       toast.error("OTP verification failed. Please try again.");
