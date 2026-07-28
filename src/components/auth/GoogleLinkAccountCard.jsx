@@ -1,0 +1,182 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import PromoLoader from "@/components/loader/PromoLoader";
+import { useAuthStore } from "@/store/auth.store";
+import { linkGoogleAccountApi } from "@/services/auth.service";
+import {
+  clearGoogleLinkPending,
+  getGoogleClientId,
+  loadGoogleIdentityScript,
+} from "@/lib/googleLink";
+import { getGoogleErrorMessage } from "@/lib/googleAuth";
+
+const getLinkErrorMessage = (err) => {
+  const code =
+    err?.response?.data?.code ||
+    err?.response?.data?.error ||
+    err?.response?.data?.message;
+
+  return {
+    code,
+    message:
+      getGoogleErrorMessage(code) ||
+      err?.response?.data?.message ||
+      "Unable to link Google account.",
+  };
+};
+
+export default function GoogleLinkAccountCard() {
+  const router = useRouter();
+  const buttonRef = useRef(null);
+  const setToken = useAuthStore((state) => state.setToken);
+  const fetchMe = useAuthStore((state) => state.fetchMe);
+
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const mountGoogleButton = async () => {
+      try {
+        setLoading(true);
+        setErrorMessage("");
+
+        const clientId = getGoogleClientId();
+
+        if (!clientId) {
+          throw new Error(
+            "Missing NEXT_PUBLIC_GOOGLE_CLIENT_ID environment variable"
+          );
+        }
+
+        await loadGoogleIdentityScript();
+
+        if (cancelled || !buttonRef.current || !window.google?.accounts?.id) {
+          return;
+        }
+
+        buttonRef.current.innerHTML = "";
+
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: async (response) => {
+            const idToken = response?.credential;
+
+            if (!idToken) {
+              setErrorMessage("Google sign-in did not return an id token.");
+              toast.error("Google sign-in did not return an id token.");
+              return;
+            }
+
+            setSubmitting(true);
+            setErrorMessage("");
+
+            try {
+              const res = await linkGoogleAccountApi({ idToken });
+              const payload = res?.data ?? res ?? {};
+              const accessToken = payload?.accessToken || payload?.token;
+
+              if (!accessToken) {
+                throw new Error("Access token missing from link response");
+              }
+
+              setToken(accessToken);
+              clearGoogleLinkPending();
+
+              try {
+                await fetchMe();
+              } catch (fetchError) {
+                console.error("Failed to refresh user after Google link:", fetchError);
+              }
+
+              toast.success("Google account linked");
+              router.replace("/profile");
+            } catch (err) {
+              const { message, code } = getLinkErrorMessage(err);
+              setErrorMessage(message);
+              toast.error(message);
+              console.warn("[google-link] link request failed", {
+                code,
+                message,
+              });
+            } finally {
+              setSubmitting(false);
+            }
+          },
+        });
+
+        window.google.accounts.id.renderButton(buttonRef.current, {
+          theme: "outline",
+          size: "large",
+          width: buttonRef.current.clientWidth || 360,
+          text: "continue_with",
+          shape: "rectangular",
+        });
+
+        if (!cancelled) {
+          setLoading(false);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          const message =
+            err?.message || "Google sign-in is currently unavailable.";
+          setErrorMessage(message);
+          setLoading(false);
+        }
+      }
+    };
+
+    mountGoogleButton();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchMe, router, setToken]);
+
+  return (
+    <section className="w-full rounded-[28px] bg-white px-6 py-7 shadow-[0_20px_40px_rgba(15,23,42,0.08)]">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-extrabold text-[#0F172A]">
+            Link Google Account
+          </h2>
+          <p className="mt-2 text-sm text-[#64748B]">
+            Connect the Google account that matches your existing email so you can sign in with either method.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <div ref={buttonRef} className="w-full min-h-[48px]" />
+        {loading ? (
+          <div className="flex justify-center py-6">
+            <PromoLoader />
+          </div>
+        ) : null}
+      </div>
+
+      {submitting ? (
+        <p className="mt-4 text-sm text-[#64748B]">Linking your Google account...</p>
+      ) : null}
+
+      {errorMessage ? (
+        <p className="mt-4 text-sm font-medium text-[#DC2626]">{errorMessage}</p>
+      ) : null}
+
+      <div className="mt-6">
+        <button
+          type="button"
+          onClick={() => router.replace("/profile")}
+          className="text-sm font-semibold text-[#2457E6]"
+        >
+          Back to profile
+        </button>
+      </div>
+    </section>
+  );
+}

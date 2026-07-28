@@ -6,15 +6,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { loginApi } from "@/services/auth.service";
 import { useAuthFlowStore } from "@/store/authFlow.store";
 import { useAuthStore } from "@/store/auth.store";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import toast from "react-hot-toast";
-import { getAuthRedirectFromLocation } from "@/lib/authRedirect";
+import { startGoogleLogin } from "@/lib/googleAuth";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const setFlow = useAuthFlowStore((state) => state.setFlow);
   const setToken = useAuthStore((state) => state.setToken);
   const setUser = useAuthStore((state) => state.setUser);
@@ -23,6 +25,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const pendingLinkToken = searchParams?.get("pendingLinkToken") || "";
+  const email = searchParams?.get("email") || "";
 
   // 🔐 VALIDATION
   const validate = () => {
@@ -50,6 +54,7 @@ export default function LoginPage() {
         phone: `+91${phone}`,
         password,
         purpose: "LOGIN",
+        ...(pendingLinkToken ? { pendingLinkToken } : {}),
       });
 
       const payload = res?.data ?? res ?? {};
@@ -66,7 +71,7 @@ export default function LoginPage() {
         toast.dismiss(toastId);
         toast.success("Login successful");
 
-        router.replace(getAuthRedirectFromLocation());
+        router.replace("/course");
 
       } else {
         throw new Error("Token missing in response");
@@ -108,14 +113,25 @@ export default function LoginPage() {
 //   router.push("/phone/enter-phone");
 // };
 
-const handleOtpLogin = () => {
+  const handleOtpLogin = () => {
+    const params = new URLSearchParams();
+    params.set("purpose", "LOGIN");
+
+    if (pendingLinkToken) {
+      params.set("pendingLinkToken", pendingLinkToken);
+    }
+
+    if (email) {
+      params.set("email", email);
+    }
+
   setFlow({
     purpose: "LOGIN",
     title: "Login with OTP",
     subtitle: "Enter your phone number to login.",
   });
 
-  router.push("/phone/enter-phone?purpose=LOGIN");
+  router.push(`/phone/enter-phone?${params.toString()}`);
 };
 
   const handleCreateAccount = () => {
@@ -245,14 +261,15 @@ const handleOtpLogin = () => {
             {loading ? "Signing In..." : "Sign In"}
           </button>
 
-          {/* <div className="flex items-center my-8">
+          <div className="flex items-center my-8">
             <div className="flex-1 h-px bg-[#E2E8F0]" />
             <span className="mx-4 text-sm text-[#94A3B8]">OR</span>
             <div className="flex-1 h-px bg-[#E2E8F0]" />
-          </div> */}
+          </div> 
 
-          {/* <button
+          <button
             type="button"
+            onClick={startGoogleLogin}
             className="w-full h-14 rounded-xl border text-[#334155] border-[#CBD5E1]
              flex items-center justify-center gap-3
              font-semibold hover:bg-[#F8FAFC]"
@@ -262,8 +279,8 @@ const handleOtpLogin = () => {
               alt="Google"
               className="w-5 h-5"
             />
-            Sign in with Google
-          </button> */}
+            Continue with Google
+          </button> 
 
         </form>
 
