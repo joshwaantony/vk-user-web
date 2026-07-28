@@ -244,15 +244,9 @@ export const useAuthStore = create(
       },
 
       /* ================= VERIFY OTP ================= */
-      verifyOtp: async (input) => {
+      verifyOtp: async (otp) => {
         try {
           const { phone, purpose } = get();
-          const otp =
-            typeof input === "string" ? input : input?.otp;
-          const pendingLinkToken =
-            typeof input === "object" && input
-              ? input.pendingLinkToken
-              : "";
 
           if (!phone || !purpose)
             throw new Error("Phone or purpose missing");
@@ -263,7 +257,6 @@ export const useAuthStore = create(
             phone,
             otp,
             purpose,
-            ...(pendingLinkToken ? { pendingLinkToken } : {}),
           });
 
           const payload = getAuthPayload(res);

@@ -8,6 +8,12 @@ export const loginApi = async (payload) => {
   return response.data;
 };
 
+/* ================= GOOGLE TOKEN LOGIN ================= */
+export const googleTokenLoginApi = async (payload) => {
+  const response = await api.post("/auth/google/token", payload);
+  return response.data;
+};
+
 /* ================= SEND OTP ================= */
 export const sendOtpApi = async (payload) => {
   const response = await api.post("/auth/otp/send", payload);
@@ -17,6 +23,18 @@ export const sendOtpApi = async (payload) => {
 /* ================= VERIFY OTP ================= */
 export const verifyOtpApi = async (payload) => {
   const response = await api.post("/auth/otp/verify", payload);
+  return response.data;
+};
+
+/* ================= AUTHENTICATED PHONE OTP SEND ================= */
+export const sendMePhoneOtpApi = async (payload) => {
+  const response = await api.post("/auth/me/phone/otp/send", payload);
+  return response.data;
+};
+
+/* ================= AUTHENTICATED PHONE OTP VERIFY ================= */
+export const verifyMePhoneOtpApi = async (payload) => {
+  const response = await api.post("/auth/me/phone/otp/verify", payload);
   return response.data;
 };
 

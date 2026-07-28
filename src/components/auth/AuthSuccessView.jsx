@@ -5,10 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import PromoLoader from "@/components/loader/PromoLoader";
 import { useAuthStore } from "@/store/auth.store";
-import {
-  consumeGoogleAuthRedirect,
-  handleGoogleSuccessRedirect,
-} from "@/lib/googleAuth";
+import { handleGoogleSuccessRedirect } from "@/lib/googleAuth";
 
 export default function AuthSuccessView() {
   const router = useRouter();
@@ -59,7 +56,7 @@ export default function AuthSuccessView() {
       toast.success("Signed in");
       setStatus("done");
 
-      router.replace(consumeGoogleAuthRedirect("/course"));
+      router.replace("/course");
     };
 
     completeSignIn();

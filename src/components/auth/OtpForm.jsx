@@ -8,6 +8,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import toast from "react-hot-toast";
+import { hasGoogleLinkPending, setGoogleLinkContext } from "@/lib/googleLink";
 
 export default function OtpVerifyPage() {
   const router = useRouter();
@@ -28,6 +29,12 @@ export default function OtpVerifyPage() {
   const [showResendAttention, setShowResendAttention] = useState(false);
   const pendingLinkToken = searchParams?.get("pendingLinkToken") || "";
   const email = searchParams?.get("email") || "";
+
+  useEffect(() => {
+    if (pendingLinkToken || email) {
+      setGoogleLinkContext({ pendingLinkToken, email });
+    }
+  }, [email, pendingLinkToken]);
 
   const inputsRef = useRef([]);
   const formattedPhone = phone
@@ -93,15 +100,14 @@ export default function OtpVerifyPage() {
       return;
     }
 
-    const result = await verifyOtp({
-      otp: otpValue,
-      ...(pendingLinkToken ? { pendingLinkToken } : {}),
-    });
+    const result = await verifyOtp(otpValue);
 
     if (result.outcome === "login") {
       // Existing user — logged in via OTP
       toast.success("Welcome back!");
-      router.replace("/course");
+      router.replace(
+        hasGoogleLinkPending() ? "/profile/link-google" : "/course"
+      );
     } else if (result.outcome === "signup") {
       // New user — proceed to registration form
       toast.success("OTP verified. Complete your registration.");

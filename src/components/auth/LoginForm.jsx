@@ -4,15 +4,18 @@
 
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { loginApi } from "@/services/auth.service";
 import { useAuthFlowStore } from "@/store/authFlow.store";
 import { useAuthStore } from "@/store/auth.store";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { startGoogleLogin } from "@/lib/googleAuth";
+import {
+  hasGoogleLinkPending,
+  setGoogleLinkContext,
+} from "@/lib/googleLink";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,6 +30,12 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const pendingLinkToken = searchParams?.get("pendingLinkToken") || "";
   const email = searchParams?.get("email") || "";
+
+  useEffect(() => {
+    if (pendingLinkToken || email) {
+      setGoogleLinkContext({ pendingLinkToken, email });
+    }
+  }, [email, pendingLinkToken]);
 
   // 🔐 VALIDATION
   const validate = () => {
@@ -54,7 +63,6 @@ export default function LoginPage() {
         phone: `+91${phone}`,
         password,
         purpose: "LOGIN",
-        ...(pendingLinkToken ? { pendingLinkToken } : {}),
       });
 
       const payload = res?.data ?? res ?? {};
@@ -71,7 +79,9 @@ export default function LoginPage() {
         toast.dismiss(toastId);
         toast.success("Login successful");
 
-        router.replace("/course");
+        router.replace(
+          hasGoogleLinkPending() ? "/profile/link-google" : "/course"
+        );
 
       } else {
         throw new Error("Token missing in response");
@@ -117,22 +127,17 @@ export default function LoginPage() {
     const params = new URLSearchParams();
     params.set("purpose", "LOGIN");
 
-    if (pendingLinkToken) {
-      params.set("pendingLinkToken", pendingLinkToken);
-    }
+    if (pendingLinkToken) params.set("pendingLinkToken", pendingLinkToken);
+    if (email) params.set("email", email);
 
-    if (email) {
-      params.set("email", email);
-    }
+    setFlow({
+      purpose: "LOGIN",
+      title: "Login with OTP",
+      subtitle: "Enter your phone number to login.",
+    });
 
-  setFlow({
-    purpose: "LOGIN",
-    title: "Login with OTP",
-    subtitle: "Enter your phone number to login.",
-  });
-
-  router.push(`/phone/enter-phone?${params.toString()}`);
-};
+    router.push(`/phone/enter-phone?${params.toString()}`);
+  };
 
   const handleCreateAccount = () => {
     setFlow({

@@ -7,7 +7,8 @@ import PromoLoader from "@/components/loader/PromoLoader";
 import { useAuthStore } from "@/store/auth.store";
 import { linkGoogleAccountApi } from "@/services/auth.service";
 import {
-  clearGoogleLinkPending,
+  clearGoogleLinkContext,
+  getGoogleLinkContext,
   getGoogleClientId,
   loadGoogleIdentityScript,
 } from "@/lib/googleLink";
@@ -37,6 +38,7 @@ export default function GoogleLinkAccountCard() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const { email } = getGoogleLinkContext();
 
   useEffect(() => {
     let cancelled = false;
@@ -86,7 +88,7 @@ export default function GoogleLinkAccountCard() {
               }
 
               setToken(accessToken);
-              clearGoogleLinkPending();
+              clearGoogleLinkContext();
 
               try {
                 await fetchMe();
@@ -148,6 +150,11 @@ export default function GoogleLinkAccountCard() {
           <p className="mt-2 text-sm text-[#64748B]">
             Connect the Google account that matches your existing email so you can sign in with either method.
           </p>
+          {email ? (
+            <p className="mt-3 rounded-2xl bg-[#F8FBFF] px-4 py-3 text-sm font-medium text-[#1D4ED8]">
+              Matched email: {email}
+            </p>
+          ) : null}
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 import AuthSuccessView from "@/components/auth/AuthSuccessView";
 
-export default function GoogleAuthSuccessPage() {
+export default function GoogleCallbackPage() {
   return <AuthSuccessView />;
 }

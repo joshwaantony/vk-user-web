@@ -264,7 +264,20 @@ export default function ProfilePage() {
             <InfoField
               icon={<FiPhone />}
               label="Phone Number"
-              value={user?.phone || "-"}
+              value={
+                <div className="flex w-full items-center justify-between gap-3">
+                  <span>{user?.phone || "-"}</span>
+                  {!user?.phone ? (
+                    <button
+                      type="button"
+                      onClick={() => router.push("/profile/add-phone")}
+                      className="shrink-0 rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] px-3 py-2 text-xs font-semibold text-[#1D4ED8] hover:bg-[#DBEAFE]"
+                    >
+                      Add Phone
+                    </button>
+                  ) : null}
+                </div>
+              }
             />
             <InfoField
               icon={<FiMail />}
@@ -312,6 +325,16 @@ export default function ProfilePage() {
 
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+            {!user?.phone ? (
+              <button
+                onClick={() => router.push("/profile/add-phone")}
+                className="w-full border border-[#BFDBFE] bg-[#EFF6FF] text-[#1D4ED8] hover:bg-[#DBEAFE] py-3 sm:py-4 rounded-xl flex items-center justify-center gap-2 transition text-sm sm:text-base font-semibold"
+              >
+                <FiPhone />
+                Add Phone Number
+              </button>
+            ) : null}
+
             <button
               onClick={() => router.push("/my-course")}
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 sm:py-4 rounded-xl flex items-center justify-center gap-2 transition text-sm sm:text-base"
