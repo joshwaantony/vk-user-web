@@ -12,6 +12,7 @@ import { FiLogOut, FiMenu, FiUser } from "react-icons/fi";
 import { useAuthStore } from "@/store/auth.store";
 import { logoutApi } from "@/services/auth.service";
 import { clearSessionData } from "@/lib/session";
+import { hasGoogleLinkPending } from "@/lib/googleLink";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -19,6 +20,7 @@ export default function Header() {
   const [mounted, setMounted] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [googleLinkPending, setGoogleLinkPending] = useState(false);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -32,6 +34,12 @@ export default function Header() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    setGoogleLinkPending(hasGoogleLinkPending());
+  }, [mounted, pathname]);
 
   /* ---------------- Shrink on Scroll (Mobile Only) ---------------- */
   useEffect(() => {
@@ -146,7 +154,16 @@ export default function Header() {
                 </button>
               </Link>
             ) : (
-              <>
+              <div className="flex items-center gap-4">
+                {googleLinkPending && pathname !== "/profile/link-google" ? (
+                  <Link
+                    href="/profile/link-google"
+                    className="rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-2 text-sm font-semibold text-[#1D4ED8] hover:bg-[#DBEAFE] transition"
+                  >
+                    Link Google Account
+                  </Link>
+                ) : null}
+
                 <Link href="/profile">
                   <button className="flex items-center justify-center w-10 h-10 rounded-full bg-[#EEF2FF] text-[#1C4ED8] hover:bg-[#1C4ED8] hover:text-white transition-all duration-300 shadow-sm">
                     <FiUser size={18} />
@@ -159,7 +176,7 @@ export default function Header() {
                 >
                   Logout
                 </button>
-              </>
+              </div>
             )}
           </div>
 
@@ -219,6 +236,12 @@ export default function Header() {
               </Link>
             )}
 
+            {isLoggedIn && googleLinkPending && pathname !== "/profile/link-google" ? (
+              <Link href="/profile/link-google" onClick={() => setOpen(false)}>
+                Link Google Account
+              </Link>
+            ) : null}
+
             <Link href="/contact" onClick={() => setOpen(false)}>
               Contact
             </Link>
@@ -232,15 +255,27 @@ export default function Header() {
                 </button>
               </Link>
             ) : (
-              <button
-                onClick={() => {
-                  setOpen(false);
-                  setShowLogoutModal(true);
-                }}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg w-full font-semibold"
-              >
-                Logout
-              </button>
+              <div className="space-y-3">
+                {googleLinkPending && pathname !== "/profile/link-google" ? (
+                  <Link
+                    href="/profile/link-google"
+                    onClick={() => setOpen(false)}
+                    className="block w-full rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-2 text-center font-semibold text-[#1D4ED8]"
+                  >
+                    Link Google Account
+                  </Link>
+                ) : null}
+
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    setShowLogoutModal(true);
+                  }}
+                  className="bg-red-500 text-white px-4 py-2 rounded-lg w-full font-semibold"
+                >
+                  Logout
+                </button>
+              </div>
             )}
           </div>
         </div>

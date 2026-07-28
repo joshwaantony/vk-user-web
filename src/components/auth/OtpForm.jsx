@@ -5,12 +5,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import toast from "react-hot-toast";
 
 export default function OtpVerifyPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const {
     verifyOtp,
@@ -25,6 +26,8 @@ export default function OtpVerifyPage() {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [timeLeft, setTimeLeft] = useState(expiresIn || 0);
   const [showResendAttention, setShowResendAttention] = useState(false);
+  const pendingLinkToken = searchParams?.get("pendingLinkToken") || "";
+  const email = searchParams?.get("email") || "";
 
   const inputsRef = useRef([]);
   const formattedPhone = phone
@@ -90,7 +93,10 @@ export default function OtpVerifyPage() {
       return;
     }
 
-    const result = await verifyOtp(otpValue);
+    const result = await verifyOtp({
+      otp: otpValue,
+      ...(pendingLinkToken ? { pendingLinkToken } : {}),
+    });
 
     if (result.outcome === "login") {
       // Existing user — logged in via OTP
@@ -147,6 +153,12 @@ export default function OtpVerifyPage() {
           </p>
         </div>
       )}
+
+      {email ? (
+        <p className="mb-4 text-xs text-[#64748B]">
+          We’ll link this Google account to {email} after you confirm the phone number.
+        </p>
+      ) : null}
 
       <div className="flex justify-center gap-4 mb-4">
         {otp.map((digit, i) => (

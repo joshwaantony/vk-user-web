@@ -61,3 +61,9 @@ export const logoutApi = async () => {
   const response = await api.post("/auth/logout", {});
   return response.data;
 };
+
+/* ================= GOOGLE ACCOUNT LINK ================= */
+export const linkGoogleAccountApi = async (payload) => {
+  const response = await api.post("/auth/google/link", payload);
+  return response.data;
+};

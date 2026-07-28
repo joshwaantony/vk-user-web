@@ -28,13 +28,31 @@ export default async function Page({ searchParams }) {
   const { title, subtitle, purpose } = getFlowCopy(
     resolvedSearchParams?.purpose
   );
+  const nextRouteParams = new URLSearchParams();
+
+  if (resolvedSearchParams?.pendingLinkToken) {
+    nextRouteParams.set(
+      "pendingLinkToken",
+      resolvedSearchParams.pendingLinkToken
+    );
+  }
+
+  if (resolvedSearchParams?.email) {
+    nextRouteParams.set("email", resolvedSearchParams.email);
+  }
+
+  const nextRouteQuery = nextRouteParams.toString();
 
   return (
     <PhoneForm
       title={title}
       subtitle={subtitle}
       purpose={purpose}
-      nextRoute="/phone/verify"
+      nextRoute={
+        nextRouteQuery
+          ? `/phone/verify?${nextRouteQuery}`
+          : "/phone/verify"
+      }
     />
   );
 }
