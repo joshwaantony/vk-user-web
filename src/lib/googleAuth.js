@@ -9,16 +9,21 @@ export const GOOGLE_AUTH_START_URL = `${API_ORIGIN}/api/v1/auth/google`;
 export const startGoogleLogin = () => {
   if (typeof window === "undefined") return;
 
-  const redirect = getSafeAuthRedirect(
-    new URLSearchParams(window.location.search).get("redirect"),
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectFromUrl = getSafeAuthRedirect(searchParams.get("redirect"), "");
+  const redirectFromSession = getSafeAuthRedirect(
+    sessionStorage.getItem(GOOGLE_AUTH_REDIRECT_KEY),
     ""
   );
+  const redirect = redirectFromUrl || redirectFromSession || "/course";
+  const startUrl = new URL(GOOGLE_AUTH_START_URL);
+  startUrl.searchParams.set("redirect", redirect);
 
   console.info("[google-auth] starting login", {
     pathname: window.location.pathname,
-    redirect: redirect || null,
+    redirect,
     apiOrigin: API_ORIGIN,
-    startUrl: GOOGLE_AUTH_START_URL,
+    startUrl: startUrl.toString(),
   });
 
   if (redirect) {
@@ -27,7 +32,7 @@ export const startGoogleLogin = () => {
     sessionStorage.removeItem(GOOGLE_AUTH_REDIRECT_KEY);
   }
 
-  window.location.href = GOOGLE_AUTH_START_URL;
+  window.location.href = startUrl.toString();
 };
 
 export const handleGoogleSuccessRedirect = () => {

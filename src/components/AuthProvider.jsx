@@ -16,11 +16,26 @@ export default function AuthProvider({ children }) {
   const pathname = usePathname();
 
   const user = useAuthStore((state) => state.user);
+  const setToken = useAuthStore((state) => state.setToken);
   const initAuth = useAuthStore((state) => state.initAuth);
   const restoreSession = useAuthStore((state) => state.restoreSession);
 
   useEffect(() => {
     const initializeSession = async () => {
+      if (typeof window !== "undefined") {
+        const currentUrl = new URL(window.location.href);
+        const accessToken = currentUrl.searchParams.get("accessToken");
+
+        if (accessToken) {
+          setToken(accessToken);
+          currentUrl.searchParams.delete("accessToken");
+
+          const nextSearch = currentUrl.searchParams.toString();
+          const nextUrl = `${currentUrl.pathname}${nextSearch ? `?${nextSearch}` : ""}${currentUrl.hash}`;
+          window.history.replaceState({}, document.title, nextUrl);
+        }
+      }
+
       initAuth();
       const sessionState = await restoreSession();
 
@@ -31,7 +46,7 @@ export default function AuthProvider({ children }) {
     };
 
     initializeSession();
-  }, [initAuth, restoreSession, router]);
+  }, [initAuth, restoreSession, router, setToken]);
 
   useEffect(() => {
     const isLoggedIn = !!user;

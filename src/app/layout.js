@@ -1,21 +1,9 @@
 
-
-import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/AuthProvider";
 import { absoluteUrl, seoConfig } from "@/lib/seo";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata = {
   metadataBase: new URL(seoConfig.siteUrl),
@@ -65,9 +53,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="antialiased">
         {/* ✅ Razorpay SDK */}
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
@@ -84,11 +70,9 @@ export default function RootLayout({ children }) {
 
         {/* ✅ Auth Initialization */}
         <AuthProvider>
-
-        {/* ✅ App Content */}
-        {children}
-      </AuthProvider>
-      
+          {/* ✅ App Content */}
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

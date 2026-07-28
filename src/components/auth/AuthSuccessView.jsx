@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import toast from "react-hot-toast";
 import PromoLoader from "@/components/loader/PromoLoader";
 import { useAuthStore } from "@/store/auth.store";
-import { handleGoogleSuccessRedirect } from "@/lib/googleAuth";
+import {
+  consumeGoogleAuthRedirect,
+  handleGoogleSuccessRedirect,
+} from "@/lib/googleAuth";
 
 export default function AuthSuccessView() {
   const router = useRouter();
@@ -22,6 +24,8 @@ export default function AuthSuccessView() {
       });
 
       const errorCode = searchParams?.get("error") || searchParams?.get("code");
+      const pendingLinkToken = searchParams?.get("pendingLinkToken") || "";
+      const email = searchParams?.get("email") || "";
 
       if (errorCode) {
         console.warn("[auth-success] backend returned auth error", {
@@ -30,7 +34,19 @@ export default function AuthSuccessView() {
           search: window.location.search,
         });
         setStatus("error");
-        router.replace(`/auth/failure?error=${encodeURIComponent(errorCode)}`);
+
+        const failureParams = new URLSearchParams();
+        failureParams.set("error", errorCode);
+
+        if (pendingLinkToken) {
+          failureParams.set("pendingLinkToken", pendingLinkToken);
+        }
+
+        if (email) {
+          failureParams.set("email", email);
+        }
+
+        router.replace(`/auth/failure?${failureParams.toString()}`);
         return;
       }
 
@@ -46,17 +62,14 @@ export default function AuthSuccessView() {
       }
 
       setToken(result.accessToken);
-
-      try {
-        await fetchMe();
-      } catch (error) {
+      void fetchMe().catch((error) => {
         console.error("Failed to restore session:", error);
-      }
+      });
 
-      toast.success("Signed in");
+      const target = consumeGoogleAuthRedirect("/course");
       setStatus("done");
 
-      router.replace("/course");
+      window.location.replace(target);
     };
 
     completeSignIn();
@@ -66,20 +79,20 @@ export default function AuthSuccessView() {
 
   return (
     <main className="min-h-screen bg-[#F3F8FF] flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-[420px] rounded-[28px] bg-white px-8 py-10 text-center shadow-[0_20px_40px_rgba(15,23,42,0.08)]">
-        <div className="flex justify-center mb-6">
+      <div className="flex flex-col items-center text-center">
+        <div className="mb-5">
           <img src="/logo.svg" alt="Logo" className="h-16 w-16" />
         </div>
 
-        <h1 className="text-3xl font-extrabold text-[#0F172A]">
-          Completing sign-in
-        </h1>
-
-        <p className="mt-2 text-[#64748B]">
-          We’re restoring your session and sending you into the app.
+        <p className="text-lg font-semibold text-[#0F172A]">
+          Signing you in
         </p>
 
-        <div className="mt-8 flex justify-center">
+        <p className="mt-2 text-sm text-[#64748B]">
+          One moment while we take you into the app.
+        </p>
+
+        <div className="mt-6">
           <PromoLoader />
         </div>
 

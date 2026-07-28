@@ -2,6 +2,7 @@
 
 import LoginPage from "@/components/auth/LoginForm";
 import React, { useEffect } from "react";
+import { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import PromoLoader from "@/components/loader/PromoLoader";
@@ -25,9 +26,13 @@ function page() {
     );
   }
 
-  return <div className="">
-    <LoginPage/>
-  </div>;
+  return (
+    <div className="">
+      <Suspense fallback={null}>
+        <LoginPage />
+      </Suspense>
+    </div>
+  );
 }
 
 export default page;

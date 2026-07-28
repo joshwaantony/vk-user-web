@@ -1,6 +1,6 @@
-
-
 "use client";
+
+import { Suspense } from "react";
 import OtpVerifyPage from "@/components/auth/OtpForm";
 import { useRouter } from "next/navigation";
 
@@ -23,7 +23,9 @@ function page() {
         We’ve sent a one-time verification code
       </p>
 <div className="">
-        <OtpVerifyPage/>
+        <Suspense fallback={null}>
+          <OtpVerifyPage />
+        </Suspense>
 
   </div>        <p className="mt-8 text-[#64748B] mb-10">
           Wrong number ? {" "}

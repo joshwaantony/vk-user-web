@@ -3,7 +3,8 @@
 import { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getGoogleErrorMessage, startGoogleLogin } from "@/lib/googleAuth";
+import { FiArrowRight } from "react-icons/fi";
+import { getGoogleErrorMessage } from "@/lib/googleAuth";
 import { setGoogleLinkContext } from "@/lib/googleLink";
 
 export default function GoogleAuthErrorView() {
@@ -86,41 +87,29 @@ export default function GoogleAuthErrorView() {
         ) : null}
 
         <div className="mt-8 flex flex-col gap-3">
-          <button
-            type="button"
-            onClick={startGoogleLogin}
-            className="w-full h-14 rounded-xl bg-[#2457E6] text-white font-semibold text-lg shadow-[0_10px_20px_rgba(36,87,230,0.35)] hover:bg-[#1E4ED8] transition"
-          >
-            Try again
-          </button>
-
           <Link
             href={loginHref}
-            className="w-full h-14 rounded-xl border border-[#CBD5E1] text-[#334155] font-semibold flex items-center justify-center hover:bg-[#F8FAFC]"
+            className="group flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#2457E6] px-5 font-semibold text-white shadow-[0_10px_24px_rgba(36,87,230,0.28)] transition hover:-translate-y-0.5 hover:bg-[#1E4ED8]"
           >
             Continue with Password
+            <FiArrowRight className="transition-transform group-hover:translate-x-0.5" />
           </Link>
 
           {isAccountLinkRequired ? (
             <Link
               href={otpHref}
-              className="w-full h-14 rounded-xl border border-[#CBD5E1] text-[#334155] font-semibold flex items-center justify-center hover:bg-[#F8FAFC]"
+              className="group flex h-14 w-full items-center justify-center gap-2 rounded-xl border border-[#BFDBFE] bg-[#F8FBFF] px-5 font-semibold text-[#1D4ED8] transition hover:-translate-y-0.5 hover:bg-[#EFF6FF]"
             >
               Continue with OTP
+              <FiArrowRight className="transition-transform group-hover:translate-x-0.5" />
             </Link>
           ) : null}
         </div>
 
-        {errorCode ? (
-          <p className="mt-6 text-xs text-[#94A3B8]">
-            Error code: {errorCode}
-          </p>
-        ) : null}
-
         <button
           type="button"
           onClick={() => router.back()}
-          className="mt-4 text-sm font-medium text-[#2457E6]"
+          className="mt-4 text-sm font-semibold text-[#2457E6] transition hover:text-[#1E4ED8] hover:underline"
         >
           Go back
         </button>
