@@ -68,6 +68,12 @@ export const updateMeApi = async (payload) => {
   return response.data;
 };
 
+/* ================= UPDATE CURRENT USER PASSWORD ================= */
+export const updateMePasswordApi = async (payload) => {
+  const response = await api.patch("/auth/me/password", payload);
+  return response.data;
+};
+
 /* ================= REFRESH ACCESS TOKEN ================= */
 export const refreshSessionApi = async () => {
   const response = await api.post("/auth/refresh", {});

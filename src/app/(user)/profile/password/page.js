@@ -3,16 +3,16 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PromoLoader from "@/components/loader/PromoLoader";
-import PhoneForm from "@/components/auth/PhoneForm";
+import PasswordSetupForm from "@/components/auth/PasswordSetupForm";
 import { useAuthStore } from "@/store/auth.store";
 
-export default function AddPhonePage() {
+export default function ProfilePasswordPage() {
   const router = useRouter();
   const token = useAuthStore((state) => state.token);
 
   useEffect(() => {
     if (!token) {
-      router.replace("/login?redirect=/profile/add-phone");
+      router.replace("/login?redirect=/profile/password");
     }
   }, [router, token]);
 
@@ -25,14 +25,9 @@ export default function AddPhonePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F3F8FF] px-4 py-10">
+    <main className="min-h-screen bg-[#F3F8FF] px-4 py-8 lg:py-12">
       <div className="mx-auto w-full max-w-2xl">
-        <PhoneForm
-          title="Add phone number"
-          subtitle="We’ll send you a one-time verification code to confirm your number."
-          purpose="LINK_PHONE"
-          nextRoute={`/profile/add-phone/verify?next=${encodeURIComponent("/profile/password")}`}
-        />
+        <PasswordSetupForm />
       </div>
     </main>
   );
