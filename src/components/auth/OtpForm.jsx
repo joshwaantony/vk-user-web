@@ -29,6 +29,7 @@ export default function OtpVerifyPage() {
   const [showResendAttention, setShowResendAttention] = useState(false);
   const pendingLinkToken = searchParams?.get("pendingLinkToken") || "";
   const email = searchParams?.get("email") || "";
+  const nextPath = searchParams?.get("next") || "";
 
   useEffect(() => {
     if (pendingLinkToken || email) {
@@ -110,7 +111,7 @@ export default function OtpVerifyPage() {
       );
     } else if (result.outcome === "link-phone") {
       toast.success("Phone number linked");
-      router.replace("/profile");
+      router.replace(nextPath || "/profile/password");
     } else if (result.outcome === "signup") {
       // New user — proceed to registration form
       toast.success("OTP verified. Complete your registration.");

@@ -349,10 +349,10 @@ export default function ProfilePage() {
                   onClick={handleSaveProfile}
                   disabled={isSaving}
                   className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white py-3 sm:py-4 rounded-xl flex items-center justify-center gap-2 transition text-sm sm:text-base"
-                >
-                  <FiEdit />
-                  {isSaving ? "Saving..." : "Save"}
-                </button>
+              >
+                <FiEdit />
+                {isSaving ? "Saving..." : "Save"}
+              </button>
 
                 <button
                   onClick={handleCancelEdit}
@@ -376,6 +376,7 @@ export default function ProfilePage() {
               </button>
             )}
           </div>
+
         </div>
       </div>
      </div>
