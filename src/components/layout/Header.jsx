@@ -155,9 +155,9 @@ export default function Header() {
               </Link>
             ) : (
               <div className="flex items-center gap-4">
-                {googleLinkPending && pathname !== "/profile/link-google" ? (
+                {googleLinkPending && pathname !== "/profile" ? (
                   <Link
-                    href="/profile/link-google"
+                    href="/profile"
                     className="rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-2 text-sm font-semibold text-[#1D4ED8] hover:bg-[#DBEAFE] transition"
                   >
                     Link Google Account
@@ -236,8 +236,8 @@ export default function Header() {
               </Link>
             )}
 
-            {isLoggedIn && googleLinkPending && pathname !== "/profile/link-google" ? (
-              <Link href="/profile/link-google" onClick={() => setOpen(false)}>
+            {isLoggedIn && googleLinkPending && pathname !== "/profile" ? (
+              <Link href="/profile" onClick={() => setOpen(false)}>
                 Link Google Account
               </Link>
             ) : null}
@@ -256,9 +256,9 @@ export default function Header() {
               </Link>
             ) : (
               <div className="space-y-3">
-                {googleLinkPending && pathname !== "/profile/link-google" ? (
+                {googleLinkPending && pathname !== "/profile" ? (
                   <Link
-                    href="/profile/link-google"
+                    href="/profile"
                     onClick={() => setOpen(false)}
                     className="block w-full rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-2 text-center font-semibold text-[#1D4ED8]"
                   >

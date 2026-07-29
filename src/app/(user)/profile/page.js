@@ -18,6 +18,8 @@ import {
 import { useAuthStore } from "@/store/auth.store";
 import { updateMeApi } from "@/services/auth.service";
 import PromoLoader from "@/components/loader/PromoLoader";
+import GoogleLinkModal from "@/components/auth/GoogleLinkModal";
+import { hasGoogleLinkPending } from "@/lib/googleLink";
 
 const formatDate = (value) => {
   if (!value) return "-";
@@ -55,6 +57,7 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [saveSuccess, setSaveSuccess] = useState("");
+  const [showGoogleLinkModal, setShowGoogleLinkModal] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -84,6 +87,12 @@ export default function ProfilePage() {
       address: user?.address || "",
     });
   }, [user]);
+
+  useEffect(() => {
+    if (hasGoogleLinkPending()) {
+      setShowGoogleLinkModal(true);
+    }
+  }, [token, user]);
 
   const handleInputChange = (field) => (event) => {
     setFormData((prev) => ({
@@ -169,6 +178,29 @@ export default function ProfilePage() {
       </div>
 
       {/* Main Grid */}
+      {hasGoogleLinkPending() ? (
+        <div className="mb-6 rounded-3xl border border-[#BFDBFE] bg-[#EFF6FF] px-5 py-4 shadow-sm sm:px-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-bold text-[#0F172A]">
+                Google linking is ready
+              </p>
+              <p className="mt-1 text-sm text-[#64748B]">
+                Finish linking your Google account to enable both sign-in methods.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowGoogleLinkModal(true)}
+              className="rounded-xl bg-[#2457E6] px-4 py-3 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(36,87,230,0.24)] transition hover:bg-[#1E4ED8]"
+            >
+              Continue linking
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
         {/* LEFT SECTION */}
         <div className="space-y-6">
@@ -379,6 +411,11 @@ export default function ProfilePage() {
 
         </div>
       </div>
+
+      <GoogleLinkModal
+        open={showGoogleLinkModal}
+        onClose={() => setShowGoogleLinkModal(false)}
+      />
      </div>
     </div>
   );
