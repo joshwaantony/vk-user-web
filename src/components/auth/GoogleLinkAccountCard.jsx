@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { FiShield } from "react-icons/fi";
+import { FiCheckCircle } from "react-icons/fi";
 import PromoLoader from "@/components/loader/PromoLoader";
 import { useAuthStore } from "@/store/auth.store";
 import { linkGoogleAccountApi } from "@/services/auth.service";
@@ -30,7 +30,7 @@ const getLinkErrorMessage = (err) => {
   };
 };
 
-export default function GoogleLinkAccountCard() {
+export default function GoogleLinkAccountCard({ onClose, onSuccess }) {
   const router = useRouter();
   const buttonRef = useRef(null);
   const setToken = useAuthStore((state) => state.setToken);
@@ -98,7 +98,11 @@ export default function GoogleLinkAccountCard() {
               }
 
               toast.success("Google account linked");
-              router.replace("/profile");
+              if (onSuccess) {
+                onSuccess();
+              } else {
+                router.replace("/profile");
+              }
             } catch (err) {
               const { message, code } = getLinkErrorMessage(err);
               setErrorMessage(message);
@@ -142,85 +146,82 @@ export default function GoogleLinkAccountCard() {
   }, [fetchMe, router, setToken]);
 
   return (
-    <section className="w-full overflow-hidden rounded-[32px] border border-[#E2E8F0] bg-white shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
-      <div className="bg-gradient-to-r from-[#2457E6] to-[#1D4ED8] px-6 py-5 text-white sm:px-8">
-        <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/20">
-            <img src="/google.svg" alt="" className="h-5 w-5" />
-          </span>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">
-              Google
-            </p>
-            <h2 className="mt-1 text-2xl font-extrabold">
-              Confirm and link account
-            </h2>
-          </div>
+    <section className="rounded-[24px] border border-[#E2E8F0] bg-white px-5 py-5 shadow-[0_20px_50px_rgba(15,23,42,0.08)] sm:px-6 sm:py-6">
+      <div className="flex items-center gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#E2E8F0] bg-[#F8FAFC]">
+          <img src="/google.svg" alt="" className="h-6 w-6" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#2457E6]">
+            Google linking
+          </p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight text-[#0F172A] sm:text-2xl">
+            Link your Google account
+          </h2>
         </div>
       </div>
 
-      <div className="px-6 py-7 sm:px-8">
-        <p className="text-sm leading-6 text-[#64748B]">
-          Connect the Google account that matches your existing email so you can sign in with either method.
+      <p className="mt-3 text-sm leading-6 text-[#64748B]">
+        Confirm the account below to connect Google sign-in to your profile.
+      </p>
+
+      {email ? (
+        <div className="mt-5 rounded-2xl border border-[#BFDBFE] bg-[#FBFDFF] px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#4776F5] text-sm font-bold text-white">
+              {String(email).charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1 text-left">
+              <p className="break-words text-sm font-semibold text-[#0F172A] sm:text-[15px]">
+                {email}
+              </p>
+              <p className="mt-0.5 text-xs text-[#64748B]">
+                Matched with your existing profile
+              </p>
+            </div>
+            <FiCheckCircle className="shrink-0 text-[#22C55E]" size={22} />
+          </div>
+        </div>
+      ) : null}
+
+      <div className="mt-5">
+        <div ref={buttonRef} className="w-full min-h-[44px]" />
+        {loading ? (
+          <div className="flex justify-center py-4">
+            <PromoLoader />
+          </div>
+        ) : null}
+      </div>
+
+      {submitting ? (
+        <p className="mt-3 text-xs text-[#64748B]">
+          Linking your Google account...
         </p>
+      ) : null}
 
-        {email ? (
-          <div className="mt-5 rounded-2xl border border-[#BFDBFE] bg-[#F8FBFF] px-4 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1D4ED8]">
-              Matched email
-            </p>
-            <p className="mt-1 break-words text-sm font-semibold text-[#0F172A]">
-              {email}
-            </p>
-          </div>
-        ) : null}
+      {errorMessage ? (
+        <p className="mt-3 text-xs font-medium text-[#DC2626]">
+          {errorMessage}
+        </p>
+      ) : null}
 
-        <div className="mt-6 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
-          <div className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#DBEAFE] text-[#1D4ED8]">
-              <FiShield size={17} />
-            </span>
-            <div>
-              <p className="text-sm font-semibold text-[#0F172A]">
-                Linking is explicit
-              </p>
-              <p className="mt-1 text-sm leading-6 text-[#64748B]">
-                We only connect accounts after you confirm ownership on the existing profile.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <div ref={buttonRef} className="w-full min-h-[48px]" />
-          {loading ? (
-            <div className="flex justify-center py-6">
-              <PromoLoader />
-            </div>
-          ) : null}
-        </div>
-
-        {submitting ? (
-          <p className="mt-4 text-sm text-[#64748B]">
-            Linking your Google account...
-          </p>
-        ) : null}
-
-        {errorMessage ? (
-          <p className="mt-4 text-sm font-medium text-[#DC2626]">
-            {errorMessage}
-          </p>
-        ) : null}
-
-        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-          <button
-            type="button"
-            onClick={() => router.replace("/profile")}
-            className="w-full rounded-xl border border-[#CBD5E1] px-4 py-3 text-sm font-semibold text-[#334155] transition hover:bg-[#F8FAFC]"
-          >
-            Back to profile
-          </button>
-        </div>
+      <div className="mt-5 flex items-center justify-between gap-3">
+        <p className="text-xs text-[#94A3B8]">
+          Secure and reversible from profile settings.
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            if (onClose) {
+              onClose();
+            } else {
+              router.replace("/profile");
+            }
+          }}
+          className="text-sm font-semibold text-[#2457E6] transition hover:text-[#1E4ED8]"
+        >
+          Back
+        </button>
       </div>
     </section>
   );

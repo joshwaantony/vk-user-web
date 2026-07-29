@@ -80,7 +80,7 @@ export default function LoginPage() {
         toast.success("Login successful");
 
         router.replace(
-          hasGoogleLinkPending() ? "/profile/link-google" : "/course"
+          hasGoogleLinkPending() ? "/profile" : "/course"
         );
 
       } else {

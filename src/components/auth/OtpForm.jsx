@@ -107,7 +107,7 @@ export default function OtpVerifyPage() {
       // Existing user — logged in via OTP
       toast.success("Welcome back!");
       router.replace(
-        hasGoogleLinkPending() ? "/profile/link-google" : "/course"
+        hasGoogleLinkPending() ? "/profile" : "/course"
       );
     } else if (result.outcome === "link-phone") {
       toast.success("Phone number linked");
