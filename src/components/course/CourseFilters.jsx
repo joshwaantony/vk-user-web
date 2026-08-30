@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import useCourseStore from "@/store/CourseStore";
 import { FiChevronDown } from "react-icons/fi";
 
@@ -12,9 +12,17 @@ export default function CourseFilters() {
   const [query, setQuery] = useState("");
   const [sortOption, setSortOption] = useState("");
   const [isSortOpen, setIsSortOpen] = useState(false);
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const sortRef = useRef(null);
+  const languageRef = useRef(null);
 
   const {
+    languages,
+    languagesLoading,
+    languagesError,
+    selectedLanguageId,
+    fetchActiveLanguages,
+    setSelectedLanguageId,
     fetchCourses,
     courses,
     loading,
@@ -27,6 +35,11 @@ export default function CourseFilters() {
     { value: "oldest", label: "Oldest" },
     { value: "popular", label: "Popular" },
   ];
+
+  const selectedLanguageLabel = useMemo(() => {
+    const match = languages.find((language) => language.id === selectedLanguageId);
+    return match?.label || "Select language";
+  }, [languages, selectedLanguageId]);
 
   const resolveSortBy = (filterType, optionValue) => {
     if (filterType === "popular") return "POPULAR";
@@ -42,6 +55,9 @@ export default function CourseFilters() {
       if (!sortRef.current?.contains(event.target)) {
         setIsSortOpen(false);
       }
+      if (!languageRef.current?.contains(event.target)) {
+        setIsLanguageOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -55,8 +71,16 @@ export default function CourseFilters() {
 
   /* ================= SEARCH ================= */
   useEffect(() => {
+    fetchActiveLanguages();
+  }, [fetchActiveLanguages]);
+
+  /* ================= SEARCH ================= */
+  useEffect(() => {
+    if (!selectedLanguageId) return;
+
     const timerId = setTimeout(() => {
       fetchCourses({
+        languageId: selectedLanguageId,
         q: query.trim(),
         categoryId: "",
         level: "",
@@ -69,12 +93,21 @@ export default function CourseFilters() {
     }, 350);
 
     return () => clearTimeout(timerId);
-  }, [query, sortOption, activeFilter, fetchCourses]);
+  }, [
+    query,
+    sortOption,
+    activeFilter,
+    selectedLanguageId,
+    fetchCourses,
+  ]);
 
   /* ================= HANDLE FILTER ================= */
   const handleFilterChange = (type) => {
     setActiveFilter(type);
+    if (!selectedLanguageId) return;
+
     fetchCourses({
+      languageId: selectedLanguageId,
       q: query.trim(),
       categoryId: "",
       level: "",
@@ -89,33 +122,125 @@ export default function CourseFilters() {
   return (
     <div className="mt-10 space-y-6">
       
-      {/* TOP ROW – Search + Category */}
-      <div className="flex flex-col lg:flex-row gap-4">
+      {/* TOP ROW – Search + Language + Sort */}
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_340px_260px] gap-4 items-start">
         
         {/* Search */}
-        <div className="relative flex-1">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9CA3AF]">
-            🔍
-          </span>
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search Courses..."
+        <div className="w-full">
+          <label className="mb-2 block text-xs font-medium text-[#475569] opacity-0 select-none">
+            Search
+          </label>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#9CA3AF]">
+              🔍
+            </span>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search Courses..."
+              className="
+                w-full h-[54px]
+                bg-[#F8FAFC]
+                border border-[#C5CDD7]
+                rounded-xl
+                pl-12 pr-4
+                text-black
+                placeholder:text-[#9CA3AF]
+                focus:outline-none
+              "
+            />
+          </div>
+        </div>
+
+        {/* Language Dropdown */}
+        <div className="relative w-full" ref={languageRef}>
+          <label className="mb-2 block text-xs font-medium text-[#475569] opacity-0 select-none">
+            Language
+          </label>
+          <button
+            type="button"
+            onClick={() => setIsLanguageOpen((prev) => !prev)}
+            disabled={languagesLoading || !languages.length}
             className="
               w-full
               bg-[#F8FAFC]
               border border-[#C5CDD7]
               rounded-xl
-              pl-12 pr-4 py-3
-              text-black
-              placeholder:text-[#9CA3AF]
+              h-[54px] px-4
+              text-sm font-medium text-[#0F172A]
+              transition
+              hover:border-[#9AA6B2]
               focus:outline-none
+              focus:ring-2 focus:ring-[#1C3FD1]/20 focus:border-[#1C3FD1]
+              flex items-center justify-between
+              disabled:cursor-not-allowed disabled:opacity-70
             "
-          />
+            aria-haspopup="listbox"
+            aria-expanded={isLanguageOpen}
+          >
+            <span className="truncate">
+              {languagesLoading && !languages.length
+                ? "Loading languages..."
+                : selectedLanguageLabel}
+            </span>
+            <FiChevronDown
+              className={`text-[#1C3FD1] transition-transform ${
+                isLanguageOpen ? "rotate-180" : ""
+              }`}
+              size={18}
+            />
+          </button>
+
+          {isLanguageOpen && languages.length ? (
+            <div
+              className="
+                absolute z-30 mt-2 w-full
+                rounded-xl border border-[#C5CDD7]
+                bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)]
+                p-1
+              "
+              role="listbox"
+              aria-label="Language select"
+            >
+              {languages.map((language) => {
+                const isActive = language.id === selectedLanguageId;
+
+                return (
+                  <button
+                    key={language.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedLanguageId(language.id);
+                      setIsLanguageOpen(false);
+                    }}
+                    className={`
+                      w-full text-left px-3 py-2.5 rounded-lg text-sm transition
+                      ${
+                        isActive
+                          ? "bg-[#1C3FD1] text-white"
+                          : "text-[#0F172A] hover:bg-[#F1F5F9]"
+                      }
+                    `}
+                    role="option"
+                    aria-selected={isActive}
+                  >
+                    {language.label}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+
+          {languagesError ? (
+            <p className="mt-2 text-xs text-red-600">{languagesError}</p>
+          ) : null}
         </div>
 
         {/* Sort Dropdown */}
-        <div className="relative w-full lg:w-[260px]" ref={sortRef}>
+        <div className="relative w-full" ref={sortRef}>
+          <label className="mb-2 block text-xs font-medium text-[#475569] opacity-0 select-none">
+            Sort
+          </label>
           <button
             type="button"
             onClick={() => setIsSortOpen((prev) => !prev)}
@@ -124,7 +249,7 @@ export default function CourseFilters() {
               bg-[#F8FAFC]
               border border-[#C5CDD7]
               rounded-xl
-              px-4 py-3
+              h-[54px] px-4
               text-sm font-medium text-[#0F172A]
               transition
               hover:border-[#9AA6B2]

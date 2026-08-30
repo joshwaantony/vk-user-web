@@ -4,6 +4,7 @@
 
 import { create } from "zustand";
 import {
+  getActiveLanguages,
   getCourses,
   getPopularCourses,
   getCourseById,
@@ -17,6 +18,10 @@ const useCourseStore = create((set, get) => ({
   courses: [],
   popularCoursesTotal: 0,
   course: null,
+  languages: [],
+  selectedLanguageId: "",
+  languagesLoading: false,
+  languagesError: null,
   filters: {
     q: "",
     categoryId: "",
@@ -43,15 +48,87 @@ const useCourseStore = create((set, get) => ({
      ACTIONS
   ===================== */
 
+  fetchActiveLanguages: async () => {
+    try {
+      if (get().languagesLoading) return;
+
+      set({ languagesLoading: true, languagesError: null });
+
+      const languages = await getActiveLanguages();
+      const currentSelectedLanguageId = get().selectedLanguageId;
+      const hasCurrentLanguage = languages.some(
+        (language) => language.id === currentSelectedLanguageId
+      );
+      const selectedLanguageId =
+        hasCurrentLanguage
+          ? currentSelectedLanguageId
+          : languages[0]?.id || "";
+
+      set({
+        languages,
+        selectedLanguageId,
+        languagesLoading: false,
+        languagesError: null,
+      });
+    } catch (err) {
+      set({
+        languagesLoading: false,
+        languagesError:
+          err?.response?.data?.message ||
+          "Failed to load languages",
+      });
+    }
+  },
+
+  setSelectedLanguageId: (languageId) => {
+    const cleanLanguageId = String(languageId || "").trim();
+
+    set((state) => ({
+      selectedLanguageId: cleanLanguageId,
+      filters: {
+        ...state.filters,
+        page: 1,
+      },
+      pagination: {
+        ...state.pagination,
+        page: 1,
+      },
+      error: null,
+    }));
+  },
+
   // 🔎 FILTER + SEARCH COURSES
   fetchCourses: async (params = {}) => {
     try {
+      const nextLanguageId = String(
+        params.languageId || get().selectedLanguageId || ""
+      ).trim();
+
+      if (!nextLanguageId) {
+        set({
+          courses: [],
+          pagination: {
+            ...get().pagination,
+            page: 1,
+            totalItems: 0,
+            totalPages: 1,
+            hasNextPage: false,
+            hasPreviousPage: false,
+          },
+          loading: false,
+          error: null,
+        });
+        return;
+      }
+
       set((state) => ({
         loading: true,
         error: null,
+        selectedLanguageId: nextLanguageId,
         filters: {
           ...state.filters,
           ...params,
+          languageId: nextLanguageId,
           page: params.page ?? 1,
         },
       }));
@@ -59,6 +136,7 @@ const useCourseStore = create((set, get) => ({
       const nextFilters = {
         ...get().filters,
         ...params,
+        languageId: nextLanguageId,
       };
       const { courses, pagination } = await getCourses(nextFilters);
 
@@ -119,7 +197,7 @@ const useCourseStore = create((set, get) => ({
     try {
       set({ loading: true, error: null });
 
-      const courses = await getAllCourses();
+      const courses = await getAllCourses(get().selectedLanguageId);
 
       set({
         courses,
