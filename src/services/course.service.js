@@ -12,15 +12,79 @@ const SORT_BY = {
   PRICE_DESC: "PRICE_DESC",
 };
 
+const normalizeList = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.languages)) return payload.languages;
+  if (Array.isArray(payload?.items)) return payload.items;
+  if (Array.isArray(payload?.data)) return payload.data;
+  return [];
+};
+
+const getLanguageId = (language) =>
+  String(
+    language?.id ??
+      language?._id ??
+      language?.languageId ??
+      language?.code ??
+      ""
+  );
+
+const isActiveLanguage = (language) => {
+  if (language == null || typeof language !== "object") return true;
+
+  if (Object.prototype.hasOwnProperty.call(language, "active")) {
+    return !!language.active;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(language, "isActive")) {
+    return !!language.isActive;
+  }
+
+  if (typeof language.status === "string") {
+    return language.status.toUpperCase() === "ACTIVE";
+  }
+
+  return true;
+};
+
+const normalizeLanguages = (payload) =>
+  normalizeList(payload)
+    .filter(isActiveLanguage)
+    .map((language) => ({
+      ...language,
+      id: getLanguageId(language),
+      label:
+        language?.name ??
+        language?.title ??
+        language?.label ??
+        language?.code ??
+        "Unnamed language",
+    }))
+    .filter((language) => language.id);
+
+export const getActiveLanguages = async () => {
+  const res = await api.get("/languages");
+  const data = res?.data?.data ?? res?.data ?? {};
+
+  return normalizeLanguages(data);
+};
+
 /* ----------------------------------
    GET COURSES (FILTER + SEARCH)
 ---------------------------------- */
 export const getCourses = async (params = {}) => {
+  const languageId = String(params.languageId || "").trim();
+
+  if (!languageId) {
+    throw new Error("languageId is required to load courses");
+  }
+
   const sortBy = params.sortBy || SORT_BY.POPULAR;
   const isPopular = sortBy === SORT_BY.POPULAR;
 
   if (isPopular) {
     const query = new URLSearchParams({
+      languageId,
       page: String(params.page ?? 1),
       limit: String(params.limit ?? 9),
     });
@@ -38,6 +102,7 @@ export const getCourses = async (params = {}) => {
     };
   } else {
     const queryParams = {
+      languageId,
       q: params.q ?? "",
       categoryId: params.categoryId ?? "",
       level: params.level ?? "",
@@ -66,8 +131,9 @@ export const getCourses = async (params = {}) => {
 /* ----------------------------------
    GET ALL COURSES
 ---------------------------------- */
-export const getAllCourses = async () => {
+export const getAllCourses = async (languageId) => {
   const res = await getCourses({
+    languageId,
     sortBy: SORT_BY.POPULAR,
     page: 1,
     limit: 9,
