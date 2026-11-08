@@ -6,6 +6,7 @@
 
 import { useRouter } from "next/navigation";
 import { FiInfo, FiClock, FiAlertCircle } from "react-icons/fi";
+import CourseThumbnail from "@/components/course/CourseThumbnail";
 
 export default function CourseCard({ course }) {
   const router = useRouter();
@@ -38,13 +39,12 @@ export default function CourseCard({ course }) {
     >
       {/* ================= IMAGE ================= */}
       <div className="relative overflow-hidden">
-        <img
-          src={course.image || "/course-placeholder.jpg"}
+        <CourseThumbnail
+          src={course.image}
           alt={course.title || "Course"}
           className="
-            w-full 
-            h-56 sm:h-60 md:h-64 
-            object-cover
+            w-full
+            h-56 sm:h-60 md:h-64
             transition-transform duration-300
             group-hover:scale-110
           "

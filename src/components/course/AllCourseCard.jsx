@@ -11,6 +11,7 @@ import { HiStar } from "react-icons/hi";
 import { useAuthStore } from "@/store/auth.store";
 import CouponPopup from "../Coupon/CouponPopup";
 import { FaUsers } from "react-icons/fa";
+import CourseThumbnail from "./CourseThumbnail";
 
 export default function AllCourseCard({ course }) {
   const router = useRouter();
@@ -73,10 +74,10 @@ export default function AllCourseCard({ course }) {
         className="cursor-pointer bg-white rounded-2xl  shadow-sm hover:shadow-md transition overflow-hidden"
       >
         {/* Thumbnail */}
-        <img
+        <CourseThumbnail
           src={course.thumbnail}
           alt={course.title}
-          className="w-full h-48 object-cover"
+          className="w-full h-48"
         />
 
         {/* Content */}

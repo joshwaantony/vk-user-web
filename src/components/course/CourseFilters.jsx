@@ -5,16 +5,26 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import useCourseStore from "@/store/CourseStore";
-import { FiChevronDown } from "react-icons/fi";
+import { FiChevronDown, FiX } from "react-icons/fi";
+
+// "" = Default: no sortBy is sent, backend returns the admin-configured order.
+const SORT_OPTIONS = [
+  { value: "", label: "Default" },
+  { value: "LATEST", label: "Latest" },
+  { value: "OLDEST", label: "Oldest" },
+  { value: "PRICE_ASC", label: "Price: Low to High" },
+  { value: "PRICE_DESC", label: "Price: High to Low" },
+  { value: "POPULAR", label: "Popular" },
+];
+
+const SEARCH_DEBOUNCE_MS = 350;
 
 export default function CourseFilters() {
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [query, setQuery] = useState("");
-  const [sortOption, setSortOption] = useState("");
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const sortRef = useRef(null);
   const languageRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   const {
     languages,
@@ -23,32 +33,24 @@ export default function CourseFilters() {
     selectedLanguageId,
     fetchActiveLanguages,
     setSelectedLanguageId,
+    setSortBy,
     fetchCourses,
+    filters,
     courses,
     loading,
     pagination,
   } = useCourseStore();
 
-  const sortOptions = [
-    { value: "", label: "All" },
-    { value: "latest", label: "Latest" },
-    { value: "oldest", label: "Oldest" },
-    { value: "popular", label: "Popular" },
-  ];
+  const sortOption = filters.sortBy || "";
+  const activeFilter = sortOption === "POPULAR" ? "popular" : sortOption === "" ? "all" : "";
+
+  const [query, setQuery] = useState(filters.q || "");
+  const [debouncedQuery, setDebouncedQuery] = useState((filters.q || "").trim());
 
   const selectedLanguageLabel = useMemo(() => {
     const match = languages.find((language) => language.id === selectedLanguageId);
     return match?.label || "Select language";
   }, [languages, selectedLanguageId]);
-
-  const resolveSortBy = (filterType, optionValue) => {
-    if (filterType === "popular") return "POPULAR";
-    if (optionValue === "latest") return "LATEST";
-    if (optionValue === "oldest") return "OLDEST";
-    if (optionValue === "popular") return "POPULAR";
-    if (filterType === "all") return "LATEST";
-    return "LATEST";
-  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -69,54 +71,46 @@ export default function CourseFilters() {
     };
   }, []);
 
-  /* ================= SEARCH ================= */
+  /* ================= LANGUAGES ================= */
   useEffect(() => {
     fetchActiveLanguages();
   }, [fetchActiveLanguages]);
 
-  /* ================= SEARCH ================= */
+  /* ================= SEARCH (debounced) ================= */
   useEffect(() => {
-    if (!selectedLanguageId) return;
-
     const timerId = setTimeout(() => {
-      fetchCourses({
-        languageId: selectedLanguageId,
-        q: query.trim(),
-        categoryId: "",
-        level: "",
-        minPrice: 0,
-        maxPrice: 10000,
-        sortBy: resolveSortBy(activeFilter, sortOption),
-        page: 1,
-        limit: 9,
-      });
-    }, 350);
+      setDebouncedQuery(query.trim());
+    }, SEARCH_DEBOUNCE_MS);
 
     return () => clearTimeout(timerId);
-  }, [
-    query,
-    sortOption,
-    activeFilter,
-    selectedLanguageId,
-    fetchCourses,
-  ]);
+  }, [query]);
 
-  /* ================= HANDLE FILTER ================= */
-  const handleFilterChange = (type) => {
-    setActiveFilter(type);
+  /* ================= SINGLE FETCH POINT =================
+     One request per change of language, search or sort.
+     sortBy "" is never sent, so the admin order is used by default. */
+  useEffect(() => {
     if (!selectedLanguageId) return;
 
     fetchCourses({
       languageId: selectedLanguageId,
-      q: query.trim(),
-      categoryId: "",
-      level: "",
-      minPrice: 0,
-      maxPrice: 10000,
-      sortBy: resolveSortBy(type, sortOption),
+      q: debouncedQuery,
+      sortBy: sortOption,
       page: 1,
-      limit: 9,
     });
+  }, [selectedLanguageId, debouncedQuery, sortOption, fetchCourses]);
+
+  /* ================= CLEAR SEARCH =================
+     Reset both values at once so the full list reloads immediately
+     (no debounce wait) and keep focus in the box. */
+  const handleClearSearch = () => {
+    setQuery("");
+    setDebouncedQuery("");
+    searchInputRef.current?.focus();
+  };
+
+  /* ================= HANDLE FILTER BUTTONS ================= */
+  const handleFilterChange = (type) => {
+    setSortBy(type === "popular" ? "POPULAR" : "");
   };
 
   return (
@@ -135,20 +129,48 @@ export default function CourseFilters() {
               🔍
             </span>
             <input
+              ref={searchInputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape" && query) {
+                  e.preventDefault();
+                  handleClearSearch();
+                }
+              }}
               placeholder="Search Courses..."
+              aria-label="Search courses"
               className="
                 w-full h-[54px]
                 bg-[#F8FAFC]
                 border border-[#C5CDD7]
                 rounded-xl
-                pl-12 pr-4
+                pl-12 pr-12
                 text-black
                 placeholder:text-[#9CA3AF]
                 focus:outline-none
               "
             />
+
+            {query ? (
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                aria-label="Clear search"
+                title="Clear search"
+                className="
+                  absolute right-3 top-1/2 -translate-y-1/2
+                  flex h-8 w-8 items-center justify-center
+                  rounded-full
+                  text-[#64748B]
+                  transition
+                  hover:bg-[#E2E8F0] hover:text-[#0F172A]
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1C3FD1]/30
+                "
+              >
+                <FiX size={18} aria-hidden="true" />
+              </button>
+            ) : null}
           </div>
         </div>
 
@@ -261,8 +283,8 @@ export default function CourseFilters() {
             aria-expanded={isSortOpen}
           >
             <span>
-              {sortOptions.find((opt) => opt.value === sortOption)
-                ?.label || "All"}
+              {SORT_OPTIONS.find((opt) => opt.value === sortOption)
+                ?.label || "Default"}
             </span>
             <FiChevronDown
               className={`text-[#1C3FD1] transition-transform ${
@@ -283,15 +305,15 @@ export default function CourseFilters() {
               role="listbox"
               aria-label="Sort courses"
             >
-              {sortOptions.map((option) => {
+              {SORT_OPTIONS.map((option) => {
                 const isActive = sortOption === option.value;
 
                 return (
                   <button
-                    key={option.value || "all"}
+                    key={option.value || "default"}
                     type="button"
                     onClick={() => {
-                      setSortOption(option.value);
+                      setSortBy(option.value);
                       setIsSortOpen(false);
                     }}
                     className={`

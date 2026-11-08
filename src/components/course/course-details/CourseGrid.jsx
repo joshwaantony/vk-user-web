@@ -5,32 +5,38 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import usePopularCourseStore from "@/store/CourseStore";
+import useCourseStore from "@/store/CourseStore";
 import CourseCard from "./CourseCard";
 import AllCourseCardSkeleton from "@/components/loader/AllCourseCardSkeleton";
+import { ErrorWithRetry } from "@/components/course/AllCourses";
+
+const INITIAL_LIMIT = 6;
 
 export default function CourseGrid() {
   const {
-    courses,
-    loading,
+    popularCourses: courses,
+    popularLoading: loading,
+    popularError,
     popularCoursesTotal,
     fetchPopularCourses,
-  } =
-    usePopularCourseStore();
+  } = useCourseStore();
 
-  const [limit, setLimit] = useState(6); 
+  const [limit, setLimit] = useState(INITIAL_LIMIT);
+  const [requested, setRequested] = useState(false);
   const skeletonCount = courses.length || limit;
   const showLoadMoreButton = popularCoursesTotal > limit;
 
+  // GET /courses/popular?page=1&limit=<limit>
   useEffect(() => {
+    setRequested(true);
     fetchPopularCourses(limit);
-  }, [limit]);
+  }, [limit, fetchPopularCourses]);
 
   const handleLoadMore = () => {
     setLimit((prev) => prev + 3);
   };
 
-  if (loading) {
+  if (loading || !requested) {
     return (
       <div
         className="
@@ -54,6 +60,24 @@ export default function CourseGrid() {
     );
   }
 
+
+  if (popularError && !courses.length) {
+    return (
+      <ErrorWithRetry
+        className="mt-12 mb-6"
+        message="We couldn't load popular courses right now. Please check your connection and try again."
+        onRetry={() => fetchPopularCourses(limit)}
+      />
+    );
+  }
+
+  if (!courses.length) {
+    return (
+      <p className="mt-12 mb-6 px-4 text-center text-[#475569]">
+        No popular courses available yet.
+      </p>
+    );
+  }
 
   return (
     <>

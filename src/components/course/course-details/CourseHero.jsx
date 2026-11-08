@@ -6,6 +6,7 @@ import { HiArrowLeft, HiStar } from "react-icons/hi";
 import { FiUsers, FiClock, FiPlay } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import CourseThumbnail from "@/components/course/CourseThumbnail";
 
 export default function CourseHero({ course }) {
   const router = useRouter();
@@ -63,14 +64,18 @@ export default function CourseHero({ course }) {
         transition={{ duration: 0.55, delay: 0.12 }}
       >
         <div className="relative h-[220px] w-full">
-          <motion.img
-            src={course.thumbnail}
-            alt={course.title}
-            className="h-full w-full object-cover"
+          <motion.div
+            className="h-full w-full"
             initial={{ scale: 1.06 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          />
+          >
+            <CourseThumbnail
+              src={course.thumbnail}
+              alt={course.title}
+              className="h-full w-full"
+            />
+          </motion.div>
           <div className="absolute inset-0 bg-black/30" />
           <motion.h1
             className="absolute bottom-4 left-4 text-xl font-bold text-white"

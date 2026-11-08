@@ -3,6 +3,7 @@
 
 import { useRouter } from "next/navigation";
 import { FiCheckCircle, FiClock, FiAward } from "react-icons/fi";
+import CourseThumbnail from "@/components/course/CourseThumbnail";
 
 export default function CompletedCourses({ data = [] }) {
   const router = useRouter();
@@ -51,13 +52,12 @@ export default function CompletedCourses({ data = [] }) {
           >
             {/* ================= IMAGE ================= */}
             <div className="relative overflow-hidden group">
-              <img
+              <CourseThumbnail
                 src={item.course.thumbnail}
                 alt={item.course.title}
                 className="
                   w-full
                   h-52 sm:h-56 md:h-60
-                  object-cover
                   transition-transform duration-300
                   group-hover:scale-110
                 "
