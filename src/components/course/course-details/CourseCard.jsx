@@ -6,6 +6,7 @@ import { FaStar, FaClock, FaUsers } from "react-icons/fa";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import CouponPopup from "@/components/Coupon/CouponPopup";
+import CourseThumbnail from "@/components/course/CourseThumbnail";
 
 function formatCourseDuration(seconds) {
   const totalSeconds = Number(seconds) || 0;
@@ -58,10 +59,10 @@ export default function CourseCard({ course }) {
         className="cursor-pointer bg-white border border-[#C5CDD7] rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition"
       >
         {/* Thumbnail */}
-        <img
-          src={course?.thumbnail || "/fallback.jpg"}
+        <CourseThumbnail
+          src={course?.thumbnail}
           alt={course?.title}
-          className="h-[200px] w-full object-cover"
+          className="h-[200px] w-full"
         />
 
         {/* Content */}

@@ -1,236 +1,279 @@
-
-
-
-
 import { create } from "zustand";
 import {
   getActiveLanguages,
   getCourses,
   getPopularCourses,
   getCourseById,
-  getAllCourses,
 } from "@/services/course.service";
+
+const DEFAULT_LIMIT = 9;
+
+// Default filters: no sortBy (admin-configured order) and no price range.
+const DEFAULT_FILTERS = {
+  q: "",
+  categoryId: "",
+  level: "",
+  minPrice: "",
+  maxPrice: "",
+  sortBy: "",
+  page: 1,
+  limit: DEFAULT_LIMIT,
+};
+
+const EMPTY_PAGINATION = {
+  page: 1,
+  limit: DEFAULT_LIMIT,
+  totalItems: 0,
+  totalPages: 1,
+  hasNextPage: false,
+  hasPreviousPage: false,
+};
+
+const getErrorMessage = (err, fallback) =>
+  err?.response?.data?.message || fallback;
+
+// Every catalog query (new language, search, sort) bumps this generation.
+// Responses from an older generation are discarded so they can never
+// overwrite the currently selected language's courses.
+let catalogGeneration = 0;
+let popularRequestId = 0;
 
 const useCourseStore = create((set, get) => ({
   /* =====================
      STATE
   ===================== */
   courses: [],
-  popularCoursesTotal: 0,
   course: null,
   languages: [],
   selectedLanguageId: "",
   languagesLoading: false,
+  languagesLoaded: false,
   languagesError: null,
-  filters: {
-    q: "",
-    categoryId: "",
-    level: "",
-    minPrice: 0,
-    maxPrice: 10000,
-    sortBy: "POPULAR",
-    page: 1,
-    limit: 9,
-  },
-  pagination: {
-    page: 1,
-    limit: 9,
-    totalItems: 0,
-    totalPages: 1,
-    hasNextPage: false,
-    hasPreviousPage: false,
-  },
+  filters: { ...DEFAULT_FILTERS },
+  pagination: { ...EMPTY_PAGINATION },
   loading: false,
   loadingMore: false,
+  hasLoaded: false,
   error: null,
+
+  // Homepage "Most Popular" – kept separate from the catalog list.
+  popularCourses: [],
+  popularCoursesTotal: 0,
+  popularLoading: false,
+  popularError: null,
 
   /* =====================
      ACTIONS
   ===================== */
 
   fetchActiveLanguages: async () => {
-    try {
-      if (get().languagesLoading) return;
+    if (get().languagesLoading) return;
 
+    try {
       set({ languagesLoading: true, languagesError: null });
 
+      // `languages` is already sorted by the admin-configured sortOrder.
       const languages = await getActiveLanguages();
-      const currentSelectedLanguageId = get().selectedLanguageId;
-      const hasCurrentLanguage = languages.some(
-        (language) => language.id === currentSelectedLanguageId
-      );
-      const selectedLanguageId =
-        hasCurrentLanguage
-          ? currentSelectedLanguageId
-          : languages[0]?.id || "";
+      const currentId = get().selectedLanguageId;
+      const isAvailable =
+        !!currentId && languages.some((language) => language.id === currentId);
+
+      // A page refresh resets the store, so it always starts from the first
+      // language by sortOrder. In-app navigation keeps the student's pick.
+      const selectedLanguageId = isAvailable ? currentId : languages[0]?.id || "";
 
       set({
         languages,
         selectedLanguageId,
         languagesLoading: false,
+        languagesLoaded: true,
         languagesError: null,
       });
     } catch (err) {
       set({
         languagesLoading: false,
-        languagesError:
-          err?.response?.data?.message ||
-          "Failed to load languages",
+        languagesLoaded: true,
+        languagesError: getErrorMessage(err, "Failed to load languages"),
       });
     }
   },
 
+  // Switching language: clear the old list immediately, reset sort to the
+  // admin-configured default, keep the search text.
   setSelectedLanguageId: (languageId) => {
     const cleanLanguageId = String(languageId || "").trim();
+    if (cleanLanguageId === get().selectedLanguageId) return;
+
+    catalogGeneration += 1;
 
     set((state) => ({
       selectedLanguageId: cleanLanguageId,
+      courses: [],
+      pagination: { ...EMPTY_PAGINATION, limit: state.filters.limit },
       filters: {
         ...state.filters,
+        sortBy: "",
         page: 1,
       },
-      pagination: {
-        ...state.pagination,
-        page: 1,
-      },
+      loading: !!cleanLanguageId,
+      loadingMore: false,
+      hasLoaded: false,
       error: null,
     }));
   },
 
-  // 🔎 FILTER + SEARCH COURSES
+  // "" = Default (admin-configured order). Fetching is driven by the caller.
+  setSortBy: (sortBy) => {
+    const nextSortBy = sortBy || "";
+    if (nextSortBy === (get().filters.sortBy || "")) return;
+
+    set((state) => ({
+      filters: { ...state.filters, sortBy: nextSortBy, page: 1 },
+      // The catalog refetches for the new sort right away; show the loader
+      // instead of the previous result's empty message in between.
+      loading: !!state.selectedLanguageId,
+    }));
+  },
+
+  // 🔎 FILTER + SEARCH + SORT COURSES
   fetchCourses: async (params = {}) => {
-    try {
-      const nextLanguageId = String(
-        params.languageId || get().selectedLanguageId || ""
-      ).trim();
+    const languageId = String(
+      params.languageId || get().selectedLanguageId || ""
+    ).trim();
 
-      if (!nextLanguageId) {
-        set({
-          courses: [],
-          pagination: {
-            ...get().pagination,
-            page: 1,
-            totalItems: 0,
-            totalPages: 1,
-            hasNextPage: false,
-            hasPreviousPage: false,
-          },
-          loading: false,
-          error: null,
-        });
-        return;
-      }
+    catalogGeneration += 1;
+    const generation = catalogGeneration;
 
-      set((state) => ({
-        loading: true,
+    if (!languageId) {
+      set({
+        courses: [],
+        pagination: { ...EMPTY_PAGINATION },
+        loading: false,
+        loadingMore: false,
+        hasLoaded: false,
         error: null,
-        selectedLanguageId: nextLanguageId,
-        filters: {
-          ...state.filters,
-          ...params,
-          languageId: nextLanguageId,
-          page: params.page ?? 1,
-        },
-      }));
+      });
+      return;
+    }
 
-      const nextFilters = {
-        ...get().filters,
-        ...params,
-        languageId: nextLanguageId,
-      };
-      const { courses, pagination } = await getCourses(nextFilters);
+    const { languageId: _ignored, ...filterParams } = params;
+    const nextFilters = {
+      ...get().filters,
+      ...filterParams,
+      page: 1,
+    };
 
+    set({
+      loading: true,
+      loadingMore: false,
+      error: null,
+      selectedLanguageId: languageId,
+      filters: nextFilters,
+    });
+
+    try {
+      const { courses, pagination } = await getCourses({
+        ...nextFilters,
+        languageId,
+      });
+
+      if (generation !== catalogGeneration) return;
+
+      // Keep the exact order returned by the API.
       set({
         courses,
         pagination,
         loading: false,
+        hasLoaded: true,
       });
     } catch (err) {
+      if (generation !== catalogGeneration) return;
+
       set({
-        error:
-          err?.response?.data?.message ||
-          "Failed to load courses",
+        courses: [],
+        error: getErrorMessage(err, "Failed to load courses"),
         loading: false,
+        hasLoaded: true,
       });
     }
   },
 
-  // 🔄 LOAD MORE COURSES (for Infinite Scroll)
+  // 🔄 LOAD MORE COURSES (same language + same filters only)
   loadMoreCourses: async () => {
-    const { pagination, filters, loadingMore, loading } = get();
+    const {
+      pagination,
+      filters,
+      loadingMore,
+      loading,
+      selectedLanguageId,
+    } = get();
 
-    // Don't load if already loading, or if there's no next page
-    if (loading || loadingMore || !pagination.hasNextPage) return;
+    if (loading || loadingMore || !pagination.hasNextPage || !selectedLanguageId) {
+      return;
+    }
+
+    const generation = catalogGeneration;
+    const nextPage = (Number(pagination.page) || 1) + 1;
 
     try {
       set({ loadingMore: true });
 
-      const nextPage = pagination.page + 1;
-      const nextFilters = {
+      const { courses: newCourses, pagination: newPagination } = await getCourses({
         ...filters,
+        languageId: selectedLanguageId,
         page: nextPage,
-      };
+      });
 
-      const { courses: newCourses, pagination: newPagination } = await getCourses(nextFilters);
+      // Language, search or sort changed while loading – drop this page.
+      if (generation !== catalogGeneration) return;
 
-      set((state) => ({
-        courses: [...state.courses, ...newCourses],
-        pagination: newPagination,
-        filters: {
-          ...state.filters,
-          page: nextPage,
-        },
-        loadingMore: false,
-      }));
+      set((state) => {
+        const seen = new Set(state.courses.map((course) => course.id));
+        return {
+          courses: [
+            ...state.courses,
+            ...newCourses.filter((course) => !seen.has(course.id)),
+          ],
+          pagination: newPagination,
+          filters: { ...state.filters, page: nextPage },
+          loadingMore: false,
+        };
+      });
     } catch (err) {
+      if (generation !== catalogGeneration) return;
+
       set({
-        error:
-          err?.response?.data?.message ||
-          "Failed to load more courses",
+        error: getErrorMessage(err, "Failed to load more courses"),
         loadingMore: false,
       });
     }
   },
 
-  // 📚 ALL COURSES (from /courses)
-  fetchAllCourses: async () => {
-    try {
-      set({ loading: true, error: null });
-
-      const courses = await getAllCourses(get().selectedLanguageId);
-
-      set({
-        courses,
-        loading: false,
-      });
-    } catch (err) {
-      set({
-        error:
-          err?.response?.data?.message ||
-          "Failed to load courses",
-        loading: false,
-      });
-    }
-  },
-
-  // 🔥 POPULAR COURSES
+  // 🔥 POPULAR COURSES (homepage, GET /courses/popular)
   fetchPopularCourses: async (limit = 6) => {
+    popularRequestId += 1;
+    const requestId = popularRequestId;
+
     try {
-      set({ loading: true, error: null });
+      set({ popularLoading: true, popularError: null });
 
       const { courses, total } = await getPopularCourses(limit);
 
+      if (requestId !== popularRequestId) return;
+
       set({
-        courses,
+        popularCourses: courses,
         popularCoursesTotal: total,
-        loading: false,
+        popularLoading: false,
       });
     } catch (err) {
+      if (requestId !== popularRequestId) return;
+
       set({
-        error:
-          err?.response?.data?.message ||
-          "Failed to load courses",
-        loading: false,
+        popularCourses: [],
+        popularCoursesTotal: 0,
+        popularError: getErrorMessage(err, "Failed to load courses"),
+        popularLoading: false,
       });
     }
   },
@@ -248,9 +291,7 @@ const useCourseStore = create((set, get) => ({
       });
     } catch (err) {
       set({
-        error:
-          err?.response?.data?.message ||
-          "Failed to load course",
+        error: getErrorMessage(err, "Failed to load course"),
         loading: false,
       });
     }
@@ -266,9 +307,7 @@ const useCourseStore = create((set, get) => ({
       return course;
     } catch (err) {
       set({
-        error:
-          err?.response?.data?.message ||
-          "Failed to refresh course",
+        error: getErrorMessage(err, "Failed to refresh course"),
       });
       return null;
     }
